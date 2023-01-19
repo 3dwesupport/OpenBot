@@ -1,10 +1,11 @@
 package org.openbot.common;
 
-import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.openbot.R;
 import org.openbot.model.Category;
 import org.openbot.model.SubCategory;
+
+import java.util.ArrayList;
 
 public class FeatureList {
   // region Properties
