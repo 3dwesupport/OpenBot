@@ -277,6 +277,8 @@ public class AutopilotFragment extends CameraFragment {
 
   @Override
   public synchronized void onResume() {
+    croppedBitmap = null;
+    tracker = null;
     handlerThread = new HandlerThread("inference");
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
@@ -286,7 +288,6 @@ public class AutopilotFragment extends CameraFragment {
 
   @Override
   public synchronized void onPause() {
-    croppedBitmap = null;
     handlerThread.quitSafely();
     try {
       handlerThread.join();
