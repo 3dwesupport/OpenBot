@@ -81,7 +81,6 @@ public class BluetoothManager {
           @Override
           public void onLeScan(BleDevice device, int rssi, byte[] scanRecord) {
             for (BleDevice d : deviceList) {
-              if (device != null)
                 if (device.address.equals(d.address)) {
                   return;
                 }

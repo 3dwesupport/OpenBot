@@ -31,7 +31,6 @@ public class ScanDeviceAdapter extends CommonRecyclerViewAdapter<BleDevice> {
     TextView tvName = (TextView) holder.mViews.get(R.id.ble_name);
     TextView tvAddress = (TextView) holder.mViews.get(R.id.ble_address);
     TextView tvConnectionState = (TextView) holder.mViews.get(R.id.ble_connection_state);
-    if (data != null) {
       tvName.setText(data.name);
       tvAddress.setText(data.address);
       if (data.connecting) {
@@ -44,6 +43,5 @@ public class ScanDeviceAdapter extends CommonRecyclerViewAdapter<BleDevice> {
         tvConnectionState.setText("Connect");
         tvConnectionState.setTextColor(Color.BLACK);
       }
-    }
   }
 }
