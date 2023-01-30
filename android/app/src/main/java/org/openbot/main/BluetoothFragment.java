@@ -15,20 +15,24 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.ficat.easyble.BleDevice;
 import com.ficat.easyble.BleManager;
 import com.ficat.easypermissions.EasyPermissions;
 import com.ficat.easypermissions.RequestExecutor;
 import com.ficat.easypermissions.bean.Permission;
-import java.util.List;
+
 import org.openbot.OpenBotApplication;
 import org.openbot.R;
 import org.openbot.databinding.FragmentBluetoothBinding;
 import org.openbot.vehicle.Vehicle;
+
+import java.util.List;
 
 public class BluetoothFragment extends Fragment {
   private RecyclerView rv;
@@ -81,7 +85,6 @@ public class BluetoothFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @NonNull Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    if (!BleManager.isBluetoothOn()) BleManager.toggleBluetooth(true);
     // for most devices whose version is over Android6,scanning may need GPS permission
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !isGpsOn()) {
       startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
@@ -119,6 +122,7 @@ public class BluetoothFragment extends Fragment {
   private void checkPermission(boolean grantAll) {
     TextView tv = getView().findViewById(R.id.btn_refresh);
     if (grantAll) {
+      if (!BleManager.isBluetoothOn()) BleManager.toggleBluetooth(true);
       tv.setOnClickListener(
           new View.OnClickListener() {
             @Override

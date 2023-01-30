@@ -5,7 +5,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
+
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.ficat.easyble.BleDevice;
 import com.ficat.easyble.BleManager;
 import com.ficat.easyble.Logger;
@@ -15,13 +17,15 @@ import com.ficat.easyble.gatt.callback.BleConnectCallback;
 import com.ficat.easyble.gatt.callback.BleNotifyCallback;
 import com.ficat.easyble.gatt.callback.BleWriteCallback;
 import com.ficat.easyble.scan.BleScanCallback;
+
+import org.openbot.main.ScanDeviceAdapter;
+import org.openbot.utils.Constants;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.openbot.main.ScanDeviceAdapter;
-import org.openbot.utils.Constants;
 
 public class BluetoothManager {
   private BleManager manager;
@@ -51,9 +55,6 @@ public class BluetoothManager {
     if (!BleManager.supportBle(this.context)) {
       return;
     }
-    // open bluetooth without a request dialog
-    BleManager.toggleBluetooth(true);
-
     BleManager.ScanOptions scanOptions =
         BleManager.ScanOptions.newInstance()
             .scanPeriod(4000)
