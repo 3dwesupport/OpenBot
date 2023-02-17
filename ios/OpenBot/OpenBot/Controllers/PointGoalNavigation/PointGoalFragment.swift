@@ -10,7 +10,7 @@ import ARKit
 class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
 
     var sceneView: ARSCNView!
-    private var startingPoint: SCNNode!
+    private var startingPoint = SCNNode()
     private var endingPoint: SCNNode!
     private var distanceInput: UITextField!
     private var setGoalRect = UIView();
@@ -158,10 +158,11 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         marker.geometry?.firstMaterial?.diffuse.contents = UIColor.red
         sceneView.scene.rootNode.addChildNode(marker)
         if startingPoint == nil {
-            startingPoint = marker
+            startingPoint.position = camera.position;
         } else {
             endingPoint = marker
-            calculateRoute()
+            calculateRoute();
+            travelThroughNode();
         }
     }
 
@@ -177,6 +178,28 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     func calculateRoute() {
         let distance = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition)
         let direction = simd_normalize(endingPoint.simdPosition - startingPoint.simdPosition)
+        print(distance, direction)
+    }
+
+    func travelThroughNode(){
+        let path = [startingPoint.position, endingPoint.position]
+        let moveAction = SCNAction.sequence([
+            SCNAction.move(to: path[0], duration: 0),
+            SCNAction.move(to: path[1], duration: 2.0) // Change duration as needed
+        ])
+        let nodeToMove = SCNNode(geometry: SCNSphere(radius: 0.01))
+        nodeToMove.position = startingPoint.position
+        nodeToMove.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
+        sceneView.scene.rootNode.addChildNode(nodeToMove)
+        nodeToMove.runAction(moveAction)
+        let logIntervals = [0.0, 0.5, 1.0, 1.5, 2.0]
+        nodeToMove.runAction(moveAction, completionHandler: {
+            for t in logIntervals {
+                let position = nodeToMove.presentation.position
+                print("Time: \(t), Position: (\(position.x), \(position.y), \(position.z))")
+            }
+        })
+
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
