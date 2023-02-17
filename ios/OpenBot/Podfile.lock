@@ -1,23 +1,6 @@
 PODS:
-  - ARCore (1.35.0):
-    - ARCore/Base (= 1.35.0)
-  - ARCore/Base (1.35.0):
-    - GoogleDataTransport (~> 9.2)
-    - nanopb (< 2.30910.0, >= 2.30908.0)
   - DropDown (2.3.13)
-  - GoogleDataTransport (9.2.1):
-    - GoogleUtilities/Environment (~> 7.7)
-    - nanopb (< 2.30910.0, >= 2.30908.0)
-    - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/Environment (7.11.0):
-    - PromisesObjC (< 3.0, >= 1.2)
   - GoogleWebRTC (1.1.31999)
-  - nanopb (2.30909.0):
-    - nanopb/decode (= 2.30909.0)
-    - nanopb/encode (= 2.30909.0)
-  - nanopb/decode (2.30909.0)
-  - nanopb/encode (2.30909.0)
-  - PromisesObjC (2.1.1)
   - Starscream (3.0.6)
   - TensorFlowLiteC (0.0.1-nightly.20221227):
     - TensorFlowLiteC/Core (= 0.0.1-nightly.20221227)
@@ -36,7 +19,6 @@ PODS:
     - TensorFlowLiteSwift/Core (= 0.0.1-nightly.20221227)
 
 DEPENDENCIES:
-  - ARCore
   - DropDown
   - GoogleWebRTC
   - Starscream (~> 3.0.1)
@@ -45,29 +27,19 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - ARCore
     - DropDown
-    - GoogleDataTransport
-    - GoogleUtilities
     - GoogleWebRTC
-    - nanopb
-    - PromisesObjC
     - Starscream
     - TensorFlowLiteC
     - TensorFlowLiteSwift
 
 SPEC CHECKSUMS:
-  ARCore: b7ce7f400275982eb26a2e19deb3bab5cea062fc
   DropDown: 8a2116376c1981888557f72ec2ffc9a5e0e456ec
-  GoogleDataTransport: ea169759df570f4e37bdee1623ec32a7e64e67c4
-  GoogleUtilities: c2bdc4cf2ce786c4d2e6b3bcfd599a25ca78f06f
   GoogleWebRTC: b39a78c4f5cc6b0323415b9233db03a2faa7b0f0
-  nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
-  PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   TensorFlowLiteC: e1bb000be1bc8e93172becb0d3ac6c55b46f7ff9
   TensorFlowLiteSwift: c2f36a053eaf7b786d3b960f5dcfac069c7e94ea
 
-PODFILE CHECKSUM: aafa8646f17d53470ddf4aa43c9a0d9809be6d19
+PODFILE CHECKSUM: 6ad387c784c40c8a2265fbb548a75abdbfaa2f10
 
 COCOAPODS: 1.10.2

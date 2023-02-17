@@ -160,4 +160,12 @@ struct Strings {
     static let sendCommand: String = "Send Commands"
     static let lightLabel: String = "Lights"
 
+    //Navigation
+    static let setGoal : String = "Set Goal"
+    static let setGoalText : String = "Mount the phone on the robot and \n specify a goal. The robot will try to\n react the goal after pressing start."
+    static let left : String = "Left"
+    static let meter : String = "[m]";
+    static let start : String = "START";
+    static let canceled : String = "CANCEL"
+
 }
