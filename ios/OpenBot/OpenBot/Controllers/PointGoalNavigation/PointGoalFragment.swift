@@ -6,6 +6,7 @@ import Foundation
 import UIKit
 import SceneKit
 import ARKit
+import simd
 
 class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegate {
 
@@ -23,6 +24,9 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private var distance: Float = 0;
     private var forward: Float = 0;
     private var left: Float = 0;
+    private var isReached : Bool = false;
+    var marker = SCNNode();
+    let infoMessageRect = UIView();
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,14 +34,21 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
                 .bounds)
         view.addSubview(sceneView)
         let scene = SCNScene()
-        sceneView.scene = scene
+        sceneView.scene = scene;
         let configuration = ARWorldTrackingConfiguration()
-        sceneView.session.run(configuration)
-        sceneView.delegate = self
-        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
-        createSetGoalRect()
+        sceneView.session.run(configuration);
+        sceneView.delegate = self;
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints];
+        createSetGoalRect();
+        createReachMessage();
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
+
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated);
+        sceneView.session.pause();
     }
 
     func createSetGoalRect() {
@@ -49,6 +60,34 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         createForwardLeftLabels();
         createInputBoxes();
         createButtons()
+    }
+
+    func createReachMessage() {
+        infoMessageRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 200);
+        infoMessageRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white;
+        let infoText = createLabel(text: Strings.info, fontSize: 18, textColor: Colors.bdColor!);
+        infoMessageRect.addSubview(infoText)
+        infoText.translatesAutoresizingMaskIntoConstraints = false;
+        infoText.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: 30).isActive = true;
+        infoText.topAnchor.constraint(equalTo: infoMessageRect.topAnchor, constant: 30).isActive = true;
+        let goalReachedText = createLabel(text: "Goal reached", fontSize: 16, textColor: Colors.bdColor!);
+        infoMessageRect.addSubview(goalReachedText);
+        goalReachedText.translatesAutoresizingMaskIntoConstraints = false
+        goalReachedText.leadingAnchor.constraint(equalTo: infoText.leadingAnchor, constant: 0).isActive = true;
+        goalReachedText.topAnchor.constraint(equalTo: infoText.bottomAnchor, constant: 30).isActive = true;
+
+
+        let stopButton = createLabelButtons(title: Strings.stop, selector: #selector(stop(_:)))
+        infoMessageRect.addSubview(stopButton);
+        stopButton.translatesAutoresizingMaskIntoConstraints = false;
+        stopButton.leadingAnchor.constraint(equalTo: infoMessageRect.leadingAnchor, constant: width / 2 - 30).isActive = true;
+        stopButton.bottomAnchor.constraint(equalTo: infoMessageRect.topAnchor, constant: infoMessageRect.frame.height - 30).isActive = true;
+
+        let restartButton = createLabelButtons(title: Strings.restart, selector: #selector(restart(_:)))
+        infoMessageRect.addSubview(restartButton);
+        restartButton.translatesAutoresizingMaskIntoConstraints = false;
+        restartButton.trailingAnchor.constraint(equalTo: infoMessageRect.trailingAnchor, constant: -30).isActive = true;
+        restartButton.bottomAnchor.constraint(equalTo: stopButton.bottomAnchor, constant: 0).isActive = true;
     }
 
     func createSetGoalText() {
@@ -103,12 +142,12 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     }
 
     func createButtons() {
-        let cancelButton = createLabelButtons(title: Strings.canceled, color: "black", selector: #selector(cancelFun(_:)))
+        let cancelButton = createLabelButtons(title: Strings.canceled, selector: #selector(cancelFun(_:)))
         setGoalRect.addSubview(cancelButton);
         cancelButton.translatesAutoresizingMaskIntoConstraints = false;
         cancelButton.leadingAnchor.constraint(equalTo: setGoalText.leadingAnchor, constant: 0).isActive = true;
         cancelButton.bottomAnchor.constraint(equalTo: setGoalRect.bottomAnchor, constant: -15).isActive = true;
-        let startButton = createLabelButtons(title: Strings.start, color: "black", selector: #selector(doneFun(_:)))
+        let startButton = createLabelButtons(title: Strings.start, selector: #selector(doneFun(_:)));
         setGoalRect.addSubview(startButton);
         startButton.translatesAutoresizingMaskIntoConstraints = false;
         startButton.bottomAnchor.constraint(equalTo: setGoalRect.bottomAnchor, constant: -15).isActive = true;
@@ -123,7 +162,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         return label;
     }
 
-    func createLabelButtons(title: String, color: String, selector: Selector) -> UIButton {
+    func createLabelButtons(title: String, selector: Selector) -> UIButton {
         let button = UIButton();
         button.setTitleColor(.blue, for: .normal);
         button.frame.size = CGSize(width: 100, height: 40);
@@ -138,68 +177,77 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         textField.layer.masksToBounds = true;
         textField.layer.borderColor = UIColor(named: "red")?.cgColor
         textField.layer.borderWidth = 1.0;
-        textField.keyboardType = .decimalPad;
+        textField.keyboardType = .default;
         return textField;
     }
 
     @objc func doneFun(_ sender: UIView) {
         setGoalRect.removeFromSuperview();
-        var forwardDistance = (forwardInput == nil ? 0 : Float(forwardInput.text ?? "0")) ?? 0
+        isReached = false;
+        let forwardDistance = (forwardInput.text == nil ? 0 : Float(forwardInput.text ?? "0")) ?? 0
         let camera = sceneView.pointOfView!
         let cameraTransform = camera.transform
-        let cameraOrientation = SCNVector3(-cameraTransform.m31, -cameraTransform.m32, -cameraTransform.m33)
-        var forwardPosition = SCNVector3(camera.position.x, camera.position.y, camera.position.z - Float(forwardDistance));
-        let LeftDistance = (leftInput == nil ? 0 : Float(leftInput.text ?? "0")) ?? 0
+        _ = SCNVector3(-cameraTransform.m31, -cameraTransform.m32, -cameraTransform.m33)
+        let forwardPosition = SCNVector3(camera.position.x, camera.position.y, camera.position.z - Float(forwardDistance));
+        let LeftDistance = (leftInput.text == nil ? 0 : Float(leftInput.text ?? "0")) ?? 0
         let cameraRightOrientation = SCNVector3(-cameraTransform.m11, -cameraTransform.m12, -cameraTransform.m13);
         let leftPosition = SCNVector3(camera.position.x + cameraRightOrientation.x * LeftDistance, camera.position.y + cameraRightOrientation.y * LeftDistance, camera.position.z + cameraRightOrientation.z * LeftDistance) // Calculate the marker position based on the right orientation of the camera and the distance
-        let marker = SCNNode(geometry: SCNSphere(radius: 0.01))
+        marker = SCNNode(geometry: SCNSphere(radius: 0.01))
         let resultantVector = addVectors(leftPosition, forwardPosition);
         marker.position = resultantVector
         marker.geometry?.firstMaterial?.diffuse.contents = UIColor.red
         sceneView.scene.rootNode.addChildNode(marker)
-        if startingPoint == nil {
-            startingPoint.position = camera.position;
-        } else {
-            endingPoint = marker
-            calculateRoute();
-            travelThroughNode();
-        }
+        startingPoint.position = camera.position;
+        endingPoint = marker
+        calculateRoute();
     }
+
+    @objc func stop(_ sender: UIView) {
+        _ = navigationController?.popViewController(animated: true)
+    }
+
+    @objc func restart(_ sender: UIView) {
+        infoMessageRect.removeFromSuperview();
+        view.addSubview(setGoalRect);
+
+    }
+
 
     func addVectors(_ vector1: SCNVector3, _ vector2: SCNVector3) -> SCNVector3 {
-        return SCNVector3(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z)
+         SCNVector3(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z)
     }
 
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        guard let camera = sceneView.pointOfView else {
+            return
+        }
+        checkCameraPosition(position: camera.presentation.simdPosition);
+    }
+
+
+// Define a distance threshold for triggering the event
+    let distanceThreshold: Float = 0.05 // adjust this value as needed
+
+    func checkCameraPosition(position: simd_float3) {
+        if endingPoint != nil && isReached != true {
+            distance = simd_distance(position, endingPoint.simdPosition)
+            if distance <= distanceThreshold {
+                DispatchQueue.main.async {
+                    self.view.addSubview(self.infoMessageRect);
+                    self.isReached = true;
+                    self.marker.removeFromParentNode();
+                }
+            }
+        }
+    }
 
     @objc func cancelFun(_ sender: UIView) {
         _ = navigationController?.popViewController(animated: true)
     }
 
     func calculateRoute() {
-        let distance = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition)
+        _ = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition)
         let direction = simd_normalize(endingPoint.simdPosition - startingPoint.simdPosition)
-        print(distance, direction)
-    }
-
-    func travelThroughNode(){
-        let path = [startingPoint.position, endingPoint.position]
-        let moveAction = SCNAction.sequence([
-            SCNAction.move(to: path[0], duration: 0),
-            SCNAction.move(to: path[1], duration: 2.0) // Change duration as needed
-        ])
-        let nodeToMove = SCNNode(geometry: SCNSphere(radius: 0.01))
-        nodeToMove.position = startingPoint.position
-        nodeToMove.geometry?.firstMaterial?.diffuse.contents = UIColor.blue
-        sceneView.scene.rootNode.addChildNode(nodeToMove)
-        nodeToMove.runAction(moveAction)
-        let logIntervals = [0.0, 0.5, 1.0, 1.5, 2.0]
-        nodeToMove.runAction(moveAction, completionHandler: {
-            for t in logIntervals {
-                let position = nodeToMove.presentation.position
-                print("Time: \(t), Position: (\(position.x), \(position.y), \(position.z))")
-            }
-        })
-
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -210,6 +258,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
+
 }
 
 

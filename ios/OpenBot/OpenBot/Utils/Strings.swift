@@ -167,5 +167,6 @@ struct Strings {
     static let meter : String = "[m]";
     static let start : String = "START";
     static let canceled : String = "CANCEL"
-
+    static let info : String = "Info"
+    static let restart : String = "Restart"
 }
