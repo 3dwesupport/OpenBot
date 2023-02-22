@@ -124,7 +124,6 @@ class ObjectTrackingFragment: CameraController {
             NotificationCenter.default.post(name: .updateSpeedLabel, object: String(Int(left)) + "," + String(Int(right)));
             NotificationCenter.default.post(name: .updateRpmLabel, object: String(Int(control.getLeft())) + "," + String(Int(control.getRight())));
             vehicleControl = control;
-            //print("c" + String(left) + "," + String(right) + "\n");
             bluetooth.sendData(payload: "c" + String(left) + "," + String(right) + "\n");
         }
     }
@@ -319,4 +318,6 @@ class ObjectTrackingFragment: CameraController {
             gameController.sendControlFromPhoneController(control: Control(left: Float(Double(leftSpeed ?? "0.0") ?? 0.0), right: Float(Double(rightSpeed ?? "0.0") ?? 0.0)));
         }
     }
+
+
 }

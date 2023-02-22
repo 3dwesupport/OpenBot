@@ -179,4 +179,8 @@ class Common {
         }
         return "unnamed"
     }
+
+   static func returnNavigationModel()->ModelItem{
+        returnModelItem(modelName: "PilotNet-Goal")
+    }
 }

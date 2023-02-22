@@ -9,7 +9,6 @@ import Accelerate
 extension CVPixelBuffer {
     /// Returns thumbnail by cropping pixel buffer to biggest square and scaling the cropped image to model dimensions.
     func resized(to size: CGSize) -> CVPixelBuffer? {
-
         let imageWidth = CVPixelBufferGetWidth(self)
         let imageHeight = CVPixelBufferGetHeight(self)
         let pixelBufferType = CVPixelBufferGetPixelFormatType(self)

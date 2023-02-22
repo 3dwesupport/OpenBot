@@ -24,12 +24,19 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private var distance: Float = 0;
     private var forward: Float = 0;
     private var left: Float = 0;
-    private var isReached : Bool = false;
+    private var isReached: Bool = false;
     var marker = SCNNode();
     let infoMessageRect = UIView();
+    var navigation: Navigation?
+    let numberOfThreads = 1;
+    private var isInferenceQueueBusy = false;
+    private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
+    private var result: Control?
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         sceneView = ARSCNView(frame: view
                 .bounds)
         view.addSubview(sceneView)
@@ -43,6 +50,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         createReachMessage();
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        navigation = Navigation(model: Model.fromModelItem(item: Common.returnNavigationModel()), device: RuntimeDevice.CPU, numThreads: 1);
 
     }
 
@@ -61,6 +69,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         createInputBoxes();
         createButtons()
     }
+
 
     func createReachMessage() {
         infoMessageRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 200);
@@ -197,7 +206,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         marker.position = resultantVector
         marker.geometry?.firstMaterial?.diffuse.contents = UIColor.red
         sceneView.scene.rootNode.addChildNode(marker)
-        startingPoint.position = camera.position;
+        startingPoint.position = sceneView.pointOfView?.position ?? camera.position;
         endingPoint = marker
         calculateRoute();
     }
@@ -214,13 +223,81 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
 
 
     func addVectors(_ vector1: SCNVector3, _ vector2: SCNVector3) -> SCNVector3 {
-         SCNVector3(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z)
+        SCNVector3(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z)
     }
 
+
+    func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
+        guard let currentFrame = self.sceneView.session.currentFrame else {
+            return
+        }
+
+        let pixelBuffer = currentFrame.capturedImage
+        let pixelBufferType = CVPixelBufferGetPixelFormatType(pixelBuffer)
+
+        if pixelBufferType != kCVPixelFormatType_32BGRA && pixelBufferType != kCVPixelFormatType_32ARGB {
+            // Create a new CVPixelBuffer with the desired pixel format
+            var convertedPixelBuffer: CVPixelBuffer?
+            let status = CVPixelBufferCreate(nil, CVPixelBufferGetWidth(pixelBuffer), CVPixelBufferGetHeight(pixelBuffer), kCVPixelFormatType_32BGRA, nil, &convertedPixelBuffer)
+            guard status == kCVReturnSuccess else {
+                return
+            }
+
+            // Lock the original and converted pixel buffers
+            CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
+            CVPixelBufferLockBaseAddress(convertedPixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+
+            // Get the base address of the original and converted pixel buffers
+            let sourceBaseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
+            let destBaseAddress = CVPixelBufferGetBaseAddress(convertedPixelBuffer!)
+
+            // Copy the data from the original to the converted pixel buffer
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+            let destBytesPerRow = CVPixelBufferGetBytesPerRow(convertedPixelBuffer!)
+            let sourceBuffer = sourceBaseAddress!.assumingMemoryBound(to: UInt8.self)
+            let destBuffer = destBaseAddress!.assumingMemoryBound(to: UInt8.self)
+            for y in 0 ..< CVPixelBufferGetHeight(pixelBuffer) {
+                memcpy(destBuffer + y * destBytesPerRow, sourceBuffer + y * bytesPerRow, bytesPerRow)
+            }
+
+            // Unlock the original and converted pixel buffers
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
+            CVPixelBufferUnlockBaseAddress(convertedPixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+
+            // Use the converted pixel buffer
+            processPixelBuffer(convertedPixelBuffer!)
+        } else {
+            // Use the original pixel buffer
+            processPixelBuffer(pixelBuffer)
+        }
+    }
+
+    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer) {
+        if pixelBuffer == nil{
+            return
+        }
+        guard !isInferenceQueueBusy else {
+            return
+        }
+        inferenceQueue.async {
+            self.isInferenceQueueBusy = true;
+            self.result = self.navigation?.recognizeImage(pixelBuffer: pixelBuffer, goalDistance: self.distance, goalSin: 0.45, goalCos: 0.45);
+            print(self.result?.getLeft() , self.result?.getRight());
+            self.isInferenceQueueBusy = false;
+        }
+    }
+
+
+
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        if endingPoint != nil {
+            computeDeltaYaw(pose: renderer.pointOfView?.position ?? SCNVector3(), goalPose: endingPoint.position)
+
+        }
         guard let camera = sceneView.pointOfView else {
             return
         }
+
         checkCameraPosition(position: camera.presentation.simdPosition);
     }
 
@@ -228,7 +305,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
 // Define a distance threshold for triggering the event
     let distanceThreshold: Float = 0.05 // adjust this value as needed
 
-    func checkCameraPosition(position: simd_float3) {
+    func checkCameraPosition(position: simd_float3){
         if endingPoint != nil && isReached != true {
             distance = simd_distance(position, endingPoint.simdPosition)
             if distance <= distanceThreshold {
@@ -246,8 +323,9 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     }
 
     func calculateRoute() {
-        _ = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition)
+        _ = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition);
         let direction = simd_normalize(endingPoint.simdPosition - startingPoint.simdPosition)
+        print(tan(computeDeltaYaw(pose: startingPoint.position, goalPose: endingPoint.position)))
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -259,6 +337,50 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         view.endEditing(true)
     }
 
+    func computeDeltaYaw(pose: SCNVector3, goalPose: SCNVector3) -> Float {
+        let dotProduct = SCNVector3DotProduct(pose, goalPose)
+        let crossProduct = SCNVector3CrossProduct(pose, goalPose)
+        let magnitude = sqrt(pow(crossProduct.x, 2) + pow(crossProduct.y, 2) + pow(crossProduct.z, 2))
+        let goal = SCNVector3(goalPose.x - pose.x, 0, goalPose.z - pose.z)
+        // compute cross product and dot product
+        let cross = SCNVector3CrossProduct(pose, goal)
+        let dot = SCNVector3DotProduct(pose, goal)
+
+        // compute angle using atan2
+        let angle = atan2(magnitude, dot);
+        // compute sign of angle using cross product
+        let sign = signum(cross.y)
+        print(angle * sign);
+        return angle * sign
+    }
+
+
+// Utility functions for dot and cross products
+    func SCNVector3DotProduct(_ a: SCNVector3, _ b: SCNVector3) -> Float {
+        return a.x * b.x + a.y * b.y + a.z * b.z
+    }
+
+    func SCNVector3CrossProduct(_ a: SCNVector3, _ b: SCNVector3) -> SCNVector3 {
+        return SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    }
+
+    func signum(_ x: Float) -> Float {
+        if x > 0 {
+            return 1
+        } else if x < 0 {
+            return -1
+        } else {
+            return 0
+        }
+    }
+
+
+}
+
+extension SCNVector3 {
+    var simdVector: simd_float3 {
+        return simd_float3(x, y, z)
+    }
 }
 
 
