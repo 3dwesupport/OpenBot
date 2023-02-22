@@ -186,7 +186,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         textField.layer.masksToBounds = true;
         textField.layer.borderColor = UIColor(named: "red")?.cgColor
         textField.layer.borderWidth = 1.0;
-        textField.keyboardType = .default;
+        textField.keyboardType = .numbersAndPunctuation;
         return textField;
     }
 
