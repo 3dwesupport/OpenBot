@@ -32,13 +32,15 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private var isInferenceQueueBusy = false;
     private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
     private var result: Control?
+    let bluetooth = bluetoothDataController.shared;
 
-
+    ///
+    /// function called after view of point goal navigation is called
     override func viewDidLoad() {
         super.viewDidLoad()
-
         sceneView = ARSCNView(frame: view
                 .bounds)
+        sceneView.debugOptions = []
         view.addSubview(sceneView)
         let scene = SCNScene()
         sceneView.scene = scene;
@@ -54,11 +56,16 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
 
     }
 
+    ///
+    /// function will called after point goal navigation will disappear. This method will stop the arkit
+    /// - Parameter animated:
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated);
         sceneView.session.pause();
     }
 
+    ///
+    /// function to create the UI of point goal navigation. This function will called all the method that create different UI
     func createSetGoalRect() {
         setGoalRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 300);
         setGoalRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white;
@@ -70,7 +77,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         createButtons()
     }
 
-
+    ///
+    /// function to create message rect of point goal navigation
     func createReachMessage() {
         infoMessageRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 200);
         infoMessageRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white;
@@ -99,6 +107,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         restartButton.bottomAnchor.constraint(equalTo: stopButton.bottomAnchor, constant: 0).isActive = true;
     }
 
+    ///
+    /// function to create text inside the previous rect
     func createSetGoalText() {
         setGoalText = createLabel(text: Strings.setGoalText, fontSize: 16, textColor: Colors.bdColor!);
         setGoalRect.addSubview(setGoalText);
@@ -108,6 +118,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         setGoalText.topAnchor.constraint(equalTo: setGoalHeading.bottomAnchor, constant: 30).isActive = true;
     }
 
+    ///
+    /// function to create Set Goal heading
     func createSetGoalHeading() {
         setGoalHeading = createLabel(text: Strings.setGoal, fontSize: 18, textColor: Colors.bdColor!);
         setGoalRect.addSubview(setGoalHeading);
@@ -116,6 +128,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         setGoalHeading.topAnchor.constraint(equalTo: setGoalRect.topAnchor, constant: 30).isActive = true;
     }
 
+    ///
+    /// function to create forward and left text on Set goal rect
     func createForwardLeftLabels() {
         forwardLabel = createLabel(text: Strings.forward + Strings.meter, fontSize: 14, textColor: Colors.bdColor!);
         setGoalRect.addSubview(forwardLabel);
@@ -130,6 +144,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         leftLabel.topAnchor.constraint(equalTo: forwardLabel.topAnchor, constant: 0).isActive = true;
     }
 
+    ///
+    /// function to create input boxes for left and forward inputs
     func createInputBoxes() {
         forwardInput = createTextField()
         forwardInput.delegate = self;
@@ -150,6 +166,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         leftInput.heightAnchor.constraint(equalToConstant: 20).isActive = true;
     }
 
+    ///
+    /// function to create cancel and start buttons
     func createButtons() {
         let cancelButton = createLabelButtons(title: Strings.canceled, selector: #selector(cancelFun(_:)))
         setGoalRect.addSubview(cancelButton);
@@ -163,6 +181,13 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         startButton.trailingAnchor.constraint(equalTo: setGoalRect.trailingAnchor, constant: -30).isActive = true;
     }
 
+    ///
+    /// function to create text on rect
+    /// - Parameters:
+    ///   - text: text
+    ///   - fontSize: font size of text
+    ///   - textColor: font color of text
+    /// - Returns: UILabel
     func createLabel(text: String, fontSize: CGFloat, textColor: UIColor) -> UILabel {
         let label = UILabel();
         label.text = text;
@@ -171,6 +196,12 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         return label;
     }
 
+    ///
+    /// create Cancel and start button
+    /// - Parameters:
+    ///   - title: title of button ie. CANCEL or START
+    ///   - selector: function that will invoke after tapping on button
+    /// - Returns: UIButton
     func createLabelButtons(title: String, selector: Selector) -> UIButton {
         let button = UIButton();
         button.setTitleColor(.blue, for: .normal);
@@ -180,6 +211,9 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         return button;
     }
 
+    ///
+    /// function to create input field for forward and left
+    /// - Returns:
     func createTextField() -> UITextField {
         let textField = UITextField();
         textField.layer.cornerRadius = 8;
@@ -190,6 +224,9 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         return textField;
     }
 
+    ///
+    /// function run when tapping on DONE button. It will start the point goal navigation
+    /// - Parameter sender:
     @objc func doneFun(_ sender: UIView) {
         setGoalRect.removeFromSuperview();
         isReached = false;
@@ -211,24 +248,43 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         calculateRoute();
     }
 
+    ///
+    /// function called after tapping on STOP button.This function will remove the point goal navigation view and return back to homepage
+    /// - Parameter sender:
     @objc func stop(_ sender: UIView) {
         _ = navigationController?.popViewController(animated: true)
     }
 
+    ///
+    /// function to restart the point goal navigation
+    /// - Parameter sender:
     @objc func restart(_ sender: UIView) {
         infoMessageRect.removeFromSuperview();
         view.addSubview(setGoalRect);
 
     }
 
-
+    ///
+    /// function to add two SCNVector3 vector
+    /// - Parameters:
+    ///   - vector1: first vector
+    ///   - vector2: second vector
+    /// - Returns: resultant vector of vector1 + vector2
     func addVectors(_ vector1: SCNVector3, _ vector2: SCNVector3) -> SCNVector3 {
         SCNVector3(vector1.x + vector2.x, vector1.y + vector2.y, vector1.z + vector2.z)
     }
 
-
+    ///
+    /// delegate revoke when SceneKit node corresponding to a new AR anchor has been added to the scene.
+    /// - Parameters:
+    ///   - renderer: SCNSceneRenderer,
+    ///   - scene:
+    ///   - time:
     func renderer(_ renderer: SCNSceneRenderer, didRenderScene scene: SCNScene, atTime time: TimeInterval) {
-        guard let currentFrame = self.sceneView.session.currentFrame else {
+        guard let currentFrame = sceneView.session.currentFrame else {
+            return
+        }
+        if isReached {
             return
         }
 
@@ -256,7 +312,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
             let destBytesPerRow = CVPixelBufferGetBytesPerRow(convertedPixelBuffer!)
             let sourceBuffer = sourceBaseAddress!.assumingMemoryBound(to: UInt8.self)
             let destBuffer = destBaseAddress!.assumingMemoryBound(to: UInt8.self)
-            for y in 0 ..< CVPixelBufferGetHeight(pixelBuffer) {
+            for y in 0..<CVPixelBufferGetHeight(pixelBuffer) {
                 memcpy(destBuffer + y * destBytesPerRow, sourceBuffer + y * bytesPerRow, bytesPerRow)
             }
 
@@ -265,39 +321,48 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
             CVPixelBufferUnlockBaseAddress(convertedPixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
 
             // Use the converted pixel buffer
-            processPixelBuffer(convertedPixelBuffer!)
+            if sceneView.pointOfView?.position != nil {
+                processPixelBuffer(convertedPixelBuffer!, sceneView.pointOfView!.position)
+            }
+
         } else {
             // Use the original pixel buffer
-            processPixelBuffer(pixelBuffer)
+            processPixelBuffer(pixelBuffer, sceneView.pointOfView?.position ?? SCNVector3());
         }
     }
 
-    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer) {
-        if pixelBuffer == nil{
-            return
-        }
+    ///
+    /// function to process the buffer and send buffer to navigation.tflite to give result
+    /// - Parameters:
+    ///   - pixelBuffer: pixelBuffer from camera
+    ///   - position: position of camera
+    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ position: SCNVector3) {
+
         guard !isInferenceQueueBusy else {
             return
         }
-        inferenceQueue.async {
-            self.isInferenceQueueBusy = true;
-            self.result = self.navigation?.recognizeImage(pixelBuffer: pixelBuffer, goalDistance: self.distance, goalSin: 0.45, goalCos: 0.45);
-            print(self.result?.getLeft() , self.result?.getRight());
-            self.isInferenceQueueBusy = false;
+        if endingPoint == nil {
+            return;
+        }
+
+        let yaw = computeDeltaYaw(pose: position, goalPose: endingPoint.position);
+        inferenceQueue.async { [self] in
+            isInferenceQueueBusy = true;
+            result = navigation?.recognizeImage(pixelBuffer: pixelBuffer, goalDistance: distance, goalSin: sin(yaw), goalCos: cos(yaw));
+            isInferenceQueueBusy = false;
+            sendControl(left: result?.getLeft() ?? 0, right: result?.getRight() ?? 0);
         }
     }
 
-
-
+    ///
+    /// delegate revoke when SceneKit node corresponding to a new AR anchor has been added to the scene.
+    /// - Parameters:
+    ///   - renderer:
+    ///   - time:
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        if endingPoint != nil {
-            computeDeltaYaw(pose: renderer.pointOfView?.position ?? SCNVector3(), goalPose: endingPoint.position)
-
-        }
         guard let camera = sceneView.pointOfView else {
             return
         }
-
         checkCameraPosition(position: camera.presentation.simdPosition);
     }
 
@@ -305,7 +370,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
 // Define a distance threshold for triggering the event
     let distanceThreshold: Float = 0.05 // adjust this value as needed
 
-    func checkCameraPosition(position: simd_float3){
+    ///
+    /// function to check openBot is reached at point or not
+    /// - Parameter position: position of camera
+    func checkCameraPosition(position: simd_float3) {
         if endingPoint != nil && isReached != true {
             distance = simd_distance(position, endingPoint.simdPosition)
             if distance <= distanceThreshold {
@@ -318,25 +386,41 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         }
     }
 
+    ///
+    /// function to cancel the point goal navigation and return to home
+    /// - Parameter sender:
     @objc func cancelFun(_ sender: UIView) {
         _ = navigationController?.popViewController(animated: true)
     }
 
+    ///
+    /// function to calculate the route to the point
     func calculateRoute() {
         _ = simd_distance(startingPoint.simdPosition, endingPoint.simdPosition);
-        let direction = simd_normalize(endingPoint.simdPosition - startingPoint.simdPosition)
-        print(tan(computeDeltaYaw(pose: startingPoint.position, goalPose: endingPoint.position)))
+        _ = simd_normalize(endingPoint.simdPosition - startingPoint.simdPosition)
     }
 
+    ///
+    /// function called to remove keyboard
+    /// - Parameter textField:
+    /// - Returns:
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder();
         return true
     }
 
+    ///
+    /// function called to remove keyboard
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
 
+    ///
+    /// function to calculate the delta yaw for device position and goal position
+    /// - Parameters:
+    ///   - pose:
+    ///   - goalPose:
+    /// - Returns:
     func computeDeltaYaw(pose: SCNVector3, goalPose: SCNVector3) -> Float {
         let dotProduct = SCNVector3DotProduct(pose, goalPose)
         let crossProduct = SCNVector3CrossProduct(pose, goalPose)
@@ -345,23 +429,27 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         // compute cross product and dot product
         let cross = SCNVector3CrossProduct(pose, goal)
         let dot = SCNVector3DotProduct(pose, goal)
-
         // compute angle using atan2
         let angle = atan2(magnitude, dot);
         // compute sign of angle using cross product
         let sign = signum(cross.y)
-        print(angle * sign);
         return angle * sign
     }
 
-
-// Utility functions for dot and cross products
+    ///
+    /// Utility functions for dot and cross products
     func SCNVector3DotProduct(_ a: SCNVector3, _ b: SCNVector3) -> Float {
-        return a.x * b.x + a.y * b.y + a.z * b.z
+         a.x * b.x + a.y * b.y + a.z * b.z
     }
 
+    ///
+    /// function to do cross product between two vectors
+    /// - Parameters:
+    ///   - a: first vector
+    ///   - b: second vector
+    /// - Returns: cross product of a and b ie. a*b
     func SCNVector3CrossProduct(_ a: SCNVector3, _ b: SCNVector3) -> SCNVector3 {
-        return SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+         SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
     }
 
     func signum(_ x: Float) -> Float {
@@ -374,12 +462,24 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         }
     }
 
+    ///
+    /// function to send commands to openBot via bluetooth
+    /// - Parameters:
+    ///   - left: left speed range -1 to 1
+    ///   - right: right speed range -1 to 1
+    func sendControl(left : Float, right : Float){
+        let leftCommand = (left * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
+        let rightCommand = (right * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
+        bluetooth.sendData(payload: "c" + String(leftCommand) + "," + String(rightCommand) + "\n");
+        print(leftCommand , "    ",rightCommand);
+    }
+
 
 }
 
 extension SCNVector3 {
     var simdVector: simd_float3 {
-        return simd_float3(x, y, z)
+         simd_float3(x, y, z)
     }
 }
 

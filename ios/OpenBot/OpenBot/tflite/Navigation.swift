@@ -40,7 +40,6 @@ class Navigation: Network {
         let scaledSize = CGSize(width: getImageSizeX(), height: getImageSizeY())
         var scaledPixelBuffer : CVPixelBuffer? = nil
         let pixelBufferPixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
-        print(pixelBufferPixelFormat,kCVPixelFormatType_32BGRA,kCVPixelFormatType_32ARGB)
         if pixelBufferPixelFormat == kCVPixelFormatType_32BGRA || pixelBufferPixelFormat == kCVPixelFormatType_32ARGB{
             scaledPixelBuffer = pixelBuffer.resized(to: scaledSize)
 
@@ -49,7 +48,6 @@ class Navigation: Network {
             convertGoalToData(goalDistance: goalDistance, goalSin: goalSin, goalCos: goalCos);
             let inputTensor = try tflite!.input(at: imgIndex);
             if scaledPixelBuffer == nil {
-                print("i am here ")
                 return Control() ;
             }
             guard let rgbData = rgbDataFromBuffer(scaledPixelBuffer!, isModelQuantized: inputTensor.dataType == .uInt8) else {
@@ -60,9 +58,8 @@ class Navigation: Network {
             try tflite?.invoke();
             let outputTensor = try tflite?.output(at: 0);
             let outputSize = outputTensor?.shape.dimensions.reduce(1, { x, y in x * y }) ?? 0
-            print("outputSize", outputSize);
             let outputData = UnsafeMutableBufferPointer<Float32>.allocate(capacity: outputSize)
-            _ = outputTensor?.data.copyBytes(to: outputData)
+            _ = outputTensor?.data.copyBytes(to: outputData);
             return Control(left: outputData[0], right: outputData[1])
         }
         catch {
