@@ -34,6 +34,7 @@ struct Images {
     static let edit = UIImage(named: "edit")
     static let upwardArrow = UIImage(named: "upward-arrow")
     static let openBotLogo = UIImage(named: "openBotLogo");
+    static let gmapMarker = UIImage(named: "gmap_marker")
 
 }
 

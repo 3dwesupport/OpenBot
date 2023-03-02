@@ -426,7 +426,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     }
 
     @objc func serverHandler(_ sender: UIView) {
-//        print("hello server")
+
     }
 
     @objc func updateResolution() {
@@ -477,7 +477,7 @@ class expandSetting: UIView, UITextFieldDelegate, UIScrollViewDelegate {
     }
 
     @objc func delayFieldDidChange(_ sender: UITextField) {
-        print(sender.text as Any)
+
     }
 
     @objc func showDropdown(_ sender: UIButton) {

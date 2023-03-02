@@ -3,6 +3,7 @@
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <accessibilityOverrides isEnabled="YES" boldText="YES" buttonShapes="YES" onOffLabels="YES" increaseContrast="YES" reduceTransparency="YES" dynamicTypePreference="2"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -151,7 +152,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="v1q-HX-51b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2959" y="1656"/>
+            <point key="canvasLocation" x="2957.971014492754" y="1655.3571428571429"/>
         </scene>
         <!--Home Page View Controller-->
         <scene sceneID="8b0-hH-SCr">
@@ -426,7 +427,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="tertiaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.29803921568627451" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.69803921568627447" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

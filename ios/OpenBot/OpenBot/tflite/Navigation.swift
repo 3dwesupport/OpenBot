@@ -5,12 +5,15 @@
 import Foundation
 import TensorFlowLite
 
+var temp: CVPixelBuffer!
+
 class Navigation: Network {
     let IMAGE_MEAN: Float = 0.0;
     let IMAGE_STD: Float = 255.0;
     private var goalIndex: Int = 0;
     private var imgIndex: Int = 0;
     var goalData: Data?
+
     override init(model: Model, device: RuntimeDevice, numThreads: Int) {
         try! super.init(model: model, device: device, numThreads: numThreads)
         do {
@@ -36,21 +39,23 @@ class Navigation: Network {
         }
     }
 
+    var i = 1;
+
     func recognizeImage(pixelBuffer: CVPixelBuffer, goalDistance: Float, goalSin: Float, goalCos: Float) -> Control {
         let scaledSize = CGSize(width: getImageSizeX(), height: getImageSizeY())
-        var scaledPixelBuffer : CVPixelBuffer? = nil
+//        var scaledPixelBuffer: CVPixelBuffer? = nil
         let pixelBufferPixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
-        if pixelBufferPixelFormat == kCVPixelFormatType_32BGRA || pixelBufferPixelFormat == kCVPixelFormatType_32ARGB{
-            scaledPixelBuffer = pixelBuffer.resized(to: scaledSize)
-
-        }
+//        scaledPixelBuffer = pixelBuffer.resizePixelBuffer(pixelBuffer, to: scaledSize);
         do {
             convertGoalToData(goalDistance: goalDistance, goalSin: goalSin, goalCos: goalCos);
             let inputTensor = try tflite!.input(at: imgIndex);
-            if scaledPixelBuffer == nil {
-                return Control() ;
-            }
-            guard let rgbData = rgbDataFromBuffer(scaledPixelBuffer!, isModelQuantized: inputTensor.dataType == .uInt8) else {
+//            if scaledPixelBuffer == nil {
+//                return Control();
+//            }
+
+            let croppedPixelBuffer = pixelBuffer.resizePixelBuffer(pixelBuffer, width: 160, height: 90);
+            temp = croppedPixelBuffer;
+            guard let rgbData = rgbDataFromBuffer(croppedPixelBuffer!, isModelQuantized: inputTensor.dataType == .uInt8) else {
                 return Control(left: 0, right: 0)
             }
             try tflite?.copy(goalData!, toInputAt: goalIndex);
@@ -61,8 +66,7 @@ class Navigation: Network {
             let outputData = UnsafeMutableBufferPointer<Float32>.allocate(capacity: outputSize)
             _ = outputTensor?.data.copyBytes(to: outputData);
             return Control(left: outputData[0], right: outputData[1])
-        }
-        catch {
+        } catch {
 
             print("error:\(error)")
             return Control(left: 0, right: 0)
@@ -73,15 +77,27 @@ class Navigation: Network {
         return Control();
     }
 
+
+    func returnCroppedImage(croppedBuffer: CVPixelBuffer) -> CVPixelBuffer {
+        croppedBuffer
+    }
+
     func convertGoalToData(goalDistance: Float, goalSin: Float, goalCos: Float) {
         var goalBytes: [UInt8] = []
-        let distanceBytes = withUnsafeBytes(of: goalDistance) { Array($0) }
-        let sinBytes = withUnsafeBytes(of: goalSin) { Array($0) }
-        let cosBytes = withUnsafeBytes(of: goalCos) { Array($0) }
+        let distanceBytes = withUnsafeBytes(of: goalDistance) {
+            Array($0)
+        }
+        let sinBytes = withUnsafeBytes(of: goalSin) {
+            Array($0)
+        }
+        let cosBytes = withUnsafeBytes(of: goalCos) {
+            Array($0)
+        }
         goalBytes.append(contentsOf: distanceBytes)
         goalBytes.append(contentsOf: sinBytes)
         goalBytes.append(contentsOf: cosBytes)
         goalData = Data(bytes: &goalBytes, count: goalBytes.count)
     }
+
 
 }

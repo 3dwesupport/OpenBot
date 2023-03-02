@@ -33,8 +33,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
     private var result: Control?
     let bluetooth = bluetoothDataController.shared;
-
-    ///
+    var tempPixelBuffer : CVPixelBuffer!
     /// function called after view of point goal navigation is called
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +52,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
         navigation = Navigation(model: Model.fromModelItem(item: Common.returnNavigationModel()), device: RuntimeDevice.CPU, numThreads: 1);
-
     }
 
     ///
@@ -67,7 +65,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///
     /// function to create the UI of point goal navigation. This function will called all the method that create different UI
     func createSetGoalRect() {
-        setGoalRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 300);
+        setGoalRect.frame = CGRect(x: 30, y: height / 2 - 200, width: width - 60, height: 300);
         setGoalRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white;
         view.addSubview(setGoalRect);
         createSetGoalHeading();
@@ -147,14 +145,14 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///
     /// function to create input boxes for left and forward inputs
     func createInputBoxes() {
-        forwardInput = createTextField()
+        forwardInput = createTextField();
         forwardInput.delegate = self;
         setGoalRect.addSubview(forwardInput);
         forwardInput.translatesAutoresizingMaskIntoConstraints = false;
         forwardInput.leadingAnchor.constraint(equalTo: setGoalRect.leadingAnchor, constant: width / 2 - 100).isActive = true;
         forwardInput.topAnchor.constraint(equalTo: forwardLabel.bottomAnchor, constant: 20).isActive = true;
         forwardInput.widthAnchor.constraint(equalToConstant: 75).isActive = true;
-        forwardInput.heightAnchor.constraint(equalToConstant: 20).isActive = true;
+        forwardInput.heightAnchor.constraint(equalToConstant: 30).isActive = true;
 
         leftInput = createTextField();
         leftInput.delegate = self;
@@ -163,7 +161,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         leftInput.leadingAnchor.constraint(equalTo: leftLabel.leadingAnchor, constant: 0).isActive = true;
         leftInput.topAnchor.constraint(equalTo: leftLabel.bottomAnchor, constant: 20).isActive = true;
         leftInput.widthAnchor.constraint(equalToConstant: 70).isActive = true;
-        leftInput.heightAnchor.constraint(equalToConstant: 20).isActive = true;
+        leftInput.heightAnchor.constraint(equalToConstant: 30).isActive = true;
     }
 
     ///
@@ -216,10 +214,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     /// - Returns:
     func createTextField() -> UITextField {
         let textField = UITextField();
+        textField.frame.size.width = 100;
+        textField.layer.borderWidth = 1;
         textField.layer.cornerRadius = 8;
         textField.layer.masksToBounds = true;
-        textField.layer.borderColor = UIColor(named: "red")?.cgColor
-        textField.layer.borderWidth = 1.0;
         textField.keyboardType = .numbersAndPunctuation;
         return textField;
     }
@@ -238,10 +236,12 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let LeftDistance = (leftInput.text == nil ? 0 : Float(leftInput.text ?? "0")) ?? 0
         let cameraRightOrientation = SCNVector3(-cameraTransform.m11, -cameraTransform.m12, -cameraTransform.m13);
         let leftPosition = SCNVector3(camera.position.x + cameraRightOrientation.x * LeftDistance, camera.position.y + cameraRightOrientation.y * LeftDistance, camera.position.z + cameraRightOrientation.z * LeftDistance) // Calculate the marker position based on the right orientation of the camera and the distance
-        marker = SCNNode(geometry: SCNSphere(radius: 0.01))
+        marker =  SCNNode(geometry: SCNPlane(width: 0.1, height: 0.1))
         let resultantVector = addVectors(leftPosition, forwardPosition);
         marker.position = resultantVector
-        marker.geometry?.firstMaterial?.diffuse.contents = UIColor.red
+        let imageMaterial = SCNMaterial()
+        imageMaterial.diffuse.contents = Images.gmapMarker;
+        marker.geometry?.firstMaterial = imageMaterial
         sceneView.scene.rootNode.addChildNode(marker)
         startingPoint.position = sceneView.pointOfView?.position ?? camera.position;
         endingPoint = marker
@@ -287,47 +287,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         if isReached {
             return
         }
-
         let pixelBuffer = currentFrame.capturedImage
-        let pixelBufferType = CVPixelBufferGetPixelFormatType(pixelBuffer)
-
-        if pixelBufferType != kCVPixelFormatType_32BGRA && pixelBufferType != kCVPixelFormatType_32ARGB {
-            // Create a new CVPixelBuffer with the desired pixel format
-            var convertedPixelBuffer: CVPixelBuffer?
-            let status = CVPixelBufferCreate(nil, CVPixelBufferGetWidth(pixelBuffer), CVPixelBufferGetHeight(pixelBuffer), kCVPixelFormatType_32BGRA, nil, &convertedPixelBuffer)
-            guard status == kCVReturnSuccess else {
-                return
-            }
-
-            // Lock the original and converted pixel buffers
-            CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
-            CVPixelBufferLockBaseAddress(convertedPixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
-
-            // Get the base address of the original and converted pixel buffers
-            let sourceBaseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
-            let destBaseAddress = CVPixelBufferGetBaseAddress(convertedPixelBuffer!)
-
-            // Copy the data from the original to the converted pixel buffer
-            let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
-            let destBytesPerRow = CVPixelBufferGetBytesPerRow(convertedPixelBuffer!)
-            let sourceBuffer = sourceBaseAddress!.assumingMemoryBound(to: UInt8.self)
-            let destBuffer = destBaseAddress!.assumingMemoryBound(to: UInt8.self)
-            for y in 0..<CVPixelBufferGetHeight(pixelBuffer) {
-                memcpy(destBuffer + y * destBytesPerRow, sourceBuffer + y * bytesPerRow, bytesPerRow)
-            }
-
-            // Unlock the original and converted pixel buffers
-            CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
-            CVPixelBufferUnlockBaseAddress(convertedPixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
-
-            // Use the converted pixel buffer
-            if sceneView.pointOfView?.position != nil {
-                processPixelBuffer(convertedPixelBuffer!, sceneView.pointOfView!.position)
-            }
-
-        } else {
-            // Use the original pixel buffer
-            processPixelBuffer(pixelBuffer, sceneView.pointOfView?.position ?? SCNVector3());
+        if sceneView.pointOfView?.position != nil {
+            processPixelBuffer(pixelBuffer, sceneView.pointOfView!)
+            tempPixelBuffer = pixelBuffer;
         }
     }
 
@@ -336,7 +299,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     /// - Parameters:
     ///   - pixelBuffer: pixelBuffer from camera
     ///   - position: position of camera
-    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ position: SCNVector3) {
+    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ currentPosition: SCNNode ) {
 
         guard !isInferenceQueueBusy else {
             return
@@ -344,10 +307,11 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         if endingPoint == nil {
             return;
         }
-
-        let yaw = computeDeltaYaw(pose: position, goalPose: endingPoint.position);
         inferenceQueue.async { [self] in
             isInferenceQueueBusy = true;
+            let startPose = Pose(tx: currentPosition.position.x, ty: currentPosition.position.y, tz: currentPosition.position.z, qx: currentPosition.orientation.x, qy: currentPosition.orientation.y, qz: currentPosition.orientation.z, qw: currentPosition.orientation.w);
+            let endPose = Pose(tx: endingPoint.position.x, ty: endingPoint.position.y, tz: endingPoint.position.z, qx: endingPoint.orientation.x, qy: endingPoint.orientation.y, qz: endingPoint.orientation.z, qw: endingPoint.orientation.w);
+            let yaw = computeDeltaYaw(pose: startPose, goalPose: endPose);
             result = navigation?.recognizeImage(pixelBuffer: pixelBuffer, goalDistance: distance, goalSin: sin(yaw), goalCos: cos(yaw));
             isInferenceQueueBusy = false;
             sendControl(left: result?.getLeft() ?? 0, right: result?.getRight() ?? 0);
@@ -418,22 +382,28 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///
     /// function to calculate the delta yaw for device position and goal position
     /// - Parameters:
-    ///   - pose:
-    ///   - goalPose:
+    ///   - pose: device position
+    ///   - goalPose: destination position
     /// - Returns:
-    func computeDeltaYaw(pose: SCNVector3, goalPose: SCNVector3) -> Float {
-        let dotProduct = SCNVector3DotProduct(pose, goalPose)
-        let crossProduct = SCNVector3CrossProduct(pose, goalPose)
-        let magnitude = sqrt(pow(crossProduct.x, 2) + pow(crossProduct.y, 2) + pow(crossProduct.z, 2))
-        let goal = SCNVector3(goalPose.x - pose.x, 0, goalPose.z - pose.z)
-        // compute cross product and dot product
-        let cross = SCNVector3CrossProduct(pose, goal)
-        let dot = SCNVector3DotProduct(pose, goal)
-        // compute angle using atan2
-        let angle = atan2(magnitude, dot);
-        // compute sign of angle using cross product
-        let sign = signum(cross.y)
-        return angle * sign
+    func computeDeltaYaw(pose: Pose, goalPose: Pose) -> Float {
+        // compute robot forward axis (global coordinate system)
+        let forward: [Float] = [0.0, 0.0, -1.0]
+        let forwardRotated = pose.rotateVector(vector: forward)
+
+        // distance vector to goal (global coordinate system)
+        let dx = goalPose.tx - pose.tx
+        let dz = goalPose.tz - pose.tz
+
+        let yaw = atan2(forwardRotated[2], forwardRotated[0]) - atan2(dz, dx)
+
+        // fit to range (-pi, pi]
+        var resultYaw = yaw
+        if (resultYaw > Float.pi) {
+            resultYaw -= 2 * Float.pi
+        } else if (resultYaw <= -Float.pi) {
+            resultYaw += 2 * Float.pi
+        }
+        return resultYaw
     }
 
     ///
@@ -452,16 +422,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
          SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
     }
 
-    func signum(_ x: Float) -> Float {
-        if x > 0 {
-            return 1
-        } else if x < 0 {
-            return -1
-        } else {
-            return 0
-        }
-    }
-
     ///
     /// function to send commands to openBot via bluetooth
     /// - Parameters:
@@ -471,10 +431,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let leftCommand = (left * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
         let rightCommand = (right * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
         bluetooth.sendData(payload: "c" + String(leftCommand) + "," + String(rightCommand) + "\n");
-        print(leftCommand , "    ",rightCommand);
+//        print(leftCommand , "  ",rightCommand);
     }
-
-
 }
 
 extension SCNVector3 {
@@ -482,7 +440,41 @@ extension SCNVector3 {
          simd_float3(x, y, z)
     }
 }
+class Pose {
+    var tx: Float
+    var ty: Float
+    var tz: Float
+    var qx: Float
+    var qy: Float
+    var qz: Float
+    var qw: Float
 
+    init(tx: Float, ty: Float, tz: Float, qx: Float, qy: Float, qz: Float, qw: Float) {
+        self.tx = tx
+        self.ty = ty
+        self.tz = tz
+        self.qx = qx
+        self.qy = qy
+        self.qz = qz
+        self.qw = qw
+    }
 
+    // rotate a vector by this pose's orientation
+    func rotateVector(vector: [Float]) -> [Float] {
+        let x = vector[0]
+        let y = vector[1]
+        let z = vector[2]
 
+        let x2 = qw * x + qy * z - qz * y
+        let y2 = qw * y - qx * z + qz * x
+        let z2 = qw * z + qx * y - qy * x
+        let w2 = -qx * x - qy * y - qz * z
+
+        return [
+            qy * z2 - qz * y2 + qw * x2 + qx * w2,
+            qz * x2 - qx * z2 + qw * y2 + qy * w2,
+            qx * y2 - qy * x2 + qw * z2 + qz * w2
+        ]
+    }
+}
 

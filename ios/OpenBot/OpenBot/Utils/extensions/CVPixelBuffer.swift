@@ -4,7 +4,7 @@
 
 import Foundation
 import Accelerate
-
+import UIKit
 
 extension CVPixelBuffer {
     /// Returns thumbnail by cropping pixel buffer to biggest square and scaling the cropped image to model dimensions.
@@ -12,10 +12,6 @@ extension CVPixelBuffer {
         let imageWidth = CVPixelBufferGetWidth(self)
         let imageHeight = CVPixelBufferGetHeight(self)
         let pixelBufferType = CVPixelBufferGetPixelFormatType(self)
-
-        assert(pixelBufferType == kCVPixelFormatType_32BGRA ||
-                pixelBufferType == kCVPixelFormatType_32ARGB)
-
         let inputImageRowBytes = CVPixelBufferGetBytesPerRow(self)
         let imageChannels = 4
 
@@ -66,5 +62,35 @@ extension CVPixelBuffer {
 
         return scaledPixelBuffer
     }
+
+    ///
+    /// cropping the image by top 30 with given size this function is used by point goal navigation
+    /// - Parameters:
+    ///   - pixelBuffer: pixel of images
+    ///   - cropSize: size to be cropped
+    func resizePixelBuffer(_ pixelBuffer: CVPixelBuffer, width: Int, height: Int) -> CVPixelBuffer? {
+        var resizedPixelBuffer: CVPixelBuffer?
+        let options = [kCVPixelBufferCGImageCompatibilityKey: true,
+                       kCVPixelBufferCGBitmapContextCompatibilityKey: true] as CFDictionary
+
+        CVPixelBufferCreate(nil, width, height, CVPixelBufferGetPixelFormatType(pixelBuffer), options, &resizedPixelBuffer)
+        guard let outputPixelBuffer = resizedPixelBuffer else {
+            return nil
+        }
+
+        let inputImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let ciContext = CIContext()
+        let scaleX = CGFloat(width) / CGFloat(CVPixelBufferGetWidth(pixelBuffer))
+        let scaleY = CGFloat(height) / CGFloat(CVPixelBufferGetHeight(pixelBuffer))
+        let scaleTransform = CGAffineTransform(scaleX: scaleX, y: scaleY)
+
+        ciContext.render(inputImage.transformed(by: scaleTransform),
+                to: outputPixelBuffer,
+                bounds: CGRect(x: 0, y: 0, width: width, height: height),
+                colorSpace: CGColorSpaceCreateDeviceRGB())
+
+        return outputPixelBuffer
+    }
+
 
 }
