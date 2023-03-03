@@ -33,6 +33,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
     private var result: Control?
     let bluetooth = bluetoothDataController.shared;
+    @IBOutlet weak var img: UIImageView!
     var tempPixelBuffer : CVPixelBuffer!
     /// function called after view of point goal navigation is called
     override func viewDidLoad() {
@@ -52,6 +53,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
         navigation = Navigation(model: Model.fromModelItem(item: Common.returnNavigationModel()), device: RuntimeDevice.CPU, numThreads: 1);
+        view.addSubview(img);
     }
 
     ///
@@ -298,6 +300,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     /// function to process the buffer and send buffer to navigation.tflite to give result
     /// - Parameters:
     ///   - pixelBuffer: pixelBuffer from camera
+    ///   - currentPosition:
     ///   - position: position of camera
     func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ currentPosition: SCNNode ) {
 
@@ -309,14 +312,19 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         }
         inferenceQueue.async { [self] in
             isInferenceQueueBusy = true;
+            let originalImage = pixelBuffer.createUIImage(fromPixelBuffer: pixelBuffer, colorSpace: nil);
+            let croppedImage =  originalImage?.resized(to: CGSize(width: 160, height: 90));
             let startPose = Pose(tx: currentPosition.position.x, ty: currentPosition.position.y, tz: currentPosition.position.z, qx: currentPosition.orientation.x, qy: currentPosition.orientation.y, qz: currentPosition.orientation.z, qw: currentPosition.orientation.w);
             let endPose = Pose(tx: endingPoint.position.x, ty: endingPoint.position.y, tz: endingPoint.position.z, qx: endingPoint.orientation.x, qy: endingPoint.orientation.y, qz: endingPoint.orientation.z, qw: endingPoint.orientation.w);
             let yaw = computeDeltaYaw(pose: startPose, goalPose: endPose);
-            result = navigation?.recognizeImage(pixelBuffer: pixelBuffer, goalDistance: distance, goalSin: sin(yaw), goalCos: cos(yaw));
+            result = navigation?.recognizeImage(pixelBuffer: pixelBuffer.buffer(from: croppedImage!) ?? pixelBuffer, goalDistance: distance, goalSin: sin(yaw), goalCos: cos(yaw));
             isInferenceQueueBusy = false;
             sendControl(left: result?.getLeft() ?? 0, right: result?.getRight() ?? 0);
         }
     }
+
+
+
 
     ///
     /// delegate revoke when SceneKit node corresponding to a new AR anchor has been added to the scene.
@@ -431,8 +439,10 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let leftCommand = (left * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
         let rightCommand = (right * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
         bluetooth.sendData(payload: "c" + String(leftCommand) + "," + String(rightCommand) + "\n");
-//        print(leftCommand , "  ",rightCommand);
+        print(leftCommand , "  ",rightCommand);
     }
+
+
 }
 
 extension SCNVector3 {
@@ -440,41 +450,3 @@ extension SCNVector3 {
          simd_float3(x, y, z)
     }
 }
-class Pose {
-    var tx: Float
-    var ty: Float
-    var tz: Float
-    var qx: Float
-    var qy: Float
-    var qz: Float
-    var qw: Float
-
-    init(tx: Float, ty: Float, tz: Float, qx: Float, qy: Float, qz: Float, qw: Float) {
-        self.tx = tx
-        self.ty = ty
-        self.tz = tz
-        self.qx = qx
-        self.qy = qy
-        self.qz = qz
-        self.qw = qw
-    }
-
-    // rotate a vector by this pose's orientation
-    func rotateVector(vector: [Float]) -> [Float] {
-        let x = vector[0]
-        let y = vector[1]
-        let z = vector[2]
-
-        let x2 = qw * x + qy * z - qz * y
-        let y2 = qw * y - qx * z + qz * x
-        let z2 = qw * z + qx * y - qy * x
-        let w2 = -qx * x - qy * y - qz * z
-
-        return [
-            qy * z2 - qz * y2 + qw * x2 + qx * w2,
-            qz * x2 - qx * z2 + qw * y2 + qy * w2,
-            qx * y2 - qy * x2 + qw * z2 + qz * w2
-        ]
-    }
-}
-

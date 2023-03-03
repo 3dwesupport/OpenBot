@@ -48,7 +48,6 @@ extension CVPixelBuffer {
                 free(UnsafeMutableRawPointer(mutating: pointer))
             }
         }
-
         var scaledPixelBuffer: CVPixelBuffer?
 
         // Converts the scaled vImage buffer to CVPixelBuffer
@@ -59,7 +58,6 @@ extension CVPixelBuffer {
             free(scaledImageBytes)
             return nil
         }
-
         return scaledPixelBuffer
     }
 
@@ -67,6 +65,8 @@ extension CVPixelBuffer {
     /// cropping the image by top 30 with given size this function is used by point goal navigation
     /// - Parameters:
     ///   - pixelBuffer: pixel of images
+    ///   - width:
+    ///   - height:
     ///   - cropSize: size to be cropped
     func resizePixelBuffer(_ pixelBuffer: CVPixelBuffer, width: Int, height: Int) -> CVPixelBuffer? {
         var resizedPixelBuffer: CVPixelBuffer?
@@ -91,6 +91,51 @@ extension CVPixelBuffer {
 
         return outputPixelBuffer
     }
+/**
+ generating buffer from UIImage
+ - Parameter image:
+ - Returns: CVPixelBuffer
+ */
+    func buffer(from image: UIImage) -> CVPixelBuffer? {
+        let attrs = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue, kCVPixelBufferCGBitmapContextCompatibilityKey: kCFBooleanTrue] as CFDictionary
+        var pixelBuffer : CVPixelBuffer?
+        let status = CVPixelBufferCreate(kCFAllocatorDefault, Int(image.size.width), Int(image.size.height), kCVPixelFormatType_32ARGB, attrs, &pixelBuffer)
+        guard (status == kCVReturnSuccess) else {
+            return nil
+        }
 
+        CVPixelBufferLockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+        let pixelData = CVPixelBufferGetBaseAddress(pixelBuffer!)
+        let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
+        let context = CGContext(data: pixelData, width: Int(image.size.width), height: Int(image.size.height), bitsPerComponent: 8, bytesPerRow: CVPixelBufferGetBytesPerRow(pixelBuffer!), space: rgbColorSpace, bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue)
+        context?.translateBy(x: 0, y: image.size.height)
+        context?.scaleBy(x: 1.0, y: -1.0)
+        UIGraphicsPushContext(context!)
+        image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+        UIGraphicsPopContext()
+        CVPixelBufferUnlockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+        return pixelBuffer
+    }
+
+    /***
+     function to create UIImage from cvpixelbuffer
+     - Parameters:
+       - pixelBuffer:
+       - colorSpace:
+     - Returns:
+     */
+    func createUIImage(fromPixelBuffer pixelBuffer: CVPixelBuffer, colorSpace: CGColorSpace?) -> UIImage? {
+        // Create a CIImage from the pixel buffer
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer, options: [CIImageOption.colorSpace: colorSpace])
+
+        // Create a UIImage from the CIImage
+        let context = CIContext()
+        if let cgImage = context.createCGImage(ciImage, from: ciImage.extent) {
+            let uiImage = UIImage(cgImage: cgImage)
+            return uiImage
+        }
+
+        return nil
+    }
 
 }

@@ -9,16 +9,12 @@ extension UIImage {
     func flipHorizontally() -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
         let context = UIGraphicsGetCurrentContext()!
-
         context.translateBy(x: size.width / 2, y: size.height / 2)
         context.scaleBy(x: -1.0, y: 1.0)
         context.translateBy(x: -size.width / 2, y: -size.height / 2)
-
         self.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
-
         let newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
-
         return newImage
     }
 
@@ -31,4 +27,6 @@ extension UIImage {
         }
         return image
     }
+
+
 }

@@ -13,7 +13,6 @@ class Navigation: Network {
     private var goalIndex: Int = 0;
     private var imgIndex: Int = 0;
     var goalData: Data?
-
     override init(model: Model, device: RuntimeDevice, numThreads: Int) {
         try! super.init(model: model, device: device, numThreads: numThreads)
         do {
@@ -42,17 +41,9 @@ class Navigation: Network {
     var i = 1;
 
     func recognizeImage(pixelBuffer: CVPixelBuffer, goalDistance: Float, goalSin: Float, goalCos: Float) -> Control {
-        let scaledSize = CGSize(width: getImageSizeX(), height: getImageSizeY())
-//        var scaledPixelBuffer: CVPixelBuffer? = nil
-        let pixelBufferPixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
-//        scaledPixelBuffer = pixelBuffer.resizePixelBuffer(pixelBuffer, to: scaledSize);
         do {
             convertGoalToData(goalDistance: goalDistance, goalSin: goalSin, goalCos: goalCos);
             let inputTensor = try tflite!.input(at: imgIndex);
-//            if scaledPixelBuffer == nil {
-//                return Control();
-//            }
-
             let croppedPixelBuffer = pixelBuffer.resizePixelBuffer(pixelBuffer, width: 160, height: 90);
             temp = croppedPixelBuffer;
             guard let rgbData = rgbDataFromBuffer(croppedPixelBuffer!, isModelQuantized: inputTensor.dataType == .uInt8) else {
@@ -67,14 +58,10 @@ class Navigation: Network {
             _ = outputTensor?.data.copyBytes(to: outputData);
             return Control(left: outputData[0], right: outputData[1])
         } catch {
-
             print("error:\(error)")
             return Control(left: 0, right: 0)
 
         };
-
-
-        return Control();
     }
 
 

@@ -79,6 +79,7 @@
 		727D3D319744DCFF840F7C23 /* HomePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D396BDB689AFF9C3931C6 /* HomePageViewController.swift */; };
 		727D3D7ED38D147ECD48C9BA /* SignalingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D37586F16DE497CEA62CE /* SignalingMessage.swift */; };
 		727D3D8A8059D87F84174B97 /* AdaptiveLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3F45A25D4C4A8A309FFC /* AdaptiveLayoutHelper.swift */; };
+		727D3E1401EFC2497D802866 /* Pose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3AFB1703A1EE56EFBCB2 /* Pose.swift */; };
 		727D3E359F26636BBDC6E3A4 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3C4EBE89B9B6E537BE8B /* Device.swift */; };
 		727D3E6881E8758C94FF74F4 /* GifLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3A51A7A6155C22E62412 /* GifLoader.swift */; };
 		727D3E780CA6260A927019BD /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D368915F3602E605FEA51 /* Client.swift */; };
@@ -179,6 +180,7 @@
 		727D3A55B16EF3CEDA3901BF /* bluetoothDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = bluetoothDataController.swift; sourceTree = "<group>"; };
 		727D3A8D7ACD08EF11740FC2 /* Connection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		727D3ABD8F9F9D0485B435C2 /* VehicleControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VehicleControl.swift; path = Modes/VehicleControl.swift; sourceTree = "<group>"; };
+		727D3AFB1703A1EE56EFBCB2 /* Pose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Pose.swift; path = extensions/Pose.swift; sourceTree = "<group>"; };
 		727D3B76CF73A97A22A8022E /* BluetoothTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BluetoothTable.swift; path = Bluetooth/BluetoothTable.swift; sourceTree = "<group>"; };
 		727D3C3066AD6AA8A45A9E52 /* Navigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		727D3C4EBE89B9B6E537BE8B /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
@@ -298,6 +300,7 @@
 				727D34C4952446BF8CED903D /* ScreenSizeUtil.swift */,
 				4FEF482EC43FA3B64007EBD2 /* JSON.swift */,
 				4FEF4A37AE5E709273A2ED40 /* Date.swift */,
+				727D3AFB1703A1EE56EFBCB2 /* Pose.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -819,6 +822,7 @@
 				4FEF43D0E4F94DBBD4DB0614 /* Date.swift in Sources */,
 				727D3BE24615EE288F4136CC /* PointGoalFragment.swift in Sources */,
 				727D3703B503A12110EE2A9F /* Navigation.swift in Sources */,
+				727D3E1401EFC2497D802866 /* Pose.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
