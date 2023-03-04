@@ -33,7 +33,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
     private var result: Control?
     let bluetooth = bluetoothDataController.shared;
-    @IBOutlet weak var img: UIImageView!
+   
     var tempPixelBuffer : CVPixelBuffer!
     /// function called after view of point goal navigation is called
     override func viewDidLoad() {
@@ -53,7 +53,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
         view.addGestureRecognizer(tap)
         navigation = Navigation(model: Model.fromModelItem(item: Common.returnNavigationModel()), device: RuntimeDevice.CPU, numThreads: 1);
-        view.addSubview(img);
     }
 
     ///
@@ -313,7 +312,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         inferenceQueue.async { [self] in
             isInferenceQueueBusy = true;
             let originalImage = pixelBuffer.createUIImage(fromPixelBuffer: pixelBuffer, colorSpace: nil);
-            let croppedImage =  originalImage?.resized(to: CGSize(width: 160, height: 90));
+            let imgAfterCroppingTop = originalImage?.cropImage(image: originalImage!, toRect: CGRect(x: 0, y: 30, width: (originalImage?.size.width)!, height: (originalImage?.size.height)!))
+            let croppedImage =  imgAfterCroppingTop?.resized(to: CGSize(width: 160, height: 90));
             let startPose = Pose(tx: currentPosition.position.x, ty: currentPosition.position.y, tz: currentPosition.position.z, qx: currentPosition.orientation.x, qy: currentPosition.orientation.y, qz: currentPosition.orientation.z, qw: currentPosition.orientation.w);
             let endPose = Pose(tx: endingPoint.position.x, ty: endingPoint.position.y, tz: endingPoint.position.z, qx: endingPoint.orientation.x, qy: endingPoint.orientation.y, qz: endingPoint.orientation.z, qw: endingPoint.orientation.w);
             let yaw = computeDeltaYaw(pose: startPose, goalPose: endPose);
