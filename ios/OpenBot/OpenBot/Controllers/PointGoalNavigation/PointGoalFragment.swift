@@ -33,8 +33,8 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     private let inferenceQueue = DispatchQueue(label: "openbot.navigation.inferencequeue")
     private var result: Control?
     let bluetooth = bluetoothDataController.shared;
-   
-    var tempPixelBuffer : CVPixelBuffer!
+    var tempPixelBuffer: CVPixelBuffer!
+
     /// function called after view of point goal navigation is called
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,10 +63,34 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         sceneView.session.pause();
     }
 
+    /***
+     Function will call when we change the orientation of our phone
+     - Parameters:
+       - size:
+       - coordinator:
+     */
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        if currentOrientation == .portrait {
+            sceneView.frame.size = CGSize(width: width, height: height);
+             setGoalRect.frame.origin = CGPoint(x: 30, y: height / 2 - 200);
+            infoMessageRect.frame.origin = CGPoint(x: 30, y: height / 2 - 100);
+        } else {
+            sceneView.frame.size = CGSize(width: height, height: width);
+            setGoalRect.frame.origin = CGPoint(x: height/2-setGoalRect.frame.height/2, y: width/2-setGoalRect.frame.width/2)
+            infoMessageRect.frame.origin = CGPoint(x: height/2 - width/2 + 30, y: width/2 - 100 );
+        }
+    }
+
     ///
     /// function to create the UI of point goal navigation. This function will called all the method that create different UI
     func createSetGoalRect() {
-        setGoalRect.frame = CGRect(x: 30, y: height / 2 - 200, width: width - 60, height: 300);
+        if currentOrientation == .portrait{
+            setGoalRect.frame = CGRect(x: 30, y: height / 2 - 200, width: width - 60, height: 300);
+        }
+       else{
+           setGoalRect.frame = CGRect(x: height/2-width/2 + 30, y: width/2 - 150, width: width - 60, height: 300);
+       }
         setGoalRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white;
         view.addSubview(setGoalRect);
         createSetGoalHeading();
@@ -79,7 +103,12 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///
     /// function to create message rect of point goal navigation
     func createReachMessage() {
-        infoMessageRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 200);
+        if currentOrientation == .portrait{
+            infoMessageRect.frame = CGRect(x: 30, y: height / 2 - 100, width: width - 60, height: 200);
+        }
+        else{
+            infoMessageRect.frame = CGRect(x: height/2 - width/2 + 30, y: width/2 - 100 , width: width - 60, height: 200);
+        }
         infoMessageRect.backgroundColor = traitCollection.userInterfaceStyle == .dark ? Colors.bdColor : .white;
         let infoText = createLabel(text: Strings.info, fontSize: 18, textColor: Colors.bdColor!);
         infoMessageRect.addSubview(infoText)
@@ -237,7 +266,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
         let LeftDistance = (leftInput.text == nil ? 0 : Float(leftInput.text ?? "0")) ?? 0
         let cameraRightOrientation = SCNVector3(-cameraTransform.m11, -cameraTransform.m12, -cameraTransform.m13);
         let leftPosition = SCNVector3(camera.position.x + cameraRightOrientation.x * LeftDistance, camera.position.y + cameraRightOrientation.y * LeftDistance, camera.position.z + cameraRightOrientation.z * LeftDistance) // Calculate the marker position based on the right orientation of the camera and the distance
-        marker =  SCNNode(geometry: SCNPlane(width: 0.1, height: 0.1))
+        marker = SCNNode(geometry: SCNPlane(width: 0.1, height: 0.1))
         let resultantVector = addVectors(leftPosition, forwardPosition);
         marker.position = resultantVector
         let imageMaterial = SCNMaterial()
@@ -301,7 +330,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///   - pixelBuffer: pixelBuffer from camera
     ///   - currentPosition:
     ///   - position: position of camera
-    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ currentPosition: SCNNode ) {
+    func processPixelBuffer(_ pixelBuffer: CVPixelBuffer, _ currentPosition: SCNNode) {
 
         guard !isInferenceQueueBusy else {
             return
@@ -313,7 +342,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
             isInferenceQueueBusy = true;
             let originalImage = pixelBuffer.createUIImage(fromPixelBuffer: pixelBuffer, colorSpace: nil);
             let imgAfterCroppingTop = originalImage?.cropImage(image: originalImage!, toRect: CGRect(x: 0, y: 30, width: (originalImage?.size.width)!, height: (originalImage?.size.height)!))
-            let croppedImage =  imgAfterCroppingTop?.resized(to: CGSize(width: 160, height: 90));
+            let croppedImage = imgAfterCroppingTop?.resized(to: CGSize(width: 160, height: 90));
             let startPose = Pose(tx: currentPosition.position.x, ty: currentPosition.position.y, tz: currentPosition.position.z, qx: currentPosition.orientation.x, qy: currentPosition.orientation.y, qz: currentPosition.orientation.z, qw: currentPosition.orientation.w);
             let endPose = Pose(tx: endingPoint.position.x, ty: endingPoint.position.y, tz: endingPoint.position.z, qx: endingPoint.orientation.x, qy: endingPoint.orientation.y, qz: endingPoint.orientation.z, qw: endingPoint.orientation.w);
             let yaw = computeDeltaYaw(pose: startPose, goalPose: endPose);
@@ -322,8 +351,6 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
             sendControl(left: result?.getLeft() ?? 0, right: result?.getRight() ?? 0);
         }
     }
-
-
 
 
     ///
@@ -417,7 +444,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///
     /// Utility functions for dot and cross products
     func SCNVector3DotProduct(_ a: SCNVector3, _ b: SCNVector3) -> Float {
-         a.x * b.x + a.y * b.y + a.z * b.z
+        a.x * b.x + a.y * b.y + a.z * b.z
     }
 
     ///
@@ -427,7 +454,7 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     ///   - b: second vector
     /// - Returns: cross product of a and b ie. a*b
     func SCNVector3CrossProduct(_ a: SCNVector3, _ b: SCNVector3) -> SCNVector3 {
-         SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+        SCNVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
     }
 
     ///
@@ -435,18 +462,16 @@ class PointGoalFragment: UIViewController, ARSCNViewDelegate, UITextFieldDelegat
     /// - Parameters:
     ///   - left: left speed range -1 to 1
     ///   - right: right speed range -1 to 1
-    func sendControl(left : Float, right : Float){
+    func sendControl(left: Float, right: Float) {
         let leftCommand = (left * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
         let rightCommand = (right * 128).rounded(FloatingPointRoundingRule.toNearestOrAwayFromZero);
         bluetooth.sendData(payload: "c" + String(leftCommand) + "," + String(rightCommand) + "\n");
-        print(leftCommand , "  ",rightCommand);
+        print(leftCommand, "  ", rightCommand);
     }
-
-
 }
 
 extension SCNVector3 {
     var simdVector: simd_float3 {
-         simd_float3(x, y, z)
+        simd_float3(x, y, z)
     }
 }
