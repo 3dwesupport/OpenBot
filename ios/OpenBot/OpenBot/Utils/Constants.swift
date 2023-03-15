@@ -48,7 +48,8 @@ struct Colors {
     static let border = UIColor(named: "borderColor")
     static let bdColor = UIColor(named: "bdColor")
     static let navigationColor = UIColor(named: "navigationColor")
-    static let modelDetail = UIColor(named: "modelDetailPopup")
+    static let modelDetail = UIColor(named: "modelDetailPopup");
+    static let accentColor = UIColor(named: "accentColor");
 
 }
 
