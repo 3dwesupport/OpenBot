@@ -101,20 +101,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
         .setFragmentResultListener(
             Constants.KEY_EVENT,
             this,
-            (requestKey, result) -> {
-              KeyEvent event = result.getParcelable(Constants.DATA);
-              if (KeyEvent.ACTION_UP == event.getAction()) {
-                processKeyEvent(result.getParcelable(Constants.DATA));
-              }
-              Control newControl =
-                  vehicle
-                      .getGameController()
-                      .processButtonInput(result.getParcelable(Constants.DATA));
-              if (vehicle.getControl().getLeft() != newControl.getLeft()
-                  && vehicle.getControl().getRight() != newControl.getRight()) {
-                vehicle.setControl(newControl);
-              }
-            });
+            (requestKey, result) -> processKeyEvent(result.getParcelable(Constants.DATA)));
 
     mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
@@ -122,7 +109,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
     startAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.blink);
 
     mViewModel
-        .getDeviceData()
+        .getUsbData()
         .observe(
             getViewLifecycleOwner(),
             data -> {

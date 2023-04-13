@@ -53,7 +53,7 @@
 //------------------------------------------------------//
 
 // Setup the OpenBot version (DIY, PCB_V1, PCB_V2, RTR_TT, RC_CAR, LITE, RTR_520, DIY_ESP32)
-#define OPENBOT RTR_520
+#define OPENBOT RTR_TT
 
 //------------------------------------------------------//
 // SETTINGS - Global settings
@@ -466,8 +466,8 @@ enum msgParts {
 msgParts msgPart = HEADER;
 char header;
 char endChar = '\n';
-const char MAX_MSG_SZ = 60;
-char msg_buf[MAX_MSG_SZ] = "";
+const char MAX_MSG_SZ = 32;
+char msg_buf[MAX_MSG_SZ];
 int msg_idx = 0;
 
 #if (HAS_BLUETOOTH)
@@ -824,8 +824,7 @@ void setup() {
   Serial.println('r');
 
 #if (HAS_BLUETOOTH)
-  String ble_name = "OpenBot: " + robot_type;
-  BLEDevice::init(ble_name.c_str());
+  BLEDevice::init("Openbot BLE");
   bleServer = BLEDevice::createServer();
   bleServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = bleServer->createService(BLEUUID(SERVICE_UUID));
@@ -1714,9 +1713,9 @@ Serial.print(data);
 Serial.println();
 #if (HAS_BLUETOOTH)
   if (deviceConnected) {
-    char outData[MAX_MSG_SZ] = "";
-    for (int i = 0; i < data.length(); i++) {
-      outData[i] = data[i];
+    char outData[50] = "";
+    for (int i = 0; i < dataToSend.length(); i++) {
+      outData[i] = dataToSend[i];
     }
     pTxCharacteristic->setValue(outData);
     pTxCharacteristic->notify();

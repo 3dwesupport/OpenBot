@@ -28,35 +28,20 @@ public class RobotInfoFragment extends ControlsFragment {
   public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    if (vehicle.getConnectionType().equals("USB")) {
-      binding.usbToggle.setVisibility(View.VISIBLE);
-      binding.bleToggle.setVisibility(View.GONE);
-    } else if (vehicle.getConnectionType().equals("Bluetooth")) {
-      binding.bleToggle.setVisibility(View.VISIBLE);
-      binding.usbToggle.setVisibility(View.GONE);
-    }
-
     mViewModel
         .getUsbStatus()
         .observe(getViewLifecycleOwner(), status -> binding.usbToggle.setChecked(status));
 
     binding.usbToggle.setChecked(vehicle.isUsbConnected());
-    binding.bleToggle.setChecked(vehicle.bleConnected());
+
+    binding.usbToggle.setOnCheckedChangeListener((buttonView, isChecked) -> refreshGui());
 
     binding.usbToggle.setOnClickListener(
         v -> {
           binding.usbToggle.setChecked(vehicle.isUsbConnected());
-          Navigation.findNavController(requireView()).navigate(R.id.open_usb_fragment);
+          Navigation.findNavController(requireView()).navigate(R.id.open_settings_fragment);
         });
 
-    binding.bleToggle.setOnClickListener(
-        v -> {
-          binding.bleToggle.setChecked(vehicle.bleConnected());
-          Navigation.findNavController(requireView()).navigate(R.id.open_bluetooth_fragment);
-        });
-
-    binding.usbToggle.setOnCheckedChangeListener((buttonView, isChecked) -> refreshGui());
-    binding.bleToggle.setOnCheckedChangeListener((buttonView, isChecked) -> refreshGui());
     binding.refreshToggle.setOnClickListener(v -> refreshGui());
 
     binding.lightsSlider.addOnChangeListener(
@@ -178,11 +163,5 @@ public class RobotInfoFragment extends ControlsFragment {
         binding.sonarInfo.setText(String.format(Locale.US, "%3.0f cm", vehicle.getSonarReading()));
         break;
     }
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-    binding.bleToggle.setChecked(vehicle.bleConnected());
   }
 }

@@ -20,11 +20,11 @@ public class MainViewModel extends ViewModel {
 
   private final MutableLiveData<String> usbData = new MutableLiveData<>();
 
-  public void setDeviceData(String data) {
+  public void setUsbData(String data) {
     usbData.setValue(data);
   }
 
-  public LiveData<String> getDeviceData() {
+  public LiveData<String> getUsbData() {
     return usbData;
   }
 
