@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A1126EE2A6E4AAF00D6F387 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 3A1126ED2A6E4AAF00D6F387 /* SocketIO */; };
 		3A3C9E0D29E803AC008758C9 /* projectCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A3C9E0C29E803AC008758C9 /* projectCollectionViewCell.xib */; };
 		3A70CA1229C98E5800E4192B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3A70CA1129C98E5800E4192B /* GoogleService-Info.plist */; };
 		3AA7193929DD42CF00DE8336 /* openCode.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3AA7193829DD42CF00DE8336 /* openCode.storyboard */; };
@@ -106,6 +107,7 @@
 		727D3AC020F4956E20B53A9A /* UITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3D5655D02C86CD08281C /* UITextField.swift */; };
 		727D3B42755B3A6BF1C5202F /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3189735FC4F7A4E4A6C1 /* Browser.swift */; };
 		727D3B9525E721AC05B0AD3B /* AdaptedConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D30493151AEA8D4DA58C9 /* AdaptedConstraint.swift */; };
+		727D3CA29A8A252D51ADFDC9 /* WebServerFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D370DA3B356933EB46C5A /* WebServerFragment.swift */; };
 		727D3CCBA2ED9D056786AAC1 /* ProjectFragement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D326C57B2AFC7F2AEEDB1 /* ProjectFragement.swift */; };
 		727D3D05C58FC97350145FFD /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D388488E1FFD98E542061 /* Authentication.swift */; };
 		727D3D2A7DD7B128C9CC969A /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D39B02AB471D9F31B0747 /* Font.swift */; };
@@ -119,6 +121,7 @@
 		727D3EB96F3F1D250E9D32E7 /* ServerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3D5C91B30251F62FA65B /* ServerItem.swift */; };
 		727D3ED3273EC19C2C900543 /* UIDeviceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3F48BB4398A5788D746E /* UIDeviceExtension.swift */; };
 		727D3EFB9016C8224990ACE8 /* ProfileFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3A89E5445B66EEB3177C /* ProfileFragment.swift */; };
+		727D3F6208F0EA111ECDD9E9 /* WebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D353C84B760BD3847A11E /* WebSocketManager.swift */; };
 		727D3FA70675D0042BFBB89A /* ScannerFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3E372C09E1BADA2A03FA /* ScannerFragment.swift */; };
 		BF9BAED828AF94A800EF3E48 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF9BAED728AF94A800EF3E48 /* GameController.framework */; };
 		DB5B604C1844E78F9C021354 /* Pods_OpenBot_OpenBotUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17B6546E3D327621CBEAFCB9 /* Pods_OpenBot_OpenBotUITests.framework */; };
@@ -229,10 +232,12 @@
 		727D32E3FF7FA5BADAAEDBE6 /* WebRTCDelegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebRTCDelegates.swift; path = WebRTC/WebRTCDelegates.swift; sourceTree = "<group>"; };
 		727D33A5A0ABFBC52D7FC371 /* sensorDataRetrieve.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sensorDataRetrieve.swift; sourceTree = "<group>"; };
 		727D33AFAD7EDEC111578DE8 /* Projects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Projects.swift; sourceTree = "<group>"; };
+		727D353C84B760BD3847A11E /* WebSocketManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocketManager.swift; sourceTree = "<group>"; };
 		727D35A4DFA72830811B2D07 /* RTCCustomFrameCapture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RTCCustomFrameCapture.swift; path = WebRTC/RTCCustomFrameCapture.swift; sourceTree = "<group>"; };
 		727D35EAA13908B142BC4773 /* WebViewFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewFragment.swift; sourceTree = "<group>"; };
 		727D36143ED88C8E210BCEB1 /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		727D368915F3602E605FEA51 /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		727D370DA3B356933EB46C5A /* WebServerFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebServerFragment.swift; sourceTree = "<group>"; };
 		727D37586F16DE497CEA62CE /* SignalingMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalingMessage.swift; sourceTree = "<group>"; };
 		727D383824EABABFDE0806CE /* Toast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
 		727D384384E67F20294222AC /* EditProfileFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditProfileFragment.swift; sourceTree = "<group>"; };
@@ -294,6 +299,7 @@
 			files = (
 				BF9BAED828AF94A800EF3E48 /* GameController.framework in Frameworks */,
 				525632FAD7D5CA948A20F6B9 /* Pods_OpenBot.framework in Frameworks */,
+				3A1126EE2A6E4AAF00D6F387 /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +419,7 @@
 				727D35A4DFA72830811B2D07 /* RTCCustomFrameCapture.swift */,
 				727D3E0255E9EFCEBD190510 /* WebRTCClient.swift */,
 				727D32E3FF7FA5BADAAEDBE6 /* WebRTCDelegates.swift */,
+				727D37A8DE43DA782622FC9A /* Web-server */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -528,6 +535,7 @@
 				727D356FCD75B6B73D8C5A7C /* runRobot */,
 				727D3AD9225580EC94775651 /* WebView */,
 				727D3DEDE1506A0363E8D959 /* Alert */,
+				727D3B83874F4D38D39999BF /* WebServer */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -672,6 +680,14 @@
 			path = runRobot;
 			sourceTree = "<group>";
 		};
+		727D37A8DE43DA782622FC9A /* Web-server */ = {
+			isa = PBXGroup;
+			children = (
+				727D353C84B760BD3847A11E /* WebSocketManager.swift */,
+			);
+			path = "Web-server";
+			sourceTree = "<group>";
+		};
 		727D38A54661B9A54A681AC1 /* QrScanner */ = {
 			isa = PBXGroup;
 			children = (
@@ -687,6 +703,14 @@
 				727D300DE421E6957CB4CD67 /* Readme.md */,
 			);
 			path = WebView;
+			sourceTree = "<group>";
+		};
+		727D3B83874F4D38D39999BF /* WebServer */ = {
+			isa = PBXGroup;
+			children = (
+				727D370DA3B356933EB46C5A /* WebServerFragment.swift */,
+			);
+			path = WebServer;
 			sourceTree = "<group>";
 		};
 		727D3BBE14B8FA7877902A13 /* Authentication */ = {
@@ -785,6 +809,9 @@
 			dependencies = (
 			);
 			name = OpenBot;
+			packageProductDependencies = (
+				3A1126ED2A6E4AAF00D6F387 /* SocketIO */,
+			);
 			productName = OpenBot;
 			productReference = 4FEF46775439F2AC3ED4FE35 /* OpenBot.app */;
 			productType = "com.apple.product-type.application";
@@ -832,6 +859,9 @@
 				Base,
 			);
 			mainGroup = 4FEF4FDE69B20F82CA2C0196;
+			packageReferences = (
+				3A1126EC2A6E4AAF00D6F387 /* XCRemoteSwiftPackageReference "socket" */,
+			);
 			productRefGroup = 4FEF4A209F128B8F5AC06E17 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -902,6 +932,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${PODS_ROOT}/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework",
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework",
+				"${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework",
 				"${BUILT_PRODUCTS_DIR}/abseil/absl.framework",
@@ -932,6 +963,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketIO.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ZIPFoundation.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/absl.framework",
@@ -1039,6 +1071,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${PODS_ROOT}/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework",
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework",
+				"${BUILT_PRODUCTS_DIR}/Socket.IO-Client-Swift/SocketIO.framework",
 				"${BUILT_PRODUCTS_DIR}/Starscream/Starscream.framework",
 				"${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework",
 				"${BUILT_PRODUCTS_DIR}/abseil/absl.framework",
@@ -1069,6 +1102,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SocketIO.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Starscream.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ZIPFoundation.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/absl.framework",
@@ -1222,6 +1256,8 @@
 				727D397E28A6A94840B702D4 /* AlertFragment.swift in Sources */,
 				727D35D8CB673649BF1AD948 /* Endpoint.swift in Sources */,
 				727D3EB96F3F1D250E9D32E7 /* ServerItem.swift in Sources */,
+				727D3F6208F0EA111ECDD9E9 /* WebSocketManager.swift in Sources */,
+				727D3CA29A8A252D51ADFDC9 /* WebServerFragment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1562,6 +1598,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3A1126EC2A6E4AAF00D6F387 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3A1126ED2A6E4AAF00D6F387 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1126EC2A6E4AAF00D6F387 /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4FEF44CF03B950ABA7A3C2A8 /* Project object */;
 }
