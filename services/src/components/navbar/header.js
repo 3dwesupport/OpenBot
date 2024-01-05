@@ -22,15 +22,8 @@ export function LogoSection() {
                 </div>
             </div>
         </div>
-
-        // <div className={"logoDiv"}>
-        //
-        //     <img alt="openBotIcon"  className={"icon"}    src={Images.openBotLogo}></img>
-        //         <span className={"mainTitle"} >OpenBot Dashboard</span>
-        // </div>
     )
 }
-
 
 function Header() {
 

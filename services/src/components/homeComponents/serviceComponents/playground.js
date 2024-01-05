@@ -60,11 +60,10 @@ export function CardComponent(props) {
     }
     return (
         <Card sx={{
-            width: "30%", height: '31%', display: "flex", flexDirection: "column", alignItems: "center",
+            width: "100%", display: "flex", flexDirection: "column", alignItems: "center",
             justifyContent: "center", backgroundColor: bgColor, overflow: "hidden",
-            //marginTop:4,
-            // marginLeft:11,
-            borderRadius: 3
+            borderRadius: 3,
+            height: "100%"
         }}>
             <div className={"cardImage"}>
                 <img src={image} alt="Card Image"/>
