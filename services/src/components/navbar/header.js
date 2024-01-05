@@ -14,12 +14,21 @@ export function LogoSection() {
         navigate(PathName.home);
     }
 
-return(
-    <div className={"logoDiv"}>
-        <img alt="openBotIcon"  className={"icon"}   src={Images.openBotLogo}></img>
-            <span className={"mainTitle"} >OpenBot Dashboard</span>
-    </div>
-)
+    return (<div className={"navbar_navbarDiv"}>
+            <div className={"navbarTitleDiv"}>
+                <img alt="openBotIcon" className={"navbar_mainIcon"} src={Images.openBotLogo}></img>
+                <div className={"navbar_headDiv"}>
+                    <span className={"mainTitle"}>OpenBot Dashboard</span>
+                </div>
+            </div>
+        </div>
+
+        // <div className={"logoDiv"}>
+        //
+        //     <img alt="openBotIcon"  className={"icon"}    src={Images.openBotLogo}></img>
+        //         <span className={"mainTitle"} >OpenBot Dashboard</span>
+        // </div>
+    )
 }
 
 
@@ -55,11 +64,12 @@ function Header() {
             //TODO add slider for internet off
         }
     }
+
     return (
-      <div className={"navbarDiv"}>
-          <LogoSection/>
-          <RightSection/>
-      </div>
+        <div className={"navbar_navbarDiv"}>
+            <LogoSection/>
+            <RightSection/>
+        </div>
 
     );
 
@@ -79,25 +89,20 @@ function Header() {
         // const isSignedIn = localStorage.getItem("isSigIn") === "true";
 
         return (
-            <>
-                <div className={"themeDiv"}>
-                        {/*change theme icon*/}
-                    <img alt="themeIcon" className={"lightThemeIcon"}  src={Images.lightTheme_icon}></img>
-                        {/*divider*/}
-                        {<img alt="icon" src={Images.line_icon} className={"lineIcon"}/>}
-                    <div className={"btnDiv"}>
-                    <button onClick={()=>handelSignIn()}  className={"buttonIcon"}>
-                        <span>Sign in</span>
-                    </button>
-                    </div>
+            <div className={"navbar_rightSectionDiv"}>
+                <img alt="Theme" className={"navbar_themeIcon"} src={Images.lightTheme_icon}></img>
+                <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
+                <button className={"navbar_buttonIcon"}>
+                    <span>Sign in</span>
+                </button>
+
                 {/*if signed in then show icon and name or else sign in option*/}
                 {/*<ProfileSignIn setIsProfileModal={setIsProfileModal} user={user} setUser={setUser}/>*/}
             </div>
-                </>
+
         )
     }
 }
-
 
 
 export default Header;

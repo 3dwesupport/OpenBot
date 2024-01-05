@@ -1,0 +1,49 @@
+.container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cardContainer {
+    height: 100%;
+    width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    column-gap: 5%;
+    row-gap: 5%;
+    padding-top: 2%;
+}
+
+.title {
+    font-size: 1.3rem;
+    font-family: Gilroy-Medium, sans-serif;
+    padding-left: 5%;
+}
+
+.cardImage {
+    display: flex;
+    justifyContent: center;
+    align-items: center;
+}
+
+.txtDiv {
+    display: flex;
+    justifyContent: center;
+    align-items: center;
+    padding-top: 2%;
+    width: 100%;
+}
+
+.txtStyleDiv {
+    display: flex;
+    justifyContent: center;
+    align-items: center;
+    margin-top: 2%;
+}
+
+@media only screen and (max-width: 768px) {
+
+}
