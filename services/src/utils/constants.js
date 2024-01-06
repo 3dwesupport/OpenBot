@@ -3,5 +3,6 @@ export const PathName = {
 }
 
 export const localStorageKeys = {
-    accessToken : "accessToken"
+    accessToken : "accessToken",
+    user:"user"
 }

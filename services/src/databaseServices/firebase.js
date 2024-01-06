@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app";
 import 'firebase/compat/auth';
-import {localStorageKeys} from "../utils/constants";
+import {localStorageKeys, PathName} from "../utils/constants";
+import Cookies from "js-cookie";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -35,8 +36,27 @@ export async function googleSigIn() {
     } else {
         const signIn = await auth.signInWithPopup(provider)
         localStorage.setItem("isSigIn", "true");
-        localStorage.setItem(localStorageKeys.accessToken, signIn.credential?.accessToken);
+        const cookieOptions = {
+            // domain: '.openbot.org',
+            domain: 'localhost',
+            // domain: ".itinker.io",
+            secure: true
+        };
+        let customToken = await getCustomToken(auth?.currentUser?.uid);
+        Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
+        Cookies.set(localStorageKeys.user, customToken, cookieOptions);
         return signIn
+    }
+}
+
+async function getCustomToken(UID) {
+    try {
+        const response = await fetch(`http://localhost:9000/getToken?uid=${UID}`);
+        const data = await response.json();
+        console.log("data::::", data.token);
+        return data.token
+    } catch (error) {
+        console.error('Error fetching token:', error);
     }
 }
 

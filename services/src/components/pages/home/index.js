@@ -7,7 +7,7 @@ export const Home = () => {
     return (
         <div style={{height:"100vh"}}>
             <Header/>
-            {/*<HomeServices/>*/}
+            <HomeServices/>
         </div>
     );
 }
