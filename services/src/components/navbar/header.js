@@ -1,11 +1,10 @@
 import React, {useContext, useEffect} from "react";
 import {StoreContext} from "../../context/storeContext";
 import {auth, googleSigIn} from "../../databaseServices/firebase";
-import styles from "./navbar.css";
 import {Images} from "../../utils/images";
 import {useNavigate} from "react-router-dom";
 import {PathName} from "../../utils/constants";
-
+import "./navbar.css";
 export function LogoSection() {
     let navigate = useNavigate()
 
@@ -18,7 +17,7 @@ export function LogoSection() {
             <div className={"navbarTitleDiv"}>
                 <img alt="openBotIcon" className={"navbar_mainIcon"} src={Images.openBotLogo}></img>
                 <div className={"navbar_headDiv"}>
-                    <span className={"mainTitle"}>OpenBot Dashboard</span>
+                    <div className={"mainTitle"}>OpenBot Dashboard</div>
                 </div>
             </div>
         </div>
@@ -68,34 +67,17 @@ function Header() {
 
 
     function RightSection(params) {
-        const {
-            toggleTheme,
-            theme,
-            setIsProfileModal,
-            user,
-            setUser,
-        } = params
-        // const themes = useTheme();
-        // const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
-        // const tabletQuery = window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches;
-        // const isMobileLandscape = window.matchMedia("(max-height:440px) and (max-width: 1000px) and (orientation: landscape)").matches
-        // const isSignedIn = localStorage.getItem("isSigIn") === "true";
-
+        const {} = params
         return (
             <div className={"navbar_rightSectionDiv"}>
                 <img alt="Theme" className={"navbar_themeIcon"} src={Images.lightTheme_icon}></img>
                 <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
-                <button className={"navbar_buttonIcon"}>
-                    <span>Sign in</span>
+                <button onClick={()=>handelSignIn()}  className={"navbar_buttonIcon"}>
+                    <div>Sign in</div>
                 </button>
-
-                {/*if signed in then show icon and name or else sign in option*/}
-                {/*<ProfileSignIn setIsProfileModal={setIsProfileModal} user={user} setUser={setUser}/>*/}
             </div>
-
         )
     }
 }
-
 
 export default Header;

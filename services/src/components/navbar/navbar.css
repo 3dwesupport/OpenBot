@@ -63,3 +63,21 @@
     width: 5rem;
     margin: 10px;
 }
+@media only screen and (max-width: 768px){
+    .navbar_rightSectionDiv {
+        margin-right: 2rem;
+    }
+    .navbarTitleDiv {
+        margin-left: 2rem;
+    }
+    .navbar_themeIcon{
+        margin: 4px;
+    }
+    .navbar_lineIcon{
+        margin: 4px;
+    }
+    .navbar_buttonIcon{
+        margin: 4px;
+    }
+
+}

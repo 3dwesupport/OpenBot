@@ -26,33 +26,52 @@
     align-items: center;
 }
 
-.txtDiv {
+.textDiv {
     display: flex;
     justifyContent: center;
     align-items: center;
-    padding-top: 2%;
     width: 100%;
 }
 
-.txtStyleDiv {
+.textStyleDiv {
     display: flex;
     justifyContent: center;
     align-items: center;
     margin-top: 2%;
+    color: #FFFFFF;
 }
 
 @media only screen and (max-width: 768px) {
     .container {
-
         display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        /*gap: 20px;*/
     }
 
     .cardContainer {
-        width: 50%;
-        height: auto;
-        column-gap: 10%;
-        row-gap: 10%;
+        height: 73%;
+        width: 95%;
+        grid-template-columns: repeat(2, 1fr);
+    }
 
+    .textDiv {
+        height: 10%;
+    }
+
+    .cardImage {
+        padding: 10px;
+        height: 30%;
 
     }
+    .textStyleDiv{
+        height: 1%;
+        font-size: 85%;
+    }
+img{
+    height: 80%;
+    width: 100%;
+}
+
 }
