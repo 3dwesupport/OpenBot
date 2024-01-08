@@ -23,7 +23,7 @@ app.use(cors());
 async function generateToken(UID) {
     return admin.auth().createCustomToken(UID)
         .then((customToken) => {
-            console.log("Custom token: ", customToken)
+            // console.log("Custom token: ", customToken)
             return customToken;
         })
         .catch((error) => {
