@@ -15,6 +15,11 @@ app.listen(port, () => {
 })
 app.use(cors());
 
+/**
+ * function to generate token from admin service account
+ * @param UID
+ * @returns {Promise<string>}
+ */
 async function generateToken(UID) {
     return admin.auth().createCustomToken(UID)
         .then((customToken) => {
@@ -25,9 +30,11 @@ async function generateToken(UID) {
             console.error('Error creating custom token:', error);
             return null;
         });
-
 }
 
+/**
+ * function to get custom token of specific uid and send in response
+ */
 app.get('/getToken', async (req, res) => {
     try {
         const UID = req.query.uid;

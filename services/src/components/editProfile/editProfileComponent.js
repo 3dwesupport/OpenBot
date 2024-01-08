@@ -1,19 +1,13 @@
 import React from "react";
 import Header from "../homeComponents/navbar/header";
-import "./editProfile.css"
+import "./editProfileComponent.css"
 
-export function EditProfile(props) {
-
+export function EditProfileComponent(props) {
 
     return (<div>
-            <Header/>
             <div className={"editProfileContainer"}>
                 <span>Edit Profile</span>
             </div>
         </div>
-
-
-
-
     )
 }

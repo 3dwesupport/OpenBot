@@ -3,6 +3,10 @@ import 'firebase/compat/auth';
 import {localStorageKeys, PathName} from "../utils/constants";
 import Cookies from "js-cookie";
 
+/**
+ * Firebase Configuration
+ * @type {{storageBucket: *, apiKey: *, messagingSenderId: *, appId: *, projectId: *, measurementId: *, authDomain: *}}
+ */
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_AUTH_DOMAIN,
@@ -40,7 +44,7 @@ export async function googleSigIn() {
             // domain: '.openbot.org',
             domain: 'localhost',
             // domain: ".itinker.io",
-            secure: true
+            secure: true,
         };
         let customToken = await getCustomToken(auth?.currentUser?.uid);
         Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
@@ -49,11 +53,15 @@ export async function googleSigIn() {
     }
 }
 
-async function getCustomToken(UID) {
+/**
+ * function to handle single sign-on using custom token
+ * @param UID
+ * @returns {Promise<*>}
+ */
+export async function getCustomToken(UID) {
     try {
         const response = await fetch(`http://localhost:9000/getToken?uid=${UID}`);
         const data = await response.json();
-        console.log("data::::", data.token);
         return data.token
     } catch (error) {
         console.error('Error fetching token:', error);

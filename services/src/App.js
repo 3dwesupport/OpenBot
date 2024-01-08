@@ -1,9 +1,10 @@
 import './App.css';
 import {RouterComponent} from "./components/router/routes";
 import {useEffect, useState} from "react";
-import {auth} from "./databaseServices/firebase"
+import {auth, getCustomToken} from "./databaseServices/firebase"
 import StoreProvider from "./context/storeContext"
 import {localStorageKeys} from "./utils/constants";
+import Cookies from "js-cookie";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -39,6 +40,15 @@ function App() {
                         displayName: result.user?.displayName,
                         email: result.user?.email,
                     });
+                    const cookieOptions = {
+                        // domain: '.openbot.org',
+                        domain: 'localhost',
+                        // domain: ".itinker.io",
+                        secure: true,
+                    };
+                    let customToken = await getCustomToken(auth?.currentUser?.uid);
+                    Cookies.set(localStorageKeys.accessToken, result.credential?.accessToken, cookieOptions);
+                    Cookies.set(localStorageKeys.user, customToken, cookieOptions);
                 }
             });
         }

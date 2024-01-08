@@ -65,13 +65,15 @@
         height: 30%;
 
     }
-    .textStyleDiv{
+
+    .textStyleDiv {
         height: 1%;
         font-size: 85%;
     }
-img{
-    height: 80%;
-    width: 100%;
-}
+
+    img {
+        height: 80%;
+        width: 100%;
+    }
 
 }
