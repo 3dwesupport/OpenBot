@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useContext} from "react";
 import "../card/card.css"
-import {CardData} from "../../../../utils/constants";
+import {CardData, localStorageKeys} from "../../../../utils/constants";
 import {CardComponent} from "../card/card";
+import {StoreContext} from "../../../../context/storeContext";
 
 /**
  * Function to display all openBot services on home page
@@ -9,6 +10,8 @@ import {CardComponent} from "../card/card";
  * @constructor
  */
 export function OpenBotServiceComponent() {
+
+    const {user} = useContext(StoreContext);
     /**
      * function to handle click event on cards
      * @param clickedCard
@@ -32,13 +35,13 @@ export function OpenBotServiceComponent() {
     return (
         <div className={"container"}>
             {/* Title section */}
-            <div className={"textDiv"}>
+            {localStorage.getItem("isSignIn") === "true" ? <div className={"textDiv"}>
                 <div className="title">
                     {/* Bold "WELCOME" */}
                     <div style={{fontWeight: 'bold', display: 'inline'}}>WELCOME</div>
-                    , NAME
+                    , {user?.displayName}
                 </div>
-            </div>
+            </div> : <div className={"textDiv"}/>}
             {/* Card container */}
             <div className={"cardContainer"}>
                 {/* Mapping over CardData array and rendering servicesSection for each item */}

@@ -39,7 +39,7 @@ export async function googleSigIn() {
         await auth.signInWithRedirect(provider)
     } else {
         const signIn = await auth.signInWithPopup(provider)
-        localStorage.setItem("isSigIn", "true");
+        localStorage.setItem("isSignIn", "true");
         const cookieOptions = {
             // domain: '.openbot.org',
             domain: 'localhost',
