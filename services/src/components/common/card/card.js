@@ -9,9 +9,7 @@ import Card from '@mui/material/Card';
  */
 export function CardComponent({value, handleCardClick}) {
 
-    /**
-     * function to handle click on card component
-     */
+    // function to handle click on card component
     const handleClick = () => {
         handleCardClick(value);
     };

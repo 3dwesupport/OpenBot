@@ -1,21 +1,19 @@
 import React, {useContext} from "react";
-import "../card/card.css"
-import {CardData, localStorageKeys} from "../../../../utils/constants";
-import {CardComponent} from "../card/card";
-import {StoreContext} from "../../../../context/storeContext";
+import "../../common/card/card.css"
+import {CardData, localStorageKeys} from "../../../utils/constants";
+import {CardComponent} from "../../common/card/card";
+import {StoreContext} from "../../../context/storeContext";
 
 /**
  * Function to display all openBot services on home page
  * @returns {Element}
  * @constructor
  */
-export function OpenBotServiceComponent() {
+export function DashboardComponent() {
 
     const {user} = useContext(StoreContext);
-    /**
-     * function to handle click event on cards
-     * @param clickedCard
-     */
+
+    //function to handle click event on cards
     const handleCardClick = (clickedCard) => {
         switch (clickedCard.text) {
             case CardData[0].text:

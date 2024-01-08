@@ -1,7 +1,12 @@
-import Header from "../../homeComponents/navbar/header";
+import Header from "../../navbar/header";
 import React from "react";
-import {EditProfileComponent} from "../../editProfile/editProfileComponent";
+import {EditProfileComponent} from "../../profile/editProfileComponent";
 
+/**
+ * function to display user profile page
+ * @returns {Element}
+ * @constructor
+ */
 const UserProfile = () => {
 
     return (

@@ -1,10 +1,10 @@
 import React, {useContext, useEffect} from "react";
-import {StoreContext} from "../../../context/storeContext";
-import {auth, googleSigIn} from "../../../databaseServices/firebase";
-import {Images} from "../../../utils/images";
+import {StoreContext} from "../../context/storeContext";
+import {auth, googleSigIn} from "../../database/firebase";
+import {Images} from "../../utils/images";
 import "./navbar.css";
 import {useNavigate} from "react-router-dom";
-import {PathName} from "../../../utils/constants";
+import {PathName} from "../../utils/constants";
 import "./navbar.css";
 
 /**
@@ -45,9 +45,7 @@ export default Header;
 export function RightSection(params) {
     const {setIsSignIn, isOnline, setUser} = params
 
-    /**
-     * function to handle sign-in on clicking button
-     */
+    //function to handle sign-in on clicking button
     function handelSignIn() {
         if (isOnline) {
             googleSigIn().then(res => {
@@ -86,9 +84,7 @@ export function RightSection(params) {
 export function LogoSection() {
     let navigate = useNavigate()
 
-    /**
-     * function to open home page
-     */
+    //function to open home page
     const openHomepage = () => {
         navigate(PathName.home);
     }

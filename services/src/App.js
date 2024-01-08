@@ -1,7 +1,7 @@
 import './App.css';
 import {RouterComponent} from "./components/router/routes";
 import {useEffect, useState} from "react";
-import {auth, getCustomToken} from "./databaseServices/firebase"
+import {auth, getCustomToken} from "./database/firebase"
 import StoreProvider from "./context/storeContext"
 import {localStorageKeys} from "./utils/constants";
 import Cookies from "js-cookie";
@@ -56,9 +56,7 @@ function App() {
 
     return (
         <StoreProvider user={user} setUser={setUser} isOnline={isOnline}>
-            <div>
-                <RouterComponent/>
-            </div>
+            <RouterComponent/>
         </StoreProvider>
     );
 }

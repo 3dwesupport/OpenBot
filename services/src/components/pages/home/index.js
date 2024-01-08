@@ -1,13 +1,18 @@
 import React from "react";
-import Header from "../../homeComponents/navbar/header";
-import {OpenBotServiceComponent} from "../../homeComponents/openbotServices/servicesSection/openbotServiceComponent";
+import Header from "../../navbar/header";
+import {DashboardComponent} from "../../home/dashboard/dashboardComponent";
 
+/**
+ * function to display home page
+ * @returns {Element}
+ * @constructor
+ */
 export const Home = () => {
 
     return (
         <div style={{height: "100vh"}}>
             <Header/>
-            <OpenBotServiceComponent/>
+            <DashboardComponent/>
         </div>
     );
 }

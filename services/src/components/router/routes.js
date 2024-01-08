@@ -3,6 +3,11 @@ import {PathName} from "../../utils/constants";
 import {Home} from "../pages/home";
 import UserProfile from "../pages/userProfile";
 
+/**
+ * Router to maintain different paths of the application
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export const RouterComponent = () => {
     return (
         <BrowserRouter>
