@@ -2,6 +2,7 @@ import {Images} from "./images";
 
 export const PathName = {
     "home" : "/",
+    "EditProfile": "/EditProfile"
 }
 export const localStorageKeys = {
 

@@ -3,6 +3,11 @@ import "./card.css"
 import {CardData} from "../../../utils/constants";
 import {CardComponent} from "./CardComponent/card";
 
+/**
+ * Function to display all openBot services on home page
+ * @returns {Element}
+ * @constructor
+ */
 export function HomeServices() {
     return (
         <div className={"container"}>
@@ -24,7 +29,9 @@ export function HomeServices() {
     );
 }
 
-
+/**
+ * function to redirect to playground on clicking playground component
+ */
 export const redirectToPlayground = () => {
     window.open("https://www.openbot.itinker.io/", '_blank');
     // window.open("http://localhost:3001/", '_blank');
