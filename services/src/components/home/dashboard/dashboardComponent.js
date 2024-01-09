@@ -33,7 +33,7 @@ export function DashboardComponent() {
     return (
         <div className={"container"}>
             {/* Title section */}
-            {localStorage.getItem("isSignIn") === "true" ? <div className={"textDiv"}>
+            {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <div className={"textDiv"}>
                 <div className="title">
                     {/* Bold "WELCOME" */}
                     <div style={{fontWeight: 'bold', display: 'inline'}}>WELCOME</div>

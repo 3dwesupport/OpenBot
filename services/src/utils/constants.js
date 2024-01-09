@@ -1,14 +1,15 @@
 import {Images} from "./images";
 
 export const PathName = {
-    "home" : "/",
+    "home": "/",
     "editProfile": "/editProfile"
 }
 export const localStorageKeys = {
-
-    accessToken : "accessToken",
-    user:"user"
+    accessToken: "accessToken",
+    user: "user",
+    isSignIn: "isSignIn"
 }
+
 // Array of card data
 export const CardData = [
     {bgColor: "#FFAB1A", image: Images.openbotCardIcon, text: "OpenBot Playground"},
@@ -18,4 +19,10 @@ export const CardData = [
     {bgColor: "#EA3D78", image: Images.downloadCloudCardIcon, text: "Download Apps"},
     {bgColor: "#B73DDF", image: Images.graphCardIcon, text: "Usage Analytics"},
 ];
+
+export const Constants = {
+    online: "online",
+    offline: "offline",
+
+}
 

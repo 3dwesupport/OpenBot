@@ -2,6 +2,7 @@ import firebase from "firebase/compat/app";
 import 'firebase/compat/auth';
 import {localStorageKeys, PathName} from "../utils/constants";
 import Cookies from "js-cookie";
+import {getAuth, signOut} from "firebase/auth";
 
 /**
  * Firebase Configuration
@@ -39,7 +40,7 @@ export async function googleSigIn() {
         await auth.signInWithRedirect(provider)
     } else {
         const signIn = await auth.signInWithPopup(provider)
-        localStorage.setItem("isSignIn", "true");
+        localStorage.setItem(localStorageKeys.isSignIn, "true");
         const cookieOptions = {
             // domain: '.openbot.org',
             domain: 'localhost',
@@ -68,4 +69,24 @@ export async function getCustomToken(UID) {
     }
 }
 
-
+/**
+ * function to log out user from Google account
+ * @returns {Promise<void>}
+ */
+export async function googleSignOut() {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+        window.location.reload()
+        localStorage.setItem(localStorageKeys.isSignIn, "false");
+        const cookieOptions = {
+            // domain: '.openbot.org',
+            domain: 'localhost',
+            // domain: ".itinker.io",
+            secure: true,
+        };
+        Cookies.remove(localStorageKeys.user, cookieOptions)
+        Cookies.remove(localStorageKeys.accessToken, cookieOptions);
+    }).catch((error) => {
+        console.log("Sign-out error ", error)
+    });
+}

@@ -3,7 +3,7 @@ import {RouterComponent} from "./components/router/routes";
 import {useEffect, useState} from "react";
 import {auth, getCustomToken} from "./database/firebase"
 import StoreProvider from "./context/storeContext"
-import {localStorageKeys} from "./utils/constants";
+import {Constants, localStorageKeys} from "./utils/constants";
 import Cookies from "js-cookie";
 
 function App() {
@@ -19,13 +19,11 @@ function App() {
     };
 
     useEffect(() => {
-        window.addEventListener("online", handleOnline);
-        window.addEventListener("offline", handleOffline);
-
-
+        window.addEventListener(Constants.online, handleOnline);
+        window.addEventListener(Constants.offline, handleOffline);
         return () => {
-            window.removeEventListener("online", handleOnline);
-            window.removeEventListener("offline", handleOffline);
+            window.removeEventListener(Constants.online, handleOnline);
+            window.removeEventListener(Constants.offline, handleOffline);
         };
     }, [])
 
@@ -34,7 +32,7 @@ function App() {
             auth.getRedirectResult().then(async function (result) {
                 if (result.credential) {
                     localStorage.setItem(localStorageKeys.accessToken, result.credential.accessToken);
-                    localStorage.setItem("isSigIn", "true");
+                    localStorage.setItem(localStorageKeys.isSignIn, "true");
                     setUser({
                         photoURL: result.user?.photoURL,
                         displayName: result.user?.displayName,
