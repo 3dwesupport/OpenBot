@@ -7,6 +7,8 @@ import trainModelCardIcon from"../assets/images/trainModel_card_icon.png"
 import billingCardIcon from"../assets/images/billing_card_icon.png"
 import downloadCloudCardIcon from"../assets/images/download_cloud_card_icon.png"
 import graphCardIcon from "../assets/images/graph_card_icon.png"
+import EditProfileIcon from"../assets/images/editProfile_Icon.png"
+import logOutIcon from "../assets/images/logOut_icon.png"
 
 export const Images = {
     openBotLogo:openBotLogo,
@@ -17,5 +19,7 @@ export const Images = {
     trainModelCardIcon:trainModelCardIcon,
     billingCardIcon:billingCardIcon,
     downloadCloudCardIcon:downloadCloudCardIcon,
-    graphCardIcon:graphCardIcon
+    graphCardIcon:graphCardIcon,
+    EditProfileIcon:EditProfileIcon,
+    logOutIcon:logOutIcon,
 }

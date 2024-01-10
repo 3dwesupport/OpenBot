@@ -1,6 +1,6 @@
 import Header from "../../navbar/header";
 import React from "react";
-import {EditProfileComponent} from "../../profile/editProfileComponent";
+import {EditProfile} from "../../profile/editProfile";
 
 /**
  * function to display user profile page
@@ -12,7 +12,7 @@ const UserProfile = () => {
     return (
         <div style={{height: "100vh"}}>
             <Header/>
-            <EditProfileComponent/>
+            <EditProfile/>
         </div>
     );
 }
