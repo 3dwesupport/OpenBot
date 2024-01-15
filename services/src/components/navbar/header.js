@@ -1,11 +1,15 @@
-import React, {useContext, useEffect} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import {StoreContext} from "../../context/storeContext";
 import {auth, googleSigIn} from "../../database/firebase";
 import {Images} from "../../utils/images";
 import "./navbar.css";
 import {useNavigate} from "react-router-dom";
-import {PathName} from "../../utils/constants";
+import {localStorageKeys, PathName} from "../../utils/constants";
 import "./navbar.css";
+import {useTheme} from "@mui/material";
+import {ThemeContext} from "@emotion/react";
+import {dark, light} from "@mui/material/styles/createPalette";
+import {ProfileModal} from "../profile/profileModal";
 
 /**
  * Dashboard header which contains logo, theme and profile signIn
@@ -13,8 +17,9 @@ import "./navbar.css";
  * @constructor
  */
 function Header() {
+    const {theme, toggleTheme} = useContext(ThemeContext);
+    const {user, setUser, setIsSignIn, isOnline} = useContext(StoreContext);
 
-    const {setUser, setIsSignIn, isOnline} = useContext(StoreContext);
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
@@ -26,10 +31,12 @@ function Header() {
         })
     }, [setUser]);
 
+    console.log("current user:::", user?.photoURL)
+
     return (
         <div className={"navbar_navbarDiv"}>
             <LogoSection/>
-            <RightSection setIsSignIn={setIsSignIn} setUser={setUser} isOnline={isOnline}/>
+            <RightSection user={user} setIsSignIn={setIsSignIn} setUser={setUser} isOnline={isOnline}/>
         </div>
     );
 }
@@ -43,7 +50,8 @@ export default Header;
  * @constructor
  */
 export function RightSection(params) {
-    const {setIsSignIn, isOnline, setUser} = params
+    const {setIsSignIn, isOnline, setUser, user} = params
+    const isSignedIn = localStorage.getItem(localStorageKeys.isSignIn);
 
     //function to handle sign-in on clicking button
     function handelSignIn() {
@@ -67,11 +75,13 @@ export function RightSection(params) {
 
     return (
         <div className={"navbar_rightSectionDiv"}>
-            <img alt="Theme" className={"navbar_themeIcon"} src={Images.lightTheme_icon}></img>
+            <img title={"Theme"} alt="icon"
+                 src={Images.lightTheme_icon}
+                 className={"light_themeIcon"}/>
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
-            <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
+            {isSignedIn ? <ProfileModal user={user} setUser={setUser}/> : <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
                 <div>Sign in</div>
-            </button>
+            </button>}
         </div>
     )
 }
@@ -100,4 +110,5 @@ export function LogoSection() {
         </div>
     )
 }
+
 

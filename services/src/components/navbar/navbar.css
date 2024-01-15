@@ -39,10 +39,16 @@
     margin-right: 4rem;
 }
 
-.navbar_themeIcon {
+.light_themeIcon {
     cursor: pointer;
     height: 23px;
     width: 23px;
+    margin: 10px;
+}
+.dark_themeIcon{
+    height: 23px;
+    width: 23px;
+    cursor: pointer;
     margin: 10px;
 }
 

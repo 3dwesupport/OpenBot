@@ -3,6 +3,8 @@ import 'firebase/compat/auth';
 import {localStorageKeys, PathName} from "../utils/constants";
 import Cookies from "js-cookie";
 import {getAuth, signOut} from "firebase/auth";
+import {collection, doc, setDoc} from "@firebase/firestore";
+import {getDoc, getFirestore} from "firebase/firestore";
 
 /**
  * Firebase Configuration
@@ -89,4 +91,26 @@ export async function googleSignOut() {
     }).catch((error) => {
         console.log("Sign-out error ", error)
     });
+}
+
+export async function getDateOfBirth() {
+    const docRef = doc(db, "users", auth.currentUser?.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const date = new Date(docSnap.data().dob.toDate());
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+}
+
+/**
+ * function to store date of birth in firebase
+ * @param DOB
+ * @returns {Promise<void>}
+ */
+export async function setDateOfBirth(DOB) {
+    const workspaceRef = doc(collection(db, "users"), auth.currentUser?.uid);
+    setDoc(workspaceRef, DOB).catch((e) => console.log(e));
 }

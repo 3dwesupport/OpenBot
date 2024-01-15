@@ -1,0 +1,227 @@
+.mainScreen {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.parentDiv {
+    width: 70%;
+}
+
+.profileDiv {
+    align-items: flex-end;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 90px;
+    display: flex;
+    height: 100px;
+    justify-content: flex-end;
+    /*margin-left: 20px;*/
+    width: 100px;
+}
+
+
+.editProfileContainer {
+    padding-top: 4%;
+}
+
+.editProfileTextDiv {
+    font-family: Gilroy-SemiBold, serif;
+    font-size: 20px;
+}
+
+.editProfileImageDiv {
+    position: relative;
+    display: flex;
+    padding-top: 2%;
+    align-items: flex-end;
+    width: 100px;
+    justify-content: flex-end;
+
+}
+.loaderDiv{
+    display: flex;
+    height: 100px;
+    width: 100px;
+    border-radius: 90px;
+    align-items: flex-end;
+    justify-content: flex-end;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.profileImage {
+    display: flex;
+    height: 100px;
+    width: 100px;
+    border-radius: 90px;
+    align-items: flex-end;
+    justify-content: flex-end;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.icon {
+    padding-top: 2%;
+
+}
+
+.editProfileIcon {
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+ position: absolute;
+}
+
+
+.nameDiv {
+    display: flex;
+    gap: 20%;
+}
+
+
+.detailsDiv {
+    width: 40%;
+}
+
+
+.emailDiv {
+    width: 100%;
+}
+
+.childDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    row-gap: 35px;
+    padding-top: 4%;
+}
+
+.logOutSection {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    width: 90%;
+}
+
+
+.buttonSection {
+    display: flex;
+    column-gap: 3%;
+}
+
+.saveButton {
+    background: #0071c5;
+    border-radius: 6px;
+    color: #fff;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 20px;
+    height: 45px;
+    justify-content: center;
+    width: 30%;
+}
+
+.cancelButton {
+    font-size: 20px;
+    height: 45px;
+    width: 30%;
+    border: 1px solid #0071c5;
+    border-radius: 6px;
+    color: #0071c5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.logOutButton {
+    font-size: 20px;
+    height: 45px;
+    width: 30%;
+    border: 1px solid #0071c5;
+    border-radius: 6px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+    padding-left: 2%;
+}
+
+.logOutIcon {
+    height: 32%;
+    width: 10%;
+}
+
+.logoutDiv {
+    padding-left: 10%;
+}
+.loader {
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+
+@media only screen and (max-width: 768px) {
+    .nameDiv {
+        gap: 20%;
+        width: 45%;
+    }
+
+    .parentDiv {
+        width: 90%;
+    }
+
+    .saveButton {
+        height: 40px;
+        width: 50%;
+    }
+
+    .cancelButton {
+        height: 40px;
+        width: 50%;
+    }
+
+    .logOutButton {
+        height: 40px;
+        width: 60%;
+    }
+
+    .detailsDiv {
+        width: 40%;
+    }
+
+    .profileImage {
+        height: 4rem;
+    }
+
+    .editProfileIcon {
+        height: 25px;
+        width: 25px;
+        padding-top: 9%;
+        padding-left: 12%;
+    }
+
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+    .profileImage {
+        height: 8rem;
+    }
+
+    .editProfileIcon {
+        height: 45px;
+        width: 45px;
+        padding-top: 10%;
+        padding-left: 12%;
+    }
+
+}

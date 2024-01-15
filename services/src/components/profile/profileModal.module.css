@@ -1,0 +1,27 @@
+.userProfileDiv{
+
+ display: flex;
+ justify-content: flex-start;
+ padding-top: 15%;
+
+}
+
+.profileModalIcon{
+ height: 30px;
+ width: 30px;
+ border-radius: 50%;
+ object-fit: cover
+}
+.profileModalIconDiv{
+ height: 30px;
+ width: 30px;
+}
+.dropdownMenuItem{
+ height: 30%;
+ width: 30%;
+display: flex;
+ align-items: flex-end;
+
+ gap: 35%;
+
+}
