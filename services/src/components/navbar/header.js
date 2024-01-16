@@ -23,13 +23,15 @@ function Header() {
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
+            console.log("res :: ", res.displayName)
             setUser({
                 photoURL: res?.photoURL,
                 displayName: res?.displayName,
                 email: res?.email,
+                uid:res?.uid
             });
         })
-    }, [setUser]);
+    }, []);
 
     console.log("current user:::", user?.photoURL)
 
@@ -79,9 +81,10 @@ export function RightSection(params) {
                  src={Images.lightTheme_icon}
                  className={"light_themeIcon"}/>
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
-            {isSignedIn ? <ProfileModal user={user} setUser={setUser}/> : <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
-                <div>Sign in</div>
-            </button>}
+            {isSignedIn ? <ProfileModal user={user} setUser={setUser}/> :
+                <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
+                    <div>Sign in</div>
+                </button>}
         </div>
     )
 }

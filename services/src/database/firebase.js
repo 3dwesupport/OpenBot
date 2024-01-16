@@ -3,8 +3,10 @@ import 'firebase/compat/auth';
 import {localStorageKeys, PathName} from "../utils/constants";
 import Cookies from "js-cookie";
 import {getAuth, signOut} from "firebase/auth";
-import {collection, doc, setDoc} from "@firebase/firestore";
+import {collection, doc, setDoc, Timestamp} from "@firebase/firestore";
 import {getDoc, getFirestore} from "firebase/firestore";
+import 'firebase/compat/firestore';
+import {getDownloadURL, getStorage, ref, uploadBytes} from 'firebase/storage';
 
 /**
  * Firebase Configuration
@@ -28,8 +30,8 @@ export const auth = firebase.auth();
 export const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({prompt: 'select_account'});
 provider.addScope("https://www.googleapis.com/auth/drive.file");
-// export const FirebaseStorage = getStorage()
-// export const db = getFirestore(app)
+export const FirebaseStorage = getStorage()
+export const db = getFirestore(app)
 export default firebase;
 
 /**
@@ -58,9 +60,19 @@ export async function googleSigIn() {
 
 /**
  * function to handle single sign-on using custom token
- * @param UID
  * @returns {Promise<*>}
+ * @param file
+ * @param fileName
  */
+export async function uploadProfilePic(file, fileName) {
+    if (fileName === undefined) {
+        return
+    }
+    const fileRef = ref(FirebaseStorage, "profile_pictures/" + auth.currentUser.uid + ".jpg")
+    await uploadBytes(fileRef, file);
+    return getDownloadURL(fileRef)
+}
+
 export async function getCustomToken(UID) {
     try {
         const response = await fetch(`http://localhost:9000/getToken?uid=${UID}`);
@@ -93,17 +105,44 @@ export async function googleSignOut() {
     });
 }
 
-export async function getDateOfBirth() {
-    const docRef = doc(db, "users", auth.currentUser?.uid);
+
+// Function to get the current date in the format YYYY-MM-DD
+export async function getCurrentDateOfBirth() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+
+export async function getDateOfBirth(uid) {
+    console.log("getDateOfBirth::::",uid)
+    const docRef = doc(db, "users", uid);
+    console.log("Getting date of birth from Firestore...");
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        const date = new Date(docSnap.data().dob.toDate());
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+
+        const dobTimestamp = docSnap.data()?.dob;
+
+        if (dobTimestamp) {
+            const date = new Date(dobTimestamp.toDate());
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            // return`${year}-${month}-${day}`; // dob which we are storing from firebase
+            const firebaseDOB = `${year}-${month}-${day}`;
+            console.log("Date of birth from Firestore:", firebaseDOB);
+            return firebaseDOB;
+
+        }
     }
+    const currentDOB = await getCurrentDateOfBirth();
+    console.log("Date of birth not found in Firestore. Returning current date of birth:", currentDOB);
+    return currentDOB; // current dob
+
 }
+
 
 /**
  * function to store date of birth in firebase
@@ -112,5 +151,23 @@ export async function getDateOfBirth() {
  */
 export async function setDateOfBirth(DOB) {
     const workspaceRef = doc(collection(db, "users"), auth.currentUser?.uid);
-    setDoc(workspaceRef, DOB).catch((e) => console.log(e));
+    try {
+        // Ensure that DOB is an object with a 'dob' property
+        const data = { dob: DOB };
+
+        // Call setDoc with the object data
+        await setDoc(workspaceRef, data);
+
+        console.log('Date of birth set successfully:', DOB);
+    } catch (error) {
+        console.error('Error setting date of birth:', error);
+        throw error; // Re-throw the error to indicate failure
+    }
 }
+
+
+
+
+
+
+

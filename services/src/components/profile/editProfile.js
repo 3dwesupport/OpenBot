@@ -2,33 +2,57 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Images} from "../../utils/images";
 import {InputFieldComponent} from "../common/inputField/inputField";
 import storeContext, {StoreContext} from "../../context/storeContext";
-import {auth} from "../../database/firebase";
+import {auth, getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/firebase";
 import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
 import styles from "./editProfile.module.css"
-import inputStyles from "../common/inputField/inputField.css"
-import {ThemeContext} from "@emotion/react";
+import {Constants} from "../../utils/constants";
+import {errorToast} from "../../utils/constants";
+import {Avatar, Stack} from "@mui/material";
+import {toast} from "react-toastify";
 import firebase from "firebase/compat/app";
 
-export function EditProfile(props) {
+
+export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, setIsEditProfileModal) {
     const {user, setUser} = useContext(StoreContext);
-    const {theme, toggleTheme} = useContext(ThemeContext);
+    const {isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
     const [isLoader, setIsLoader] = useState(false);
+    const [isProfileLoader, setIsProfileLoader] = useState(false);
     const [file, setFile] = useState(user?.photoURL && user.photoURL);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [isDropdownVisible,setIsDropdownVisible]=useState(false);
-  //  const [DOB, setDOB] = useState(isDob);
-
+    const [userDOB, setUserDOB] = useState("");
+    const [userDetails, setUserDetail] = useState({
+        displayName: user?.displayName,
+        firstName: user?.displayName,
+        lastName: user?.displayName,
+        email: user?.email,
+        photoUrl: user?.photoURL
+    })
 
     useEffect(() => {
-        if (user?.displayName) {
+        setIsProfileLoader(true)
+        console.log("user:::", user);
+        getDateOfBirth(user?.uid).then((res) => {
+            setUserDOB(res);
+            setIsProfileLoader(false)
+        }).catch((e) => {
+            setIsProfileLoader(false)
+        })
+    }, []);
+
+    useEffect(() => {
+        console.log("user::", user);
+        if (user) {
             const names = user.displayName.split(' ');
-            setFirstName(names[0] || ''); // Set the first name
-            setLastName(names.slice(1).join(' ') || ''); // Set the last name
+            setUserDetail({
+                ...userDetails,
+                firstName: names[0] || '',
+                lastName: names.slice(1).join(' ') || '',
+            })
         }
+
+
     }, [user?.displayName]);
 
 
@@ -38,6 +62,7 @@ export function EditProfile(props) {
         } else {
             setIsLoader(true);
         }
+
     }, [user]);
 
 
@@ -72,10 +97,24 @@ export function EditProfile(props) {
         });
     }
 
-    function toTimeStamp(dob) {
-        const date = new Date(dob);
-        return firebase.firestore.Timestamp.fromDate(date).toDate();
 
+    function handleNameChange(nameType, name) {
+        switch (nameType) {
+            case "firstName":
+                setUserDetail(prevState => ({
+                    ...prevState,
+                    firstName: name,
+                }));
+                break
+            case "lastName":
+                setUserDetail(prevState => ({
+                    ...prevState,
+                    lastName: name,
+                }));
+                break
+            default:
+                console.error('Invalid nameType:', nameType);
+        }
     }
 
 
@@ -89,63 +128,116 @@ export function EditProfile(props) {
         );
     }
 
+    function toTimeStamp(dob) {
+        const date = new Date(dob);
+        return firebase.firestore.Timestamp.fromDate(date).toDate();
+
+    }
+
+    const handleDOBChange = async (newDOB) => {
+        console.log("DOB::", newDOB);
+        setUserDOB(newDOB);
+    };
+
+
+    async function handleSubmit() {
+
+        if (isOnline) {
+            if (user.photoURL !== file || user.displayName !== userDetails.displayName) {
+                setIsLoader(true);
+
+                setUserDetail(prevUserDetails => ({
+                    ...prevUserDetails,
+                    firstName: userDetails?.firstName,
+                    lastName: userDetails?.lastName
+                }));
+
+                uploadProfilePic(file, file?.name || 'default file name').then(async (photoURL) => {
+                    if (user.photoURL === file) {
+                        photoURL = file;
+                    }
+
+                    console.log("name::",userDetails?.firstName,userDetails?.lastName)
+                    await auth.currentUser?.updateProfile({
+                        photoURL: photoURL,
+                        displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
+                    });
+                    const updatedUser = auth.currentUser;
+                    console.log("Updated Display Name:", updatedUser?.displayName);
+                    setIsLoader(false);
+                    window.alert("profile updated successfully");
+                })
+
+                await setDateOfBirth(toTimeStamp(userDOB));
+            }
+
+        } else {
+            errorToast(Constants.offline);
+        }
+    }
 
     return (
-        <div className={styles.mainScreen}>
-            <div className={styles.parentDiv}>
-                <div className={styles.editProfileContainer}>
-                    <div className={styles.editProfileTextDiv}>Edit Profile</div>
-                    <div className={styles.editProfileImageDiv}>
-                        {isLoader ?
-                            <div className={styles.profileImage}
-                                 style={{
-                                     borderRadius: "50%",
-                                     border: "1px solid black",
-                                     display: "flex",
-                                     justifyContent: "center",
-                                     alignItems: "center"
-                                 }}>
-                                <LoaderComponent color="blue" height="20" width="20"/>
-                            </div> :
-                            <img className={styles.profileImage} style={{borderRadius: "50%"}} src={user?.photoURL}
-                                 alt={"user"}/>}
-                        <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
-                               accept={"image/*,.heic,.heif,.jpeg"}/>
-                        <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
-                             className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
+        <>
+            {isProfileLoader ? <LoaderComponent color="blue" height="20" width="20"/> :
+                <div className={styles.mainScreen}>
+                    <div className={styles.parentDiv}>
+                        <div className={styles.editProfileContainer}>
+                            <div className={styles.editProfileTextDiv}>Edit Profile</div>
+                            <div className={styles.editProfileImageDiv}>
+                                {isLoader ?
+                                    <div className={styles.profileImage}
+                                         style={{
+                                             borderRadius: "50%",
+                                             border: "1px solid black",
+                                             display: "flex",
+                                             justifyContent: "center",
+                                             alignItems: "center"
+                                         }}>
+                                        <LoaderComponent color="blue" height="20" width="20"/>
+                                    </div> :
+                                    <img className={styles.profileImage} style={{borderRadius: "50%"}}
+                                         src={user?.photoURL}
+                                         alt={"user"}/>}
+                                <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
+                                       accept={"image/*,.heic,.heif,.jpeg"}/>
+                                {/*<img onClick={() => inputRef?.current?.click()} alt="edit profile icon"*/}
+                                {/*     className={styles.editProfileIcon} src={Images.EditProfileIcon}/>*/}
+                                {/*<Stack >*/}
+                                <Avatar onClick={() => inputRef?.current?.click()} alt="edit profile icon"
+                                        className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
+                                {/*</Stack>*/}
 
-                    </div>
-                </div>
-                <div className={styles.childDiv}>
-                    <div className={styles.nameDiv}>
-                        <InputFieldComponent label="First Name" textType="text" value={firstName}/>
-                        <InputFieldComponent label="Last Name" textType="text" value={lastName}/>
-                    </div>
-                    <div className={styles.detailsDiv}>
-                        <InputFieldComponent label="Date Of Birth"  textType="date" />
-                    </div>
-
-                    <div className={styles.emailDiv}>
-                        <InputFieldComponent value={user?.email} label={"Email address"} textType={"email"} disabled={"true"}/>
-                    </div>
-
-                    <div className={styles.buttonSection}>
-                        <div className={styles.saveButton}>
-                            <div>Save</div>
+                            </div>
                         </div>
-                        <div className={styles.cancelButton}>
-                            <div>Cancel</div>
-                        </div>
-                        <div className={styles.logOutSection}>
-                            <div className={styles.logOutButton}>
-                                <img alt={styles.icon} className={styles.logOutIcon} src={Images.logOutIcon}/>
-                                <div className={styles.logoutDiv}>Logout</div>
+                        <div className={styles.childDiv}>
+                            <div className={styles.nameDiv}>
+                                <InputFieldComponent label="First Name" textType="text" value={userDetails.firstName}
+                                                     onDataChange={(name) => handleNameChange('firstName', name)}/>
+                                <InputFieldComponent label="Last Name" textType="text" value={userDetails.lastName}
+                                                     onDataChange={(name) => handleNameChange('lastName', name)}/>
+                            </div>
+                            <div className={styles.detailsDiv}>
+                                <InputFieldComponent value={userDOB} label="Date Of Birth" textType="date"
+                                                     onDataChange={handleDOBChange}
+                                />
+                            </div>
+
+                            <div className={styles.emailDiv}>
+                                <InputFieldComponent value={user?.email} label={"Email address"} textType={"email"}
+                                                     disabled={true}/>
+                            </div>
+
+                            <div className={styles.buttonSection}>
+                                <div className={styles.saveButton} onClick={handleSubmit}>
+                                    <div>Save</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
+        </>
+
     );
 }
 
