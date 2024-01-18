@@ -8,10 +8,10 @@ import billingCardIcon from"../assets/images/billing_card_icon.png"
 import downloadCloudCardIcon from"../assets/images/download_cloud_card_icon.png"
 import graphCardIcon from "../assets/images/graph_card_icon.png"
 import EditProfileIcon from"../assets/images/editProfile_Icon.png"
-import logOutIcon from "../assets/images/logOut_icon.png"
+import logOutIcon from "../assets/images/logout_icon.png"
 import darkThemeIcon from"../assets/images/darkTheme_icon.png"
-import profileModalIcon from"../assets/images/ProfileModal_icon.png"
-import transactionHistory from"../assets/images/transactionHistory_icon.png"
+import editProfileDropdownIcon from"../assets/images/ editPofileDropdown_icon.png"
+import transactionIcon from"../assets/images/transaction_icon.png"
 import arrowLeft from "../assets/images/arrowLeft_icon.png"
 import arrowDown from "../assets/images/arrowDown_icon.png"
 
@@ -28,8 +28,8 @@ export const Images = {
     EditProfileIcon:EditProfileIcon,
     logOutIcon:logOutIcon,
     darkThemeIcon:darkThemeIcon,
-    profileModalIcon:profileModalIcon,
-    transactionHistory:transactionHistory,
+    editProfileDropdownIcon:editProfileDropdownIcon,
+    transactionIcon:transactionIcon,
     arrowLeft:arrowLeft,
     arrowDown:arrowDown,
 

@@ -14,7 +14,6 @@ const UserProfile = () => {
     return (
         <div style={{height: "100vh"}}>
             <Header/>
-            {/*{isLoader && <LoaderComponent/>}*/}
             <EditProfile />
         </div>
     );

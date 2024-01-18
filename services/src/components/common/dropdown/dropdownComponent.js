@@ -10,9 +10,8 @@ export function DropdownComponent(props) {
         label,
     } = props
 
-    console.log("icon:::", icon)
     return (
-        <div className={"dropdownIcons"}>
+        <div onClick={onClick} className={"dropdownIcons"}>
             <img src={icon} style={{height: "24px", width: "24px"}} alt={"Dropdown Item Icon"}/>
             <div className={"dropdownDiv"} >
                 <span style={{whiteSpace: "nowrap", width: '80%'}}>{label}</span>

@@ -36,6 +36,7 @@
 .navbar_rightSectionDiv {
     align-items: center;
     display: flex;
+    justify-content: space-evenly;
     margin-right: 4rem;
 }
 

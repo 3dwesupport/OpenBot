@@ -41,17 +41,7 @@
     justify-content: flex-end;
 
 }
-.loaderDiv{
-    display: flex;
-    height: 100px;
-    width: 100px;
-    border-radius: 90px;
-    align-items: flex-end;
-    justify-content: flex-end;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-}
+
 
 .profileImage {
     display: flex;
@@ -87,7 +77,9 @@
 .detailsDiv {
     width: 40%;
 }
-
+.text{
+    font-size: 18px;
+}
 
 .emailDiv {
     width: 100%;
@@ -128,18 +120,7 @@
     width: 30%;
 }
 
-.cancelButton {
-    font-size: 20px;
-    height: 45px;
-    width: 30%;
-    border: 1px solid #0071c5;
-    border-radius: 6px;
-    color: #0071c5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
+
 
 .logOutButton {
     font-size: 20px;
@@ -163,8 +144,11 @@
     padding-left: 10%;
 }
 .loader {
-    align-items: center;
-    justify-content: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color:darkred;
 
 }
 

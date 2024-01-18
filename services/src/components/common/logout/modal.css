@@ -1,0 +1,55 @@
+.logoutComponent {
+    position: absolute !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 30%;
+    border-radius: 6px;
+    background-color: #fff;
+    border: none;
+
+    /*background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);*/
+}
+.logoutDivText{
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 40px;
+    height: 85px
+}
+.logoutButtonDiv{
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.cancelButton {
+    font-size: 20px;
+    height: 45px;
+    width: 120px;
+    border: 1px solid #0071c5;
+    border-radius: 6px;
+    color: #0071c5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.okButton{
+    background: #0071c5;
+    border-radius: 6px;
+    color: #fff;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 20px;
+    height: 45px;
+    justify-content: center;
+    width: 100px;
+}

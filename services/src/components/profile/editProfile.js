@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Images} from "../../utils/images";
 import {InputFieldComponent} from "../common/inputField/inputField";
 import storeContext, {StoreContext} from "../../context/storeContext";
-import {auth, getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/firebase";
+import {auth, getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/firebase.js";
 import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
@@ -12,7 +12,7 @@ import {errorToast} from "../../utils/constants";
 import {Avatar, Stack} from "@mui/material";
 import {toast} from "react-toastify";
 import firebase from "firebase/compat/app";
-
+import ButtonComponent from "../common/button/buttonComponent";
 
 export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, setIsEditProfileModal) {
     const {user, setUser} = useContext(StoreContext);
@@ -29,17 +29,20 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
         email: user?.email,
         photoUrl: user?.photoURL
     })
-
     useEffect(() => {
         setIsProfileLoader(true)
         console.log("user:::", user);
-        getDateOfBirth(user?.uid).then((res) => {
-            setUserDOB(res);
-            setIsProfileLoader(false)
-        }).catch((e) => {
-            setIsProfileLoader(false)
-        })
-    }, []);
+        if(user) {
+            getDateOfBirth(user?.uid).then((res) => {
+                console.log("inside getDateOfBirth:",res);
+                setUserDOB(res);
+                setIsProfileLoader(false)
+            }).catch((e) => {
+                console.log(e);
+                setIsProfileLoader(false)
+            })
+        }
+    }, [user]);
 
     useEffect(() => {
         console.log("user::", user);
@@ -51,8 +54,6 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                 lastName: names.slice(1).join(' ') || '',
             })
         }
-
-
     }, [user?.displayName]);
 
 
@@ -178,7 +179,10 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
 
     return (
         <>
-            {isProfileLoader ? <LoaderComponent color="blue" height="20" width="20"/> :
+            {isProfileLoader ?
+                <div className={styles.loader}>
+                <LoaderComponent  color="blue" />
+                </div>:
                 <div className={styles.mainScreen}>
                     <div className={styles.parentDiv}>
                         <div className={styles.editProfileContainer}>
@@ -200,10 +204,8 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                                          alt={"user"}/>}
                                 <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
                                        accept={"image/*,.heic,.heif,.jpeg"}/>
-                                {/*<img onClick={() => inputRef?.current?.click()} alt="edit profile icon"*/}
-                                {/*     className={styles.editProfileIcon} src={Images.EditProfileIcon}/>*/}
-                                {/*<Stack >*/}
-                                <Avatar onClick={() => inputRef?.current?.click()} alt="edit profile icon"
+
+                                <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
                                         className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
                                 {/*</Stack>*/}
 
@@ -228,9 +230,7 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                             </div>
 
                             <div className={styles.buttonSection}>
-                                <div className={styles.saveButton} onClick={handleSubmit}>
-                                    <div>Save</div>
-                                </div>
+                                <ButtonComponent label={"Save"} onClick={handleSubmit}/>
                             </div>
                         </div>
                     </div>

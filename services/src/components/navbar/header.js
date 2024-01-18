@@ -17,18 +17,15 @@ import {ProfileModal} from "../profile/profileModal";
  * @constructor
  */
 function Header() {
-    const {theme, toggleTheme} = useContext(ThemeContext);
-    const {user, setUser, setIsSignIn, isOnline} = useContext(StoreContext);
-
+    const {user, setUser, setIsSignIn, isSignIn, isOnline} = useContext(StoreContext);
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
-            console.log("res :: ", res.displayName)
             setUser({
                 photoURL: res?.photoURL,
                 displayName: res?.displayName,
                 email: res?.email,
-                uid:res?.uid
+                uid: res?.uid
             });
         })
     }, []);
@@ -38,7 +35,8 @@ function Header() {
     return (
         <div className={"navbar_navbarDiv"}>
             <LogoSection/>
-            <RightSection user={user} setIsSignIn={setIsSignIn} setUser={setUser} isOnline={isOnline}/>
+            <RightSection user={user} setIsSignIn={setIsSignIn} isSignIn={isSignIn} setUser={setUser}
+                          isOnline={isOnline}/>
         </div>
     );
 }
@@ -52,8 +50,7 @@ export default Header;
  * @constructor
  */
 export function RightSection(params) {
-    const {setIsSignIn, isOnline, setUser, user} = params
-    const isSignedIn = localStorage.getItem(localStorageKeys.isSignIn);
+    const {setIsSignIn, isSignIn, isOnline, setUser, user} = params
 
     //function to handle sign-in on clicking button
     function handelSignIn() {
@@ -75,13 +72,16 @@ export function RightSection(params) {
         }
     }
 
+    useEffect(() => {
+        console.log("isSign:::", isSignIn)
+    }, [isSignIn]);
     return (
         <div className={"navbar_rightSectionDiv"}>
             <img title={"Theme"} alt="icon"
                  src={Images.lightTheme_icon}
                  className={"light_themeIcon"}/>
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
-            {isSignedIn ? <ProfileModal user={user} setUser={setUser}/> :
+            {isSignIn ? <ProfileModal user={user} setUser={setUser}/> :
                 <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
                     <div>Sign in</div>
                 </button>}
