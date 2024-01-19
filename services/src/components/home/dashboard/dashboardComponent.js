@@ -27,6 +27,8 @@ export function DashboardComponent() {
             case CardData[2].text:
                 console.log(CardData[2].text);
                 break;
+            default :
+                break;
         }
     };
 

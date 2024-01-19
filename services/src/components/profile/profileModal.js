@@ -7,7 +7,7 @@ import {Popover, styled} from "@mui/material";
 import {LogoutComponent} from "../common/logout/modalComponent";
 import LoaderComponent from "../common/loader/loaderComponent";
 import {PathName} from "../../utils/constants";
-import {googleSignOut} from "../../database/firebase.js";
+import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";
 
 const StyledPopover = styled(Popover)({
@@ -20,7 +20,7 @@ const StyledPopover = styled(Popover)({
 
 export function ProfileModal(props) {
     const [anchorEl, setAnchorEl] = useState(null);
-    const {user, setUser} = props;
+    const {user} = props;
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const navigate = useNavigate();
     console.log("profile :: == > ",)

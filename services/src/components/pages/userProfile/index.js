@@ -1,8 +1,6 @@
 import Header from "../../navbar/header";
-import React, {useState} from "react";
+import React from "react";
 import {EditProfile} from "../../profile/editProfile";
-import {getDateOfBirth} from "../../../database/firebase";
-import LoaderComponent from "../../common/loader/loaderComponent";
 
 /**
  * function to display user profile page

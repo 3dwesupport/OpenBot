@@ -11,7 +11,7 @@ import EditProfileIcon from"../assets/images/editProfile_Icon.png"
 import logOutIcon from "../assets/images/logout_icon.png"
 import darkThemeIcon from"../assets/images/darkTheme_icon.png"
 import editProfileDropdownIcon from"../assets/images/ editPofileDropdown_icon.png"
-import transactionIcon from"../assets/images/transaction_icon.png"
+import transactionIcon from"../assets/images/transactionHistory_icon.png"
 import arrowLeft from "../assets/images/arrowLeft_icon.png"
 import arrowDown from "../assets/images/arrowDown_icon.png"
 

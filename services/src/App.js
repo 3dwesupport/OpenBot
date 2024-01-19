@@ -1,10 +1,11 @@
 import './App.css';
 import {RouterComponent} from "./components/router/routes";
 import {useEffect, useState} from "react";
-import {auth, getCustomToken} from "./database/firebase"
+import {auth} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
 import {Constants, localStorageKeys} from "./utils/constants";
 import Cookies from "js-cookie";
+import {getCustomToken} from "./database/APIs";
 
 function App() {
     const [user, setUser] = useState(null);

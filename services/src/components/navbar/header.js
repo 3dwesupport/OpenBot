@@ -1,14 +1,11 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import {StoreContext} from "../../context/storeContext";
-import {auth, googleSigIn} from "../../database/firebase";
+import {auth, googleSigIn} from "../../database/authentication";
 import {Images} from "../../utils/images";
 import "./navbar.css";
 import {useNavigate} from "react-router-dom";
-import {localStorageKeys, PathName} from "../../utils/constants";
+import {PathName} from "../../utils/constants";
 import "./navbar.css";
-import {useTheme} from "@mui/material";
-import {ThemeContext} from "@emotion/react";
-import {dark, light} from "@mui/material/styles/createPalette";
 import {ProfileModal} from "../profile/profileModal";
 
 /**

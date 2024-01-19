@@ -1,18 +1,15 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Images} from "../../utils/images";
 import {InputFieldComponent} from "../common/inputField/inputField";
-import storeContext, {StoreContext} from "../../context/storeContext";
-import {auth, getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/firebase.js";
+import {StoreContext} from "../../context/storeContext";
+import {auth} from "../../database/authentication.js";
 import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
 import styles from "./editProfile.module.css"
-import {Constants} from "../../utils/constants";
-import {errorToast} from "../../utils/constants";
-import {Avatar, Stack} from "@mui/material";
-import {toast} from "react-toastify";
 import firebase from "firebase/compat/app";
 import ButtonComponent from "../common/button/buttonComponent";
+import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs";
 
 export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, setIsEditProfileModal) {
     const {user, setUser} = useContext(StoreContext);
@@ -152,7 +149,6 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                     firstName: userDetails?.firstName,
                     lastName: userDetails?.lastName
                 }));
-
                 uploadProfilePic(file, file?.name || 'default file name').then(async (photoURL) => {
                     if (user.photoURL === file) {
                         photoURL = file;
@@ -168,12 +164,8 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                     setIsLoader(false);
                     window.alert("profile updated successfully");
                 })
-
                 await setDateOfBirth(toTimeStamp(userDOB));
             }
-
-        } else {
-            errorToast(Constants.offline);
         }
     }
 
