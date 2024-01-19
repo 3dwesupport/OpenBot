@@ -10,6 +10,7 @@ import {PathName} from "../../utils/constants";
 import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";
 import "../common/dropdown/dropdown.css"
+
 const StyledPopover = styled(Popover)({
     '& .MuiPopover-paper': {
         padding: '20px',
@@ -20,11 +21,12 @@ const StyledPopover = styled(Popover)({
 
 export function ProfileModal(props) {
     const [anchorEl, setAnchorEl] = useState(null);
-    const {user} = props;
+    const {user, setIsSignIn} = props;
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const navigate = useNavigate();
-    console.log("profile :: == > ",)
+    const open = Boolean(anchorEl);
 
+    console.log("in prpfile mdoel")
     const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -33,18 +35,16 @@ export function ProfileModal(props) {
     };
 
     const handleLogoutClick = () => {
-        console.log("on clicking logout")
         setLogoutModalOpen(true);
         handlePopoverClose();
     };
 
     const navigateAndSignOut = () => {
         navigate(PathName.home);
-        googleSignOut().then();
+        googleSignOut().then(() => {
+            setIsSignIn(false);
+        })
     }
-
-
-    const open = Boolean(anchorEl);
 
     return (
         <div>

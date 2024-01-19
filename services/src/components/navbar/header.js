@@ -4,7 +4,7 @@ import {auth, googleSigIn} from "../../database/authentication";
 import {Images} from "../../utils/images";
 import "./navbar.css";
 import {useNavigate} from "react-router-dom";
-import {PathName} from "../../utils/constants";
+import {localStorageKeys, PathName} from "../../utils/constants";
 import {ProfileModal} from "../profile/profileModal";
 
 /**
@@ -14,6 +14,7 @@ import {ProfileModal} from "../profile/profileModal";
  */
 function Header() {
     const {user, setUser, setIsSignIn, isSignIn, isOnline} = useContext(StoreContext);
+
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
@@ -25,9 +26,6 @@ function Header() {
             });
         })
     }, []);
-
-    console.log("current user:::", user?.photoURL)
-
     return (
         <div className={"navbar_navbarDiv"}>
             <LogoSection/>
@@ -67,15 +65,15 @@ export function RightSection(params) {
             //TODO add slider for internet off
         }
     }
-
     useEffect(() => {
-        console.log("isSign:::", isSignIn)
+        console.log("isSign:::", localStorage.getItem(localStorageKeys.isSignIn));
     }, [isSignIn]);
+
     return (
         <div className={"navbar_rightSectionDiv"}>
             <img title={"Theme"} alt="icon" src={Images.lightTheme_icon} className={"light_themeIcon"}/>
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
-            {isSignIn ? <ProfileModal user={user} setUser={setUser}/> :
+            {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <ProfileModal user={user} setIsSignIn={setIsSignIn} setUser={setUser}/> :
                 <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
                     <span>Sign in</span>
                 </button>}
