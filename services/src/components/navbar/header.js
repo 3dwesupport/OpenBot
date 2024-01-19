@@ -5,7 +5,6 @@ import {Images} from "../../utils/images";
 import "./navbar.css";
 import {useNavigate} from "react-router-dom";
 import {PathName} from "../../utils/constants";
-import "./navbar.css";
 import {ProfileModal} from "../profile/profileModal";
 
 /**
@@ -74,13 +73,11 @@ export function RightSection(params) {
     }, [isSignIn]);
     return (
         <div className={"navbar_rightSectionDiv"}>
-            <img title={"Theme"} alt="icon"
-                 src={Images.lightTheme_icon}
-                 className={"light_themeIcon"}/>
+            <img title={"Theme"} alt="icon" src={Images.lightTheme_icon} className={"light_themeIcon"}/>
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
             {isSignIn ? <ProfileModal user={user} setUser={setUser}/> :
                 <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
-                    <div>Sign in</div>
+                    <span>Sign in</span>
                 </button>}
         </div>
     )

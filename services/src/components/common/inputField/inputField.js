@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import "./inputField.css";
 
 
@@ -17,11 +17,11 @@ export function InputFieldComponent(props) {
         onDataChange(e.target.value);
     };
 
-
     return (
         <div className={className ? className : "firstInputComponent"}>
             <div className={"namingDiv"}>{label}</div>
-            <input type={textType} style={{fontSize:"18px", padding:"8px"}} name={name} className={"inputBorder"} value={value}
+            <input type={textType} style={{fontSize: "18px", padding: "8px"}} name={name} className={"inputBorder"}
+                   value={value}
                    disabled={disabled} onChange={handleChange}/>
         </div>
 

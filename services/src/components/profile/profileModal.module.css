@@ -1,16 +1,13 @@
 .userProfileDiv {
-
     display: flex;
     justify-content: flex-start;
-
-
 }
 
 .profileModalIcon {
     height: 40px;
     width: 40px;
     border-radius: 50%;
-
+    object-fit: cover;
 }
 
 .profileModalIconDiv {
@@ -23,8 +20,6 @@
     width: 30%;
     display: flex;
     align-items: center;
-
-
 }
 
 .dropdown {
@@ -38,5 +33,4 @@
     color: #FFFFFF;
     font-family: Gilroy-SemiBold, sans-serif;
     white-space: nowrap;
-
 }

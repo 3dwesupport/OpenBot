@@ -6,12 +6,15 @@ import {auth} from "../../database/authentication.js";
 import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
-import styles from "./editProfile.module.css"
+import styles from "./editProfile.module.css";
+import {Constants} from "../../utils/constants";
+import {errorToast} from "../../utils/constants";
+import {Avatar} from "@mui/material";
 import firebase from "firebase/compat/app";
 import ButtonComponent from "../common/button/buttonComponent";
 import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs";
 
-export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, setIsEditProfileModal) {
+export function EditProfile() {
     const {user, setUser} = useContext(StoreContext);
     const {isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
@@ -29,9 +32,9 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
     useEffect(() => {
         setIsProfileLoader(true)
         console.log("user:::", user);
-        if(user) {
+        if (user) {
             getDateOfBirth(user?.uid).then((res) => {
-                console.log("inside getDateOfBirth:",res);
+                console.log("inside getDateOfBirth:", res);
                 setUserDOB(res);
                 setIsProfileLoader(false)
             }).catch((e) => {
@@ -44,7 +47,7 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
     useEffect(() => {
         console.log("user::", user);
         if (user) {
-            const names = user.displayName.split(' ');
+            const names = typeof user.displayName === 'string' ? user.displayName.split(' ') : [];
             setUserDetail({
                 ...userDetails,
                 firstName: names[0] || '',
@@ -154,7 +157,7 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                         photoURL = file;
                     }
 
-                    console.log("name::",userDetails?.firstName,userDetails?.lastName)
+                    console.log("name::", userDetails?.firstName, userDetails?.lastName)
                     await auth.currentUser?.updateProfile({
                         photoURL: photoURL,
                         displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
@@ -166,6 +169,8 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                 })
                 await setDateOfBirth(toTimeStamp(userDOB));
             }
+        } else {
+            errorToast(Constants.offlineMessage);
         }
     }
 
@@ -173,8 +178,8 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
         <>
             {isProfileLoader ?
                 <div className={styles.loader}>
-                <LoaderComponent  color="blue" />
-                </div>:
+                    <LoaderComponent color="blue"/>
+                </div> :
                 <div className={styles.mainScreen}>
                     <div className={styles.parentDiv}>
                         <div className={styles.editProfileContainer}>
@@ -191,15 +196,19 @@ export function EditProfile(isDob, setIsDobChanged, value, isEditProfileModal, s
                                          }}>
                                         <LoaderComponent color="blue" height="20" width="20"/>
                                     </div> :
-                                    <img className={styles.profileImage} style={{borderRadius: "50%"}}
-                                         src={user?.photoURL}
-                                         alt={"user"}/>}
+                                    <Avatar className={styles.profileImage} style={{
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                        height: "100px",
+                                        width: "100px"
+                                    }}
+                                            src={user?.photoURL}
+                                            alt={"user"}/>}
                                 <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
                                        accept={"image/*,.heic,.heif,.jpeg"}/>
 
                                 <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
-                                        className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
-                                {/*</Stack>*/}
+                                     className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
 
                             </div>
                         </div>

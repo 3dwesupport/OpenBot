@@ -10,13 +10,13 @@
     font-family: Gilroy-SemiBold, sans-serif;
 }
 
-
 .inputBorder {
     height: 30px;
     align-items: center;
     border: 1px solid rgba(0, 113, 197, .4);
     border-radius: 6px;
 }
+
 
 @media only screen and (max-width: 768px) {
 

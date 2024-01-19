@@ -1,19 +1,23 @@
-import React from "react";
+import React, {useState} from "react";
 import {Images} from "../../../utils/images";
 
 export function DropdownComponent(props) {
+    const [isHovered, setIsHovered] = useState(false);
     const {
         icon,
         onClick,
         label,
+        hoverIcon,
     } = props
 
     return (
-        <div onClick={onClick} className={"dropdownIcons"}>
-            <img src={icon} style={{height: "24px", width: "24px"}} alt={"Dropdown Item Icon"}/>
+        <div onClick={onClick} className={"dropdownIcons"} onMouseEnter={() => setIsHovered(true)}
+             onMouseLeave={() => setIsHovered(false)}>
+            <img src={isHovered ? hoverIcon : icon} style={{height: "24px", width: "24px"}} alt={"Dropdown Item Icon"}/>
             <div className={"dropdownDiv"}>
-                <span style={{whiteSpace: "nowrap", width: '80%'}}>{label}</span>
-                <img src={Images.arrowLeft} style={{height: "10px", width: "10px"}} alt={"Arrow Icon"}/>
+                <span className={"dropdownText"}>{label}</span>
+                <img src={isHovered ? Images.hoverArrowLeftIcon : Images.arrowLeft}
+                     style={{height: "12px", width: "12px", paddingTop: "6px"}} alt={"Arrow Icon"}/>
             </div>
         </div>
     )

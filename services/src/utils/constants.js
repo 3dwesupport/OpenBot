@@ -1,5 +1,6 @@
 import {Images} from "./images";
-
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export const PathName = {
     "home": "/",
     "editProfile": "/editProfile"
@@ -9,6 +10,7 @@ export const localStorageKeys = {
     user: "user",
     isSignIn: "isSignIn"
 }
+
 
 // Array of card data
 export const CardData = [
@@ -23,6 +25,22 @@ export const CardData = [
 export const Constants = {
     online: "online",
     offline: "offline",
+    ProfileSuccessMsg: "Profile updated successfully!",
+    offlineMessage: "User is offline"
+}
+
+export const errorToast=(message)=>{
+    toast.error(message,{
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+        pauseOnFocusLoss: false,
+    })
 
 }
 

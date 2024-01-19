@@ -6,6 +6,7 @@ import StoreProvider from "./context/storeContext"
 import {Constants, localStorageKeys} from "./utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs";
+import {ToastContainer} from "react-toastify";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -56,6 +57,7 @@ function App() {
     return (
         <StoreProvider user={user} setUser={setUser} isOnline={isOnline}>
             <RouterComponent/>
+            <ToastContainer autoClose={5000}/>
         </StoreProvider>
     );
 }

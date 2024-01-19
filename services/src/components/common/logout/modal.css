@@ -3,13 +3,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
-    height: 30%;
+    width: 420px;
+    height: 222px;
     border-radius: 6px;
     background-color: #fff;
-    border: none;
+    border: none!important;
 
-    /*background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);*/
+
 }
 .logoutDivText{
     width: auto;
@@ -18,8 +18,8 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: 15px;
-    padding: 40px;
-    height: 85px
+    padding: 42px;
+    height: 70px
 }
 .logoutButtonDiv{
     width: 90%;
@@ -29,27 +29,63 @@
     justify-content: flex-end;
     gap: 10px;
 }
-.cancelButton {
+.logoutButtons {
     font-size: 20px;
     height: 45px;
     width: 120px;
-    border: 1px solid #0071c5;
+    border: 1px solid #0071c5 !important;
     border-radius: 6px;
-    color: #0071c5;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
 }
-.okButton{
-    background: #0071c5;
-    border-radius: 6px;
-    color: #fff;
-    align-items: center;
-    cursor: pointer;
-    display: flex;
+
+.logoutCancelButton{
+    background-color: #FFFFFF !important;
+    color: #0071c5 !important;
+    width: 125px!important;
+    height: 42px!important;
+}
+.logoutOkButton {
+    width: 100px !important;
+    height: 42px!important;
+}
+.confirmLogout{
+    font-family: Gilroy-Medium, serif ;
     font-size: 20px;
-    height: 45px;
-    justify-content: center;
-    width: 100px;
+}
+.sureLogout{
+    font-family: Gilroy-Medium, serif ;
+    font-size: 16px;
+}
+
+@media only screen and (max-width: 768px){
+    .logoutComponent{
+        height:180px!important; ;
+        width: 300px!important;
+    }
+    .confirmLogout{
+        font-size: 18px;
+    }
+    .sureLogout{
+        font-size: 14px;
+    }
+    .logoutButtonDiv{
+        height: 4px;
+    }
+    .logoutCancelButton{
+        width: 95px!important;
+        height: 33px!important;
+        font-size: 17px!important;
+    }
+    .logoutOkButton{
+        width: 80px!important;
+        height: 33px!important;
+        font-size: 17px!important;
+    }
+    .logoutDivText{
+        padding: 30px;
+        height: 95px;
+    }
 }

@@ -9,20 +9,6 @@
     width: 70%;
 }
 
-.profileDiv {
-    align-items: flex-end;
-    background-position: 50%;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border-radius: 90px;
-    display: flex;
-    height: 100px;
-    justify-content: flex-end;
-    /*margin-left: 20px;*/
-    width: 100px;
-}
-
-
 .editProfileContainer {
     padding-top: 4%;
 }
@@ -41,7 +27,6 @@
     justify-content: flex-end;
 
 }
-
 
 .profileImage {
     display: flex;
@@ -94,14 +79,6 @@
     padding-top: 4%;
 }
 
-.logOutSection {
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    width: 90%;
-}
-
-
 .buttonSection {
     display: flex;
     column-gap: 3%;
@@ -120,36 +97,12 @@
     width: 30%;
 }
 
-
-
-.logOutButton {
-    font-size: 20px;
-    height: 45px;
-    width: 30%;
-    border: 1px solid #0071c5;
-    border-radius: 6px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    cursor: pointer;
-    padding-left: 2%;
-}
-
-.logOutIcon {
-    height: 32%;
-    width: 10%;
-}
-
-.logoutDiv {
-    padding-left: 10%;
-}
 .loader {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     color:darkred;
-
 }
 
 
@@ -164,15 +117,15 @@
         width: 90%;
     }
 
-    .saveButton {
-        height: 40px;
-        width: 50%;
-    }
+    /*.saveButton {*/
+    /*    height: 40px;*/
+    /*    width: 50%;*/
+    /*}*/
 
-    .cancelButton {
-        height: 40px;
-        width: 50%;
-    }
+    /*.cancelButton {*/
+    /*    height: 40px;*/
+    /*    width: 50%;*/
+    /*}*/
 
     .logOutButton {
         height: 40px;

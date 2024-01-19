@@ -3,22 +3,38 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    height: 140px;
+    width: 100%;
 }
 
 .dropdownIcons {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
     padding: 15px;
     flex-direction: row;
     gap: 20px;
-    width: 100%;
     cursor: pointer;
-
+    width: 100%;
+    border: 7px #FFFFFF;
+    border-left-style: solid;
 }
-.dropdownDiv{
+
+.dropdownIcons:hover {
+    background: #e8f6fe;
+    border: 7px #0071c5;
+    border-left-style: solid;
+    color: #0071c5;
+}
+
+.dropdownDiv {
     display: flex;
     justify-content: space-between;
-    width: 90%;
+    width: 215px;
 }
 
+.dropdownText {
+    white-space: nowrap;
+    font-size: 19px;
+    font-family: Gilroy-Medium, serif;
+}

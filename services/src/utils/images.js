@@ -10,10 +10,14 @@ import graphCardIcon from "../assets/images/graph_card_icon.png"
 import EditProfileIcon from"../assets/images/editProfile_Icon.png"
 import logOutIcon from "../assets/images/logout_icon.png"
 import darkThemeIcon from"../assets/images/darkTheme_icon.png"
-import editProfileDropdownIcon from"../assets/images/ editPofileDropdown_icon.png"
-import transactionIcon from"../assets/images/transactionHistory_icon.png"
+import editProfileDropdownIcon from"../assets/images/editProfileDropdown_icon.png"
+import transactionHistoryIcon from"../assets/images/transactionHistory_icon.png"
 import arrowLeft from "../assets/images/arrowLeft_icon.png"
 import arrowDown from "../assets/images/arrowDown_icon.png"
+import hoverEditProfileIcon from '../assets/images/hoverEditProfile_icon.png'
+import hoverTransactionHistoryIcon from'../assets/images/hover_transactionHistory_icon.png'
+import hoverLogoutIcon from'../assets/images/hoverLogout_icon.png'
+import hoverArrowLeftIcon from'../assets/images/hoverArrowLeft_icon.png'
 
 export const Images = {
     openBotLogo:openBotLogo,
@@ -29,8 +33,15 @@ export const Images = {
     logOutIcon:logOutIcon,
     darkThemeIcon:darkThemeIcon,
     editProfileDropdownIcon:editProfileDropdownIcon,
-    transactionIcon:transactionIcon,
+    transactionHistoryIcon:transactionHistoryIcon,
     arrowLeft:arrowLeft,
     arrowDown:arrowDown,
+    hoverEditProfileIcon:hoverEditProfileIcon,
+    hoverTransactionHistoryIcon:hoverTransactionHistoryIcon,
+    hoverLogoutIcon:hoverLogoutIcon,
+    hoverArrowLeftIcon:hoverArrowLeftIcon
+
+
+
 
 }
