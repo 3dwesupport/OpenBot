@@ -31,21 +31,17 @@ export function EditProfile() {
     })
     useEffect(() => {
         setIsProfileLoader(true)
-        console.log("user:::", user);
         if (user) {
             getDateOfBirth(user?.uid).then((res) => {
-                console.log("inside getDateOfBirth:", res);
                 setUserDOB(res);
                 setIsProfileLoader(false)
             }).catch((e) => {
-                console.log(e);
                 setIsProfileLoader(false)
             })
         }
     }, [user]);
 
     useEffect(() => {
-        console.log("user::", user);
         if (user) {
             const names = typeof user.displayName === 'string' ? user.displayName.split(' ') : [];
             setUserDetail({
@@ -69,7 +65,6 @@ export function EditProfile() {
 
     async function handleCompressFile(e) {
         const file = e.target.files[0];
-        console.log("file:::", file);
         let convertedFile = file;
         if (file.type === 'image/heic' || file.type === 'image/heif') {
             try {
@@ -120,7 +115,6 @@ export function EditProfile() {
 
 
     function changeUserImage(e) {
-        console.log("image:::", e.target.files[0])
         handleCompressFile(e).then(() =>
             setUser({
                 ...user,
@@ -136,7 +130,6 @@ export function EditProfile() {
     }
 
     const handleDOBChange = async (newDOB) => {
-        console.log("DOB::", newDOB);
         setUserDOB(newDOB);
     };
 
@@ -157,13 +150,11 @@ export function EditProfile() {
                         photoURL = file;
                     }
 
-                    console.log("name::", userDetails?.firstName, userDetails?.lastName)
                     await auth.currentUser?.updateProfile({
                         photoURL: photoURL,
                         displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
                     });
                     const updatedUser = auth.currentUser;
-                    console.log("Updated Display Name:", updatedUser?.displayName);
                     setIsLoader(false);
                     window.alert("profile updated successfully");
                 })

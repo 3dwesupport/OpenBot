@@ -20,12 +20,13 @@ export function LogoutComponent(props) {
                     <span className={"sureLogout"}>Are you sure you want to logout?</span>
                 </div>
                 <div className={"logoutButtonDiv"}>
-                    <ButtonComponent classStyle={"logoutButtons" + " " + "logoutCancelButton"} label={"Cancel"} onClick={handleLogoutModalClose}/>
-                    <ButtonComponent classStyle={"logoutButtons" +" "+ "logoutOkButton"} label={"Ok"} onClick={onClick}/>
+                    <ButtonComponent classStyle={"logoutButtons" + " " + "logoutCancelButton"} label={"Cancel"}
+                                     onClick={handleLogoutModalClose}/>
+                    <ButtonComponent classStyle={"logoutButtons" + " " + "logoutOkButton"} label={"Ok"}
+                                     onClick={onClick}/>
                 </div>
             </div>
         </Modal>
-
     )
 
 }

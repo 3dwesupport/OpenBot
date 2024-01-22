@@ -44,7 +44,7 @@ export default Header;
  * @constructor
  */
 export function RightSection(params) {
-    const {setIsSignIn, isSignIn, isOnline, setUser, user} = params
+    const {setIsSignIn, isOnline, setUser, user} = params
 
     //function to handle sign-in on clicking button
     function handelSignIn() {
@@ -65,9 +65,6 @@ export function RightSection(params) {
             //TODO add slider for internet off
         }
     }
-    useEffect(() => {
-        console.log("isSign:::", localStorage.getItem(localStorageKeys.isSignIn));
-    }, [isSignIn]);
 
     return (
         <div className={"navbar_rightSectionDiv"}>

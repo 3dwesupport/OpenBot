@@ -26,7 +26,6 @@ export function ProfileModal(props) {
     const navigate = useNavigate();
     const open = Boolean(anchorEl);
 
-    console.log("in prpfile mdoel")
     const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };

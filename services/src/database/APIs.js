@@ -5,10 +5,10 @@ import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {FirebaseStorage, auth, db} from "./authentication";
 
 /**
- * function to handle single sign-on using custom token
- * @returns {Promise<*>}
+ * function to upload profile photo to firebase storage
  * @param file
  * @param fileName
+ * @returns {Promise<string>}
  */
 export async function uploadProfilePic(file, fileName) {
     if (fileName === undefined) {
@@ -19,9 +19,15 @@ export async function uploadProfilePic(file, fileName) {
     return getDownloadURL(fileRef)
 }
 
+/**
+ * function to handle single sign-on using custom token
+ * @returns {Promise<*>}
+ * @param file
+ * @param fileName
+ */
 export async function getCustomToken(UID) {
     try {
-        const response = await fetch(`${process.env.DOMAIN_ADDRESS}/getToken?uid=${UID}`);
+        const response = await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/getToken?uid=${UID}`);
         const data = await response.json();
         return data.token
     } catch (error) {
@@ -30,7 +36,9 @@ export async function getCustomToken(UID) {
 }
 
 
-// Function to get the current date in the format YYYY-MM-DD
+/**
+ * Function to get the current date in the format YYYY-MM-DD
+ */
 export async function getCurrentDateOfBirth() {
     const date = new Date();
     const year = date.getFullYear();
@@ -39,11 +47,13 @@ export async function getCurrentDateOfBirth() {
     return `${year}-${month}-${day}`;
 }
 
-
+/**
+ * function to get date of birth if exists
+ * @param uid
+ * @returns {Promise<string>}
+ */
 export async function getDateOfBirth(uid) {
-    console.log("getDateOfBirth::::", uid)
     const docRef = doc(db, "users", uid);
-    console.log("Getting date of birth from Firestore...");
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
 
@@ -56,17 +66,14 @@ export async function getDateOfBirth(uid) {
             const day = String(date.getDate()).padStart(2, '0');
             // return`${year}-${month}-${day}`; // dob which we are storing from firebase
             const firebaseDOB = `${year}-${month}-${day}`;
-            console.log("Date of birth from Firestore:", firebaseDOB);
             return firebaseDOB;
 
         }
     }
     const currentDOB = await getCurrentDateOfBirth();
-    console.log("Date of birth not found in Firestore. Returning current date of birth:", currentDOB);
     return currentDOB; // current dob
 
 }
-
 
 /**
  * function to store date of birth in firebase
@@ -82,7 +89,6 @@ export async function setDateOfBirth(DOB) {
         // Call setDoc with the object data
         await setDoc(workspaceRef, data);
 
-        console.log('Date of birth set successfully:', DOB);
     } catch (error) {
         console.error('Error setting date of birth:', error);
         throw error; // Re-throw the error to indicate failure
