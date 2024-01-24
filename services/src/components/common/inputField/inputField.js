@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import "./inputField.css";
+
 
 
 export function InputFieldComponent(props) {
@@ -11,22 +12,23 @@ export function InputFieldComponent(props) {
         disabled,
         className = "",
         onDataChange,
+        style={},
     } = props
 
     const handleChange = (e) => {
         onDataChange(e.target.value);
     };
-
     return (
         <div className={className ? className : "firstInputComponent"}>
             <div className={"namingDiv"}>{label}</div>
-            <input type={textType} style={{fontSize: "18px", padding: "8px"}} name={name} className={"inputBorder"}
+            <input type={textType}  name={name} className={"inputBorder"}
                    value={value}
-                   disabled={disabled} onChange={handleChange} />
+                   disabled={disabled} onChange={handleChange} style={style} />
         </div>
 
 
     );
+
 
 }
 

@@ -6,9 +6,11 @@ export default function ButtonComponent(props) {
         label,
         onClick,
         classStyle,
+        disabled,
+
     } = props
     return (
-        <div onClick={onClick} className={styles.saveButton + " " + classStyle}>
+        <div onClick={disabled ? null : onClick} className={styles.saveButton + " " + classStyle}>
             <span>{label}</span>
         </div>
     )

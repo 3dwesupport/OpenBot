@@ -7,13 +7,17 @@ import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
 import styles from "./editProfile.module.css";
-import {Constants} from "../../utils/constants";
-import {errorToast} from "../../utils/constants";
+import {Constants, errorToast} from "../../utils/constants";
 import {Avatar} from "@mui/material";
 import firebase from "firebase/compat/app";
 import ButtonComponent from "../common/button/buttonComponent";
 import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs";
 
+/**
+ * Edit profile component
+ * @returns {Element}
+ * @constructor
+ */
 export function EditProfile() {
     const {user, setUser} = useContext(StoreContext);
     const {isOnline} = useContext(StoreContext);
@@ -22,13 +26,15 @@ export function EditProfile() {
     const [isProfileLoader, setIsProfileLoader] = useState(false);
     const [file, setFile] = useState(user?.photoURL && user.photoURL);
     const [userDOB, setUserDOB] = useState("");
+    const [isSaveDisabled, setIsSaveDisabled] = useState(false);
     const [userDetails, setUserDetail] = useState({
         displayName: user?.displayName,
         firstName: user?.displayName,
         lastName: user?.displayName,
         email: user?.email,
-        photoUrl: user?.photoURL
+        photoUrl: user?.photoURL,
     })
+
     useEffect(() => {
         setIsProfileLoader(true)
         if (user) {
@@ -52,7 +58,6 @@ export function EditProfile() {
         }
 
     }, [user?.displayName]);
-
 
     useEffect(() => {
         if (user) {
@@ -99,6 +104,7 @@ export function EditProfile() {
                     ...prevState,
                     firstName: name,
                 }));
+                setIsSaveDisabled(name.trim().length === 0);
                 break
             case "lastName":
                 setUserDetail(prevState => ({
@@ -110,7 +116,6 @@ export function EditProfile() {
                 console.error('Invalid nameType:', nameType);
         }
     }
-
 
     function changeUserImage(e) {
         handleCompressFile(e).then(() =>
@@ -152,6 +157,7 @@ export function EditProfile() {
                     });
                     const updatedUser = auth.currentUser;
                     setIsLoader(false);
+                    window.alert("profile updated successfully");
                 })
                 await setDateOfBirth(toTimeStamp(userDOB));
             }
@@ -193,24 +199,25 @@ export function EditProfile() {
                         </div>
                         <div className={styles.childDiv}>
                             <div className={styles.nameDiv}>
-                                <InputFieldComponent label="First Name" textType="text"  value={userDetails.firstName}
-                                                     onDataChange={(name) => handleNameChange('firstName', name)}/>
+                                <InputFieldComponent label="First Name" textType="text" value={userDetails.firstName}
+                                                     onDataChange={(name) => handleNameChange('firstName', name)}
+                                                     style={{
+                                                         border: userDetails?.firstName?.trim().length === 0 && "1px solid red",
+                                                         outline: userDetails?.firstName?.trim().length === 0 && "none",
+                                                     }}/>
                                 <InputFieldComponent label="Last Name" textType="text" value={userDetails.lastName}
                                                      onDataChange={(name) => handleNameChange('lastName', name)}/>
                             </div>
                             <div className={styles.detailsDiv}>
                                 <InputFieldComponent value={userDOB} label="Date Of Birth" textType="date"
-                                                     onDataChange={handleDOBChange}
-                                />
+                                                     onDataChange={handleDOBChange}/>
                             </div>
-
                             <div className={styles.emailDiv}>
                                 <InputFieldComponent value={user?.email} label={"Email address"} textType={"email"}
                                                      disabled={true}/>
                             </div>
-
                             <div className={styles.buttonSection}>
-                                <ButtonComponent label={"Save"} onClick={handleSubmit}/>
+                                <ButtonComponent label={"Save"} onClick={handleSubmit} disabled={isSaveDisabled}/>
                             </div>
                         </div>
 
