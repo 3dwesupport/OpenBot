@@ -7,7 +7,7 @@ import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
 import styles from "./editProfile.module.css";
-import {Constants, errorToast} from "../../utils/constants";
+import {Constants, errorToast, successToast} from "../../utils/constants";
 import {Avatar} from "@mui/material";
 import firebase from "firebase/compat/app";
 import ButtonComponent from "../common/button/buttonComponent";
@@ -84,7 +84,6 @@ export function EditProfile() {
                 return;
             }
         }
-
         new Compressor(convertedFile, {
             quality: 0.2, // Set the compression quality (0 to 1)
             success(result) {
@@ -157,7 +156,7 @@ export function EditProfile() {
                     });
                     const updatedUser = auth.currentUser;
                     setIsLoader(false);
-                    window.alert("profile updated successfully");
+                    successToast(Constants.ProfileSuccessMsg);
                 })
                 await setDateOfBirth(toTimeStamp(userDOB));
             }
@@ -213,7 +212,7 @@ export function EditProfile() {
                                                      onDataChange={handleDOBChange}/>
                             </div>
                             <div className={styles.emailDiv}>
-                                <InputFieldComponent value={user?.email} label={"Email address"} textType={"email"}
+                                <InputFieldComponent value={user?.email} label={"Email address"} style={{color:"grey"}} textType={"email"}
                                                      disabled={true}/>
                             </div>
                             <div className={styles.buttonSection}>

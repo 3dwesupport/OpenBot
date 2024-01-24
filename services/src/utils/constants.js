@@ -22,11 +22,12 @@ export const CardData = [
     {bgColor: "#B73DDF", image: Images.graphCardIcon, text: "Usage Analytics"},
 ];
 
+
 export const Constants = {
     online: "online",
     offline: "offline",
+    offlineMessage: "User is offline",
     ProfileSuccessMsg: "Profile updated successfully!",
-    offlineMessage: "User is offline"
 }
 
 export const errorToast=(message)=>{
@@ -40,6 +41,20 @@ export const errorToast=(message)=>{
         progress: undefined,
         theme: 'colored',
         pauseOnFocusLoss: false,
+    })
+
+}
+export const successToast=(message)=>{
+    toast.success(message, {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        background: '#4CAF50',
+        color: '#ffffff',
+        borderRadius: '8px',
     })
 
 }
