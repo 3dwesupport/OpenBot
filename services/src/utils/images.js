@@ -18,7 +18,7 @@ import hoverEditProfileIcon from '../assets/images/hoverEditProfile_icon.png'
 import hoverTransactionHistoryIcon from'../assets/images/hover_transactionHistory_icon.png'
 import hoverLogoutIcon from'../assets/images/hoverLogout_icon.png'
 import hoverArrowLeftIcon from'../assets/images/hoverArrowLeft_icon.png'
-import openInNewFile_icon from'../assets/images/openInNewFile_icon.png'
+import openInNewFileIcon from'../assets/images/openInNewFile_icon.png'
 export const Images = {
     openBotLogo:openBotLogo,
     lightTheme_icon:lightTheme_icon,
@@ -40,7 +40,7 @@ export const Images = {
     hoverTransactionHistoryIcon:hoverTransactionHistoryIcon,
     hoverLogoutIcon:hoverLogoutIcon,
     hoverArrowLeftIcon:hoverArrowLeftIcon,
-    openInNewFile_icon:openInNewFile_icon,
+    openInNewFileIcon:openInNewFileIcon,
 
 
 

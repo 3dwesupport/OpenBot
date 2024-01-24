@@ -12,6 +12,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    cursor: pointer;
 }
 
 .title {
@@ -20,10 +21,11 @@
     padding-left: 5%;
 }
 
-.cardImage {
+.cardImageAndText {
     display: flex;
-    justifyContent: center;
     align-items: center;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .textDiv {
@@ -34,12 +36,20 @@
 }
 
 .textStyleDiv {
-    display: flex;
-    justifyContent: center;
-    align-items: center;
-    margin-top: 2%;
     color: #FFFFFF;
     font-family: Gilroy-Medium, serif;
+}
+.newFileIcon{
+    display: flex;
+    justify-content: flex-end;
+    width: 90%;
+    align-items: flex-end;
+    position: absolute;
+    top: 0;
+    padding: 15px;
+}
+.cardImage{
+    height: 55px;
 }
 
 @media only screen and (max-width: 768px) {
@@ -49,7 +59,6 @@
         justify-content: flex-start;
         align-items: center;
     }
-
     .cardContainer {
         height: 73%;
         width: 95%;
@@ -60,17 +69,14 @@
         height: 10%;
     }
 
-    .cardImage {
-        padding: 10px;
-        height: 30%;
-
-    }
-
     .textStyleDiv {
-        height: 1%;
-        font-size: 85%;
+        font-size: 12px;
     }
-
-
+    .cardImage{
+        height: 40px;
+    }
+.newFileIcon{
+    padding: 10px;
+}
 
 }

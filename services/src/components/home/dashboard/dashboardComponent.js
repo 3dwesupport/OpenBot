@@ -3,6 +3,7 @@ import "../../common/card/card.css"
 import {CardData, localStorageKeys} from "../../../utils/constants";
 import {CardComponent} from "../../common/card/card";
 import {StoreContext} from "../../../context/storeContext";
+import {Images} from "../../../utils/images";
 
 /**
  * Function to display all openBot services on home page
@@ -46,7 +47,7 @@ export function DashboardComponent() {
             <div className={"cardContainer"}>
                 {/* Mapping over CardData array and rendering servicesSection for each item */}
                 {CardData.map((card, index) => (
-                    <CardComponent handleCardClick={handleCardClick} key={index} value={card}/>))}
+                    <CardComponent handleCardClick={handleCardClick} key={index} value={card} index={index}/>))}
             </div>
         </div>
     );
