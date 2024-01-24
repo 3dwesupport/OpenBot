@@ -91,15 +91,15 @@ export function LogoSection() {
         navigate(PathName.home);
     }
 
-    return (<div className={"navbar_navbarDiv"}>
+    return (<>
             <div className={"navbarTitleDiv"}>
                 <img alt="openBotIcon" onClick={openHomepage} className={"navbar_mainIcon"}
                      src={Images.openBotLogo}></img>
                 <div onClick={openHomepage} className={"navbar_headDiv"}>
-                    <div className={"mainTitle"}>OpenBot Dashboard</div>
+                    <span className={"mainTitle"}>OpenBot Dashboard</span>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

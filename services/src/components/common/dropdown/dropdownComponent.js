@@ -8,16 +8,17 @@ export function DropdownComponent(props) {
         onClick,
         label,
         hoverIcon,
+        className,
     } = props
 
     return (
         <div onClick={onClick} className={"dropdownIcons"} onMouseEnter={() => setIsHovered(true)}
              onMouseLeave={() => setIsHovered(false)}>
-            <img src={isHovered ? hoverIcon : icon} style={{height: "24px", width: "24px"}} alt={"Dropdown Item Icon"}/>
+            <img src={isHovered ? hoverIcon : icon} className={className} alt={"Dropdown Item Icon"}/>
             <div className={"dropdownDiv"}>
                 <span className={"dropdownText"}>{label}</span>
                 <img src={isHovered ? Images.hoverArrowLeftIcon : Images.arrowLeft}
-                     style={{height: "12px", width: "12px", paddingTop: "6px"}} alt={"Arrow Icon"}/>
+                   className={"arrowLeft"}  alt={"Arrow Icon"}/>
             </div>
         </div>
     )

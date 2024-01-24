@@ -50,6 +50,7 @@ export function EditProfile() {
                 lastName: names.slice(1).join(' ') || '',
             })
         }
+
     }, [user?.displayName]);
 
 
@@ -59,9 +60,7 @@ export function EditProfile() {
         } else {
             setIsLoader(true);
         }
-
     }, [user]);
-
 
     async function handleCompressFile(e) {
         const file = e.target.files[0];
@@ -92,7 +91,6 @@ export function EditProfile() {
             },
         });
     }
-
 
     function handleNameChange(nameType, name) {
         switch (nameType) {
@@ -135,11 +133,10 @@ export function EditProfile() {
 
 
     async function handleSubmit() {
-
+        console.log('save button clicked');
         if (isOnline) {
             if (user.photoURL !== file || user.displayName !== userDetails.displayName) {
                 setIsLoader(true);
-
                 setUserDetail(prevUserDetails => ({
                     ...prevUserDetails,
                     firstName: userDetails?.firstName,
@@ -149,14 +146,12 @@ export function EditProfile() {
                     if (user.photoURL === file) {
                         photoURL = file;
                     }
-
                     await auth.currentUser?.updateProfile({
                         photoURL: photoURL,
                         displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
                     });
                     const updatedUser = auth.currentUser;
                     setIsLoader(false);
-                    window.alert("profile updated successfully");
                 })
                 await setDateOfBirth(toTimeStamp(userDOB));
             }
@@ -177,14 +172,7 @@ export function EditProfile() {
                             <div className={styles.editProfileTextDiv}>Edit Profile</div>
                             <div className={styles.editProfileImageDiv}>
                                 {isLoader ?
-                                    <div className={styles.profileImage}
-                                         style={{
-                                             borderRadius: "50%",
-                                             border: "1px solid black",
-                                             display: "flex",
-                                             justifyContent: "center",
-                                             alignItems: "center"
-                                         }}>
+                                    <div className={styles.profileImage}>
                                         <LoaderComponent color="blue" height="20" width="20"/>
                                     </div> :
                                     <Avatar className={styles.profileImage} style={{
@@ -205,7 +193,7 @@ export function EditProfile() {
                         </div>
                         <div className={styles.childDiv}>
                             <div className={styles.nameDiv}>
-                                <InputFieldComponent label="First Name" textType="text" value={userDetails.firstName}
+                                <InputFieldComponent label="First Name" textType="text"  value={userDetails.firstName}
                                                      onDataChange={(name) => handleNameChange('firstName', name)}/>
                                 <InputFieldComponent label="Last Name" textType="text" value={userDetails.lastName}
                                                      onDataChange={(name) => handleNameChange('lastName', name)}/>
@@ -225,15 +213,13 @@ export function EditProfile() {
                                 <ButtonComponent label={"Save"} onClick={handleSubmit}/>
                             </div>
                         </div>
+
                     </div>
+
                 </div>
             }
         </>
 
     );
 }
-
-
-
-
 

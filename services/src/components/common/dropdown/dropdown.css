@@ -38,3 +38,38 @@
     font-size: 19px;
     font-family: Gilroy-Medium, serif;
 }
+.dropdownIconDiv{
+    height: 24px;
+    width: 24px;
+}
+.arrowLeft{
+    height: 12px;
+    width: 12px;
+    padding-top: 6px;
+}
+@media only screen and (max-width: 768px) {
+    .dropdownIcons {
+        width: 145px;
+        gap: 8px;
+        padding: 6px;
+    }
+    .dropdownDiv {
+        width: 120px;
+    }
+    .dropdownText {
+        font-size: 11px;
+        padding-top: 2px;
+    }
+    .dropdownIconDiv{
+        height: 16px;
+        width: 16px;
+    }
+    .dropdownItem{
+        height: 75px;
+    }
+    .arrowLeft{
+        height: 8px;
+        width: 8px;
+        padding-top: 5px;
+    }
+}

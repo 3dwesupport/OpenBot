@@ -8,7 +8,7 @@ export const PathName = {
 export const localStorageKeys = {
     accessToken: "accessToken",
     user: "user",
-    isSignIn: "isSignIn"
+    isSignIn: "isSignIn",
 }
 
 

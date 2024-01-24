@@ -20,10 +20,10 @@ export function CardComponent({value, handleCardClick}) {
             justifyContent: "center", backgroundColor: value.bgColor, borderRadius: 3, height: "100%", gap: "4%"
         }} onClick={handleClick}>
             <div className={"cardImage"}>
-                <img src={value.image} alt="Card Image" style={{cursor:"pointer"}}/>
+                <img src={value.image} alt="Card Image" style={{cursor: "pointer"}}/>
             </div>
             <div className={"textStyleDiv"}>
-                <div style={{cursor:"pointer"}}> {value.text}</div>
+                <div style={{cursor: "pointer"}}> {value.text}</div>
             </div>
         </Card>
     );

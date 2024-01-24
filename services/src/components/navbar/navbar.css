@@ -2,60 +2,59 @@
     align-items: center;
     background-color: #0071c5;
     display: flex;
-    height: 5rem;
+    height: 65px;
     justify-content: space-between;
 }
 
 .navbar_mainIcon {
     cursor: pointer;
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 25px;
+    width: 26px;
 }
 
 .navbarTitleDiv {
     align-items: center;
     display: flex;
-    margin-left: 4rem;
-
+    gap: 8px;
+    margin-left: 70px;
 }
 
 .navbar_headDiv {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    margin: 10px;
 }
 
 .mainTitle {
     color: #fff;
     cursor: pointer;
     font-family: Gilroy-Medium, sans-serif;
-    font-size: 1.3rem;
+    font-size: 18px;
 }
 
 .navbar_rightSectionDiv {
     align-items: center;
     display: flex;
-    justify-content: space-evenly;
-    margin-right: 4rem;
+    justify-content: center;
+    gap: 18px;
+    margin-right: 80px;
 }
 
 .light_themeIcon {
+    height: 22px;
+    width: 22px;
+}
+.light_themeIcon:hover{
     cursor: pointer;
-    height: 23px;
-    width: 23px;
-    margin: 10px;
+    height: 28px;
+    width: 28px;
 }
 .dark_themeIcon{
-    height: 23px;
-    width: 23px;
     cursor: pointer;
-    margin: 10px;
 }
 
 .navbar_lineIcon {
-    width: .5%;
-    margin: 10px;
+    height: 30px;
 }
 
 .navbar_buttonIcon {
@@ -70,21 +69,35 @@
     width: 5rem;
     margin: 10px;
 }
-@media only screen and (max-width: 768px){
-    .navbar_rightSectionDiv {
-        margin-right: 2rem;
+@media only screen and (max-width: 768px) {
+    .navbar_navbarDiv{
+        height: 50px;
     }
-    .navbarTitleDiv {
-        margin-left: 2rem;
+    .navbarTitleDiv{
+margin-left: 22px;
     }
-    .navbar_themeIcon{
-        margin: 4px;
+    .navbar_mainIcon {
+        height: 21px;
+        width: 20px;
+    }
+    .mainTitle{
+        font-size: 12px;
+    }
+    .light_themeIcon{
+        height: 16px;
+        width: 16px;
+    }
+    .light_themeIcon:hover{
+        cursor: pointer;
+        height: 22px;
+        width: 22px;
     }
     .navbar_lineIcon{
-        margin: 4px;
+        height: 25px;
     }
-    .navbar_buttonIcon{
-        margin: 4px;
+    .navbar_rightSectionDiv{
+        margin-right: 20px;
+        gap:10px;
     }
 
 }
