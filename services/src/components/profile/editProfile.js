@@ -7,7 +7,7 @@ import LoaderComponent from "../common/loader/loaderComponent";
 import Compressor from 'compressorjs';
 import heic2any from "heic2any";
 import styles from "./editProfile.module.css";
-import {Constants, errorToast, successToast} from "../../utils/constants";
+import {errorToast, successToast, Constants} from "../../utils/constants";
 import {Avatar} from "@mui/material";
 import firebase from "firebase/compat/app";
 import ButtonComponent from "../common/button/buttonComponent";
@@ -19,54 +19,55 @@ import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/A
  * @constructor
  */
 export function EditProfile() {
-    const {user, setUser} = useContext(StoreContext);
+    const {user} = useContext(StoreContext);
     const {isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
-    const [isLoader, setIsLoader] = useState(false);
     const [isProfileLoader, setIsProfileLoader] = useState(false);
-    const [file, setFile] = useState(user?.photoURL && user.photoURL);
+    const [file, setFile] = useState(user?.photoURL);
     const [userDOB, setUserDOB] = useState("");
     const [isSaveDisabled, setIsSaveDisabled] = useState(false);
-    const [userDetails, setUserDetail] = useState({
+    const [userDetails, setUserDetails] = useState({
         displayName: user?.displayName,
         firstName: user?.displayName,
         lastName: user?.displayName,
         email: user?.email,
-        photoUrl: user?.photoURL,
+        photoURL: user?.photoURL,
     })
-
+ // useEffect to fetch and update user profile data when the 'user' object changes
     useEffect(() => {
-        setIsProfileLoader(true)
-        if (user) {
-            getDateOfBirth(user?.uid).then((res) => {
-                setUserDOB(res);
-                setIsProfileLoader(false)
-            }).catch((e) => {
-                setIsProfileLoader(false)
-            })
+        if (!user) {
+            return;
         }
+        setIsProfileLoader(true);
+
+        (async () => {
+            try {
+                const [dob, names] = await Promise.all([
+                    getDateOfBirth(user.uid),
+                    user.displayName ? user.displayName.split(' ') : [],
+                ]);
+                setUserDOB(dob);
+                setUserDetails((prevState) => ({
+                    ...prevState,
+                    firstName: names[0] || '',
+                    lastName: names[1] || '',
+                    photoURL: user.photoURL || prevState.photoURL,
+                }));
+            } catch (error) {
+                console.error("Error fetching profile data:", error);
+            } finally {
+                setIsProfileLoader(false);
+            }
+        })();
     }, [user]);
 
-    useEffect(() => {
-        if (user) {
-            const names = typeof user.displayName === 'string' ? user.displayName.split(' ') : [];
-            setUserDetail({
-                ...userDetails,
-                firstName: names[0] || '',
-                lastName: names.slice(1).join(' ') || '',
-            })
-        }
 
-    }, [user?.displayName]);
 
-    useEffect(() => {
-        if (user) {
-            setIsLoader(false)
-        } else {
-            setIsLoader(true);
-        }
-    }, [user]);
-
+    /**
+     * function to compress the profile image
+     * @param e
+     * @returns {Promise<void>}
+     */
     async function handleCompressFile(e) {
         const file = e.target.files[0];
         let convertedFile = file;
@@ -96,17 +97,20 @@ export function EditProfile() {
         });
     }
 
+    /**
+     * function to handle name change
+     */
     function handleNameChange(nameType, name) {
         switch (nameType) {
             case "firstName":
-                setUserDetail(prevState => ({
+                setUserDetails(prevState => ({
                     ...prevState,
                     firstName: name,
                 }));
                 setIsSaveDisabled(name.trim().length === 0);
                 break
             case "lastName":
-                setUserDetail(prevState => ({
+                setUserDetails(prevState => ({
                     ...prevState,
                     lastName: name,
                 }));
@@ -116,52 +120,76 @@ export function EditProfile() {
         }
     }
 
+    /**
+     * function to handle user image change
+     * @param e
+     */
     function changeUserImage(e) {
         handleCompressFile(e).then(() =>
-            setUser({
-                ...user,
+            setUserDetails({
+                ...userDetails,
                 photoURL: URL.createObjectURL(e.target.files[0])
             })
         );
     }
 
+    /**
+     * TimeStamp format for setting DOB
+     * @param dob
+     * @returns {Date}
+     */
     function toTimeStamp(dob) {
         const date = new Date(dob);
         return firebase.firestore.Timestamp.fromDate(date).toDate();
 
     }
 
+    /**
+     * handle Date of birth change
+     * @param newDOB
+     * @returns {Promise<void>}
+     */
     const handleDOBChange = async (newDOB) => {
         setUserDOB(newDOB);
     };
 
-
+    /**
+     * Handling save button on edit profile modal
+     * @returns {Promise<void>}
+     */
     async function handleSubmit() {
+        setIsProfileLoader(true);
         console.log('save button clicked');
+
         if (isOnline) {
-            if (user.photoURL !== file || user.displayName !== userDetails.displayName) {
-                setIsLoader(true);
-                setUserDetail(prevUserDetails => ({
-                    ...prevUserDetails,
-                    firstName: userDetails?.firstName,
-                    lastName: userDetails?.lastName
-                }));
-                uploadProfilePic(file, file?.name || 'default file name').then(async (photoURL) => {
-                    if (user.photoURL === file) {
-                        photoURL = file;
+            // Check if there are changes in profile picture or display name
+            if (file !== undefined || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}`) {
+                try {
+                    let photoURL = user.photoURL;
+
+                    // Upload new profile picture if a new file is selected
+                    if (file) {
+                        photoURL = await uploadProfilePic(file, file.name || 'user profile image');
                     }
+
+                    // Update profile information
                     await auth.currentUser?.updateProfile({
                         photoURL: photoURL,
                         displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
                     });
+
+                    // Refresh the user object
                     const updatedUser = auth.currentUser;
-                    setIsLoader(false);
+                    await setDateOfBirth(toTimeStamp(userDOB));
                     successToast(Constants.ProfileSuccessMsg);
-                })
-                await setDateOfBirth(toTimeStamp(userDOB));
+                } catch (e) {
+                    console.error("Error in updating profile:", e);
+                    // TODO: Show failure toast for profile update
+                }
             }
+            setIsProfileLoader(false);
         } else {
-            errorToast(Constants.offlineMessage);
+            errorToast( Constants.offlineMessage);
         }
     }
 
@@ -176,24 +204,23 @@ export function EditProfile() {
                         <div className={styles.editProfileContainer}>
                             <div className={styles.editProfileTextDiv}>Edit Profile</div>
                             <div className={styles.editProfileImageDiv}>
-                                {isLoader ?
+                                {/*{isLoader ?*/}
                                     <div className={styles.profileImage}>
-                                        <LoaderComponent color="blue" height="20" width="20"/>
-                                    </div> :
+                                        {/*<LoaderComponent color="blue" height="20" width="20"/>*/}
+                                    </div>
                                     <Avatar className={styles.profileImage} style={{
                                         borderRadius: "50%",
                                         objectFit: "cover",
                                         height: "100px",
                                         width: "100px"
                                     }}
-                                            src={user?.photoURL}
-                                            alt={"user"}/>}
+                                            src={userDetails?.photoURL}
+                                            alt={"user"}/>
                                 <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
                                        accept={"image/*,.heic,.heif,.jpeg"}/>
 
                                 <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
                                      className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
-
                             </div>
                         </div>
                         <div className={styles.childDiv}>
@@ -212,7 +239,8 @@ export function EditProfile() {
                                                      onDataChange={handleDOBChange}/>
                             </div>
                             <div className={styles.emailDiv}>
-                                <InputFieldComponent value={user?.email} label={"Email address"} style={{color:"grey"}} textType={"email"}
+                                <InputFieldComponent value={user?.email} label={"Email address"} style={{color: "grey"}}
+                                                     textType={"email"}
                                                      disabled={true}/>
                             </div>
                             <div className={styles.buttonSection}>
@@ -225,7 +253,6 @@ export function EditProfile() {
                 </div>
             }
         </>
-
     );
 }
 

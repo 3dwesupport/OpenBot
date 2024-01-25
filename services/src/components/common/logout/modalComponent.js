@@ -3,16 +3,19 @@ import {Modal} from "@mui/material";
 import "./modal.css"
 import ButtonComponent from "../button/buttonComponent";
 
-
+/**
+ * component to represent logout modal
+ */
 export function LogoutComponent(props) {
     const {setLogoutModalOpen, logoutModalOpen, onClick} = props
 
+    //handle the logout modal close
     const handleLogoutModalClose = () => {
         setLogoutModalOpen(false);
     };
 
+    //render the logout confirmation modal
     return (
-
         <Modal open={logoutModalOpen}>
             <div className={"logoutComponent"}>
                 <div className={"logoutDivText"}>

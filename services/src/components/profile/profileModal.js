@@ -43,7 +43,7 @@ export function ProfileModal(props) {
         setAnchorEl(null);
 
     };
-
+     // on the click of logout first it will navigate to dashboard then sign-out
     const handleLogoutClick = () => {
         setLogoutModalOpen(true);
         handlePopoverClose();
@@ -55,7 +55,7 @@ export function ProfileModal(props) {
             setIsSignIn(false);
         })
     }
-
+      /*StyledPopover for the dropdown menu*/
     return (
         <div>
             <ThemeProvider theme={theme}>
@@ -63,9 +63,9 @@ export function ProfileModal(props) {
                             anchorOrigin={{vertical: 'bottom', horizontal: 'right',}}
                             transformOrigin={{vertical: 'top', horizontal: 'right'}}>
                 <div className={"dropdownItem"}>
-                        <DropdownComponent icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverEditProfileIcon}
-                                                          label="Edit Profile" className={"dropdownIconDiv"}
-                                                        onClick={() => navigate(PathName.editProfile)}/>
+                    <DropdownComponent icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverEditProfileIcon}
+                                       label="Edit Profile" className={"dropdownIconDiv"}
+                                       onClick={() => navigate(PathName.editProfile)}/>
                     <DropdownComponent label="Transaction History" hoverIcon={Images.hoverTransactionHistoryIcon}
                                        icon={Images.transactionHistoryIcon} className={"dropdownIconDiv"} />
                     <DropdownComponent label="Logout" icon={Images.logOutIcon} hoverIcon={Images.hoverLogoutIcon}
@@ -74,6 +74,7 @@ export function ProfileModal(props) {
             </StyledPopover>}
             </ThemeProvider>
             {user ? (
+                //display user profile information in right section of header
                 <div onClick={handlePopoverOpen} className={styles.dropdown}>
                     <Avatar className={styles.profileModalIcon} src={user?.photoURL} alt="User"/>
                     <span className={styles.textProfileModal}>{user?.displayName?( user.displayName.length>7 ? user.displayName.slice(0,7)+'...':user.displayName):''}</span>
@@ -81,6 +82,7 @@ export function ProfileModal(props) {
                 </div>
             ) : <LoaderComponent color="#FFFFFF" height="20" width="20"/>}
             {
+                // display the logout modal if open
                 logoutModalOpen &&
                 <LogoutComponent onClick={navigateAndSignOut} setLogoutModalOpen={setLogoutModalOpen}
                                  logoutModalOpen={logoutModalOpen}/>

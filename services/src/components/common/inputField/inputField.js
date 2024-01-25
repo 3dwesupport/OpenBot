@@ -1,7 +1,10 @@
-import React, {useState} from "react";
+import React from "react";
 import "./inputField.css";
 
 
+/**
+ * InputFieldComponent is a React functional component representing an input field.
+ */
 
 export function InputFieldComponent(props) {
     const {

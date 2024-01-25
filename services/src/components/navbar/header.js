@@ -3,39 +3,35 @@ import {StoreContext} from "../../context/storeContext";
 import {auth, googleSigIn} from "../../database/authentication";
 import {Images} from "../../utils/images";
 import "./navbar.css";
-import {useNavigate} from "react-router-dom";
 import {localStorageKeys, PathName} from "../../utils/constants";
 import {ProfileModal} from "../profile/profileModal";
+import {useNavigate} from "react-router-dom";
 
 /**
- * Dashboard header which contains logo, theme and profile signIn
+ * Logo component which contains Dashboard logo and name
  * @returns {Element}
  * @constructor
  */
-function Header() {
-    const {user, setUser, setIsSignIn, isSignIn, isOnline} = useContext(StoreContext);
+export function LogoSection() {
+    let navigate = useNavigate()
 
+    //function to open home page
+    const openHomepage = () => {
+        navigate(PathName.home);
+    }
 
-    useEffect(() => {
-        auth.onAuthStateChanged((res) => {
-            setUser({
-                photoURL: res?.photoURL,
-                displayName: res?.displayName,
-                email: res?.email,
-                uid: res?.uid
-            });
-        })
-    }, []);
-    return (
-        <div className={"navbar_navbarDiv"}>
-            <LogoSection/>
-            <RightSection user={user} setIsSignIn={setIsSignIn} isSignIn={isSignIn} setUser={setUser}
-                          isOnline={isOnline}/>
-        </div>
-    );
+    return (<>
+            <div className={"navbarTitleDiv"}>
+                <img alt="openBotIcon" onClick={openHomepage} className={"navbar_mainIcon"}
+                     src={Images.openBotLogo}></img>
+                <div onClick={openHomepage} className={"navbar_headDiv"}>
+                    <span className={"mainTitle"}>OpenBot Dashboard</span>
+                </div>
+            </div>
+        </>
+    )
 }
 
-export default Header;
 
 /**
  * Right Component which has signIn, profile picture and edit profile option
@@ -79,28 +75,30 @@ export function RightSection(params) {
 }
 
 /**
- * Logo component which contains Dashboard logo and name
+ * Dashboard header which contains logo, theme and profile signIn
  * @returns {Element}
  * @constructor
  */
-export function LogoSection() {
-    let navigate = useNavigate()
+function Header() {
+    const {user, setUser, setIsSignIn, isSignIn, isOnline} = useContext(StoreContext);
 
-    //function to open home page
-    const openHomepage = () => {
-        navigate(PathName.home);
-    }
-
-    return (<>
-            <div className={"navbarTitleDiv"}>
-                <img alt="openBotIcon" onClick={openHomepage} className={"navbar_mainIcon"}
-                     src={Images.openBotLogo}></img>
-                <div onClick={openHomepage} className={"navbar_headDiv"}>
-                    <span className={"mainTitle"}>OpenBot Dashboard</span>
-                </div>
-            </div>
-        </>
-    )
+    useEffect(() => {
+        auth.onAuthStateChanged((res) => {
+            setUser({
+                photoURL: res?.photoURL,
+                displayName: res?.displayName,
+                email: res?.email,
+                uid: res?.uid
+            });
+        })
+    }, []);
+    return (
+        <div className={"navbar_navbarDiv"}>
+            <LogoSection/>
+            <RightSection user={user} setIsSignIn={setIsSignIn} isSignIn={isSignIn} setUser={setUser}
+                          isOnline={isOnline}/>
+        </div>
+    );
 }
 
-
+export default Header;
