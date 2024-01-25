@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Images} from "../../utils/images";
-import {InputFieldComponent} from "../common/inputField/inputField";
 import {StoreContext} from "../../context/storeContext";
 import {auth} from "../../database/authentication.js";
 import LoaderComponent from "../common/loader/loaderComponent";
@@ -10,8 +9,8 @@ import styles from "./editProfile.module.css";
 import {errorToast, successToast, Constants} from "../../utils/constants";
 import {Avatar} from "@mui/material";
 import firebase from "firebase/compat/app";
-import ButtonComponent from "../common/button/buttonComponent";
 import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs";
+import {FormComponent} from "../common/form/formComponent";
 
 /**
  * Edit profile component
@@ -204,9 +203,7 @@ export function EditProfile() {
                         <div className={styles.editProfileContainer}>
                             <div className={styles.editProfileTextDiv}>Edit Profile</div>
                             <div className={styles.editProfileImageDiv}>
-                                {/*{isLoader ?*/}
                                     <div className={styles.profileImage}>
-                                        {/*<LoaderComponent color="blue" height="20" width="20"/>*/}
                                     </div>
                                     <Avatar className={styles.profileImage} style={{
                                         borderRadius: "50%",
@@ -224,32 +221,10 @@ export function EditProfile() {
                             </div>
                         </div>
                         <div className={styles.childDiv}>
-                            <div className={styles.nameDiv}>
-                                <InputFieldComponent label="First Name" textType="text" value={userDetails.firstName}
-                                                     onDataChange={(name) => handleNameChange('firstName', name)}
-                                                     style={{
-                                                         border: userDetails?.firstName?.trim().length === 0 && "1px solid red",
-                                                         outline: userDetails?.firstName?.trim().length === 0 && "none",
-                                                     }}/>
-                                <InputFieldComponent label="Last Name" textType="text" value={userDetails.lastName}
-                                                     onDataChange={(name) => handleNameChange('lastName', name)}/>
-                            </div>
-                            <div className={styles.detailsDiv}>
-                                <InputFieldComponent value={userDOB} label="Date Of Birth" textType="date"
-                                                     onDataChange={handleDOBChange}/>
-                            </div>
-                            <div className={styles.emailDiv}>
-                                <InputFieldComponent value={user?.email} label={"Email address"} style={{color: "grey"}}
-                                                     textType={"email"}
-                                                     disabled={true}/>
-                            </div>
-                            <div className={styles.buttonSection}>
-                                <ButtonComponent label={"Save"} onClick={handleSubmit} disabled={isSaveDisabled}/>
-                            </div>
+                        <FormComponent userDetails={userDetails} handleNameChange={handleNameChange} handleDOBChange={handleDOBChange}
+                                       handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} userDOB={userDOB} user={user}/>
                         </div>
-
                     </div>
-
                 </div>
             }
         </>

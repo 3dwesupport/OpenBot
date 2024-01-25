@@ -4,7 +4,7 @@ import "./modal.css"
 import ButtonComponent from "../button/buttonComponent";
 
 /**
- * component to represent logout modal
+ * component to represent logout modal on the click of logout in dropdown
  */
 export function LogoutComponent(props) {
     const {setLogoutModalOpen, logoutModalOpen, onClick} = props

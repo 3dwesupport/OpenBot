@@ -3,7 +3,7 @@ import "./inputField.css";
 
 
 /**
- * InputFieldComponent is a React functional component representing an input field.
+ * InputFieldComponent is a React functional component representing input fields of edit profile page.
  */
 
 export function InputFieldComponent(props) {

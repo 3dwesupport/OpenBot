@@ -34,7 +34,7 @@
     width: 100px;
     border-radius: 50%;
     object-fit: cover;
-   justify-content: center;
+    justify-content: center;
     align-items: center;
 
 }
@@ -48,25 +48,11 @@
     cursor: pointer;
     height: 30px;
     width: 30px;
- position: absolute;
+    position: absolute;
 }
 
-
-.nameDiv {
-    display: flex;
-    gap: 20%;
-}
-
-
-.detailsDiv {
-    width: 40%;
-}
-.text{
+.text {
     font-size: 18px;
-}
-
-.emailDiv {
-    width: 100%;
 }
 
 .childDiv {
@@ -74,13 +60,8 @@
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-    row-gap: 35px;
+    row-gap: 30px;
     padding-top: 4%;
-}
-
-.buttonSection {
-    display: flex;
-    column-gap: 3%;
 }
 
 .saveButton {
@@ -101,41 +82,19 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color:darkred;
-}
-.successAlertBox {
-    margin-left: 20px;
-    padding-left: 10px;
-    display: flex;
-    align-items: center;
-    border-radius: 6px;
-    height: 40px;
-    width: 30%;
-    background-color: rgba(91, 188, 115, 0.1);
-    color: #5BBC73;
-}
-.errorAlertBox {
-    background-color: rgba(197, 78, 48, 0.1);
-    color: #C54E30;
+    color: darkred;
 }
 
 @media only screen and (max-width: 768px) {
-    .nameDiv {
-        gap: 20px;
-        width: 100%;
-        flex-direction: column;
-    }
-
     .parentDiv {
         width: 90%;
     }
-.childDiv{
-    flex-direction:column;
-    gap: 20px;
-}
-.detailsDiv{
-    width: 100%;
-}
+
+    .childDiv {
+        flex-direction: column;
+        gap: 20px;
+    }
+
     .saveButton {
         width: 100%;
     }
@@ -146,14 +105,12 @@
         padding-top: 9%;
         padding-left: 12%;
     }
-    .buttonSection{
-        padding-top: 15px;
-    }
     .editProfileContainer {
-       display: flex;
+        display: flex;
         height: 2%;
     }
-    .editProfileImageDiv{
+
+    .editProfileImageDiv {
         padding-top: 60px;
     }
 
