@@ -2,7 +2,12 @@ import {and, collection, getCountFromServer, getDocs, query, where} from "@fireb
 import {localStorageKeys, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
-
+/**
+ * function to get new model details on monthly and yearly basis
+ * @param year
+ * @param month
+ * @returns {Promise<unknown>}
+ */
 export async function getModelDetails(year, month) {
     return new Promise(async (resolve, reject) => {
         try {

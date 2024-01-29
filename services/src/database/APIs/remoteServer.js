@@ -2,6 +2,12 @@ import {and, collection, getDocs, query, where} from "@firebase/firestore";
 import {db} from "../authentication";
 import {localStorageKeys, tables} from "../../utils/constants";
 
+/**
+ * function to get time duration for remote web server
+ * @param year
+ * @param month
+ * @returns {Promise<unknown>}
+ */
 export async function getServerDetails(year, month) {
     return new Promise(async (resolve, reject) => {
         try {

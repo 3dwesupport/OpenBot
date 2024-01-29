@@ -1,10 +1,15 @@
-import {getProjects, getProjectsMonthlyStatus} from "../../database/APIs/projects";
+import {getProjects, getProjectsMonthlyBasis} from "../../database/APIs/projects";
 import {useEffect, useState} from "react";
 import {Month} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
 import {Chart} from "../common/chart/chart";
 
+/**
+ * function to display usage analytics stats
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export function UsageAnalysis() {
     let date = new Date();
     const [usageDetails, setUsageDetails] = useState({
@@ -16,7 +21,7 @@ export function UsageAnalysis() {
     })
 
     useEffect(() => {
-        Promise.all([getProjects(date.getFullYear(), Month[date.getMonth()]), getModelDetails(date.getFullYear(), Month[date.getMonth()]), getServerDetails(date.getFullYear(), Month[date.getMonth()]), getProjectsMonthlyStatus(date.getFullYear())]).then((res) => {
+        Promise.all([getProjects(date.getFullYear(), Month[date.getMonth()]), getModelDetails(date.getFullYear(), Month[date.getMonth()]), getServerDetails(date.getFullYear(), Month[date.getMonth()]), getProjectsMonthlyBasis(date.getFullYear())]).then((res) => {
             console.log("res:::", res);
             setUsageDetails({
                 ...usageDetails,

@@ -4,6 +4,12 @@ import {Images} from "../../../utils/images";
 import {LineChart} from "@mui/x-charts/LineChart";
 import {Month} from "../../../utils/constants";
 
+/**
+ * function to display chart component
+ * @param props
+ * @returns {Element}
+ * @constructor
+ */
 export function Chart(props) {
     const {usageDetails} = props;
     let date = new Date();
