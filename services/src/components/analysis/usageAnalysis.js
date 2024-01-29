@@ -1,9 +1,8 @@
 import {getProjects} from "../../database/APIs/projects";
 import {useEffect, useState} from "react";
 import {Month} from "../../utils/constants";
-
-// import { LineChart } from '@mui/x-charts/LineChart';
-
+import {getModelDetails} from "../../database/APIs/models";
+import {getServerDetails} from "../../database/APIs/remoteServer";
 
 export function UsageAnalysis() {
     let newYear = new Date();
@@ -13,19 +12,23 @@ export function UsageAnalysis() {
         server: 0,
         runProjectCount: 0
     })
-
     useEffect(() => {
-        getProjects(newYear.getFullYear(), Month[newYear.getMonth()]).then((res) => {
+        Promise.all([getProjects(newYear.getFullYear(), Month[newYear.getMonth()]), getModelDetails(newYear.getFullYear(), Month[newYear.getMonth()]), getServerDetails(newYear.getFullYear(), Month[newYear.getMonth()])]).then((res) => {
+            console.log("res:::", res);
             setUsageDetails({
                 ...usageDetails,
-                projects: res
+                projects: res[0],
+                models: res[1],
+                server: res[2],
             })
         })
-    }, [usageDetails])
+    }, [])
 
     return (
         <>
             projects : {usageDetails?.projects}
+            models : {usageDetails?.models}
+            server : {usageDetails?.server}
         </>
     )
 }

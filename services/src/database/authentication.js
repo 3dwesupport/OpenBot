@@ -72,6 +72,7 @@ export async function googleSignOut() {
             // domain: ".itinker.io",
             secure: true,
         };
+        localStorage.setItem(localStorageKeys.UID, "");
         Cookies.remove(localStorageKeys.user, cookieOptions)
         Cookies.remove(localStorageKeys.accessToken, cookieOptions);
     }).catch((error) => {

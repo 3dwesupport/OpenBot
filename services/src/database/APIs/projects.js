@@ -3,7 +3,14 @@ import {localStorageKeys, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
 export async function getProjects(year, month) {
-    return await getDocDetails("status.year", year, "status.month", month);
+    return new Promise((resolve, reject) => {
+        getDocDetails("status.year", year, "status.month", month).then((res) => {
+            resolve(res);
+        })
+            .catch((e) => {
+                reject(e);
+            })
+    })
 }
 
 export async function getDocDetails(fieldName, value, fieldMonth, monthValue) {
@@ -13,7 +20,6 @@ export async function getDocDetails(fieldName, value, fieldMonth, monthValue) {
         let count = 0;
         querySnapshot.forEach((doc) => {
             count += doc.data().status.update;
-            return count;
         });
         return count
     } catch (error) {
