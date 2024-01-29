@@ -3,9 +3,7 @@ import {useEffect, useState} from "react";
 import {Month} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
-import {LineChart} from '@mui/x-charts/LineChart';
-import {Images} from "../../utils/images";
-import styles from "./usageAnalysis.module.css"
+import {Chart} from "../common/chart/chart";
 
 export function UsageAnalysis() {
     let date = new Date();
@@ -29,10 +27,6 @@ export function UsageAnalysis() {
             })
         })
     }, [])
-
-    const firstHalfY = usageDetails?.projectsMonthlyArray.slice(0, 6);
-    const secondHalfY = usageDetails?.projectsMonthlyArray.slice(0, -6);
-
     return (
         <>
             <div>
@@ -40,53 +34,7 @@ export function UsageAnalysis() {
                 models : {usageDetails?.models}
                 server : {usageDetails?.server}
             </div>
-            <div style={{position: "relative", width: "50%"}}>
-                <div className={styles.chartYAxisLabel}>
-                    <span>Compile code (Blockly)</span>
-                    <img src={Images.lightChartArrow} alt={"arrow"} height={20} width={15}
-                    />
-                </div>
-                <LineChart
-                    width={600}
-                    height={300}
-                    series={[{
-                        data: date.getMonth() < 6 ? firstHalfY : secondHalfY,
-                        area: true,
-                        showMark: false,
-                        color: "#459CDE",
-                    }]}
-                    xAxis={[{
-                        tickLabelStyle: {
-                            fill: "#969696"
-                        },
-                        tickFontSize: 12,
-                        scaleType: 'point',
-                        data: date.getMonth() < 6 ? Month.slice(0, 6) : Month.slice(-6),
-                    }]}
-                    yAxis={[{
-                        tickLabelStyle: {
-                            fill: "#969696"
-                        },
-                        tickFontSize: 12,
-                    }]}
-                    sx={{
-                        '.MuiLineElement-root': {
-                            // display: 'none',
-                        },
-                        ".MuiChartsAxis-line": {
-                            stroke: "none !important",
-                        },
-                        ".MuiChartsAxis-tick": {
-                            stroke: "none !important",
-                        },
-                    }}
-                />
-                <div className={styles.chartXAxisLabel}>
-                    <img style={{
-                        transform: "rotate(90deg)",
-                    }} src={Images.lightChartArrow} alt={"arrow"} height={20} width={15}/>
-                </div>
-            </div>
+            <Chart usageDetails={usageDetails}/>
         </>
     )
 }
