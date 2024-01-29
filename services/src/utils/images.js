@@ -19,6 +19,8 @@ import hoverTransactionHistoryIcon from'../assets/images/hover_transactionHistor
 import hoverLogoutIcon from'../assets/images/hoverLogout_icon.png'
 import hoverArrowLeftIcon from'../assets/images/hoverArrowLeft_icon.png'
 import openInNewFileIcon from'../assets/images/openInNewFile_icon.png'
+import lightChartArrow from "../assets/images/chart-arrow.png"
+
 export const Images = {
     openBotLogo:openBotLogo,
     lightTheme_icon:lightTheme_icon,
@@ -41,9 +43,5 @@ export const Images = {
     hoverLogoutIcon:hoverLogoutIcon,
     hoverArrowLeftIcon:hoverArrowLeftIcon,
     openInNewFileIcon:openInNewFileIcon,
-
-
-
-
-
+    lightChartArrow:lightChartArrow
 }

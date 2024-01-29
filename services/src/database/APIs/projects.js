@@ -1,5 +1,5 @@
 import {and, collection, getDocs, query, where} from "@firebase/firestore";
-import {localStorageKeys, tables} from "../../utils/constants";
+import {localStorageKeys, Month, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
 export async function getProjects(year, month) {
@@ -25,4 +25,24 @@ export async function getDocDetails(fieldName, value, fieldMonth, monthValue) {
     } catch (error) {
         console.log("error :", error);
     }
+}
+
+export async function getProjectsMonthlyStatus(year) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const ordersQuery = query(collection(db, tables.projects), and(where("status.year", '==', year), where("uid", '==', localStorage.getItem(localStorageKeys.UID))));
+            const querySnapshot = await getDocs(ordersQuery);
+            let updates = Array(12).fill(0);
+            querySnapshot.forEach((doc) => {
+                const monthIndex = Month.indexOf(doc.data().status.month);
+                if (monthIndex !== -1) {
+                    updates[monthIndex] += doc.data().status.update;
+                }
+            });
+            resolve(updates);
+        } catch (error) {
+            console.log("error :", error);
+            reject(error);
+        }
+    })
 }
