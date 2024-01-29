@@ -2,7 +2,7 @@ import 'firebase/compat/auth';
 import {collection, doc, setDoc,getDoc} from "@firebase/firestore";
 import 'firebase/compat/firestore';
 import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
-import {FirebaseStorage, auth, db} from "./authentication";
+import {FirebaseStorage, auth, db} from "../authentication";
 
 /**
  * function to upload profile photo to firebase storage
@@ -22,8 +22,7 @@ export async function uploadProfilePic(file, fileName) {
 /**
  * function to handle single sign-on using custom token
  * @returns {Promise<*>}
- * @param file
- * @param fileName
+ * @param UID
  */
 export async function getCustomToken(UID) {
     try {

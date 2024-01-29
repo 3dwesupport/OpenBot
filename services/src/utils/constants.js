@@ -3,12 +3,14 @@ import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 export const PathName = {
     "home": "/",
-    "editProfile": "/editProfile"
+    "editProfile": "/editProfile",
+    "usageAnalysis" : "/usageAnalysis"
 }
 export const localStorageKeys = {
     accessToken: "accessToken",
     user: "user",
     isSignIn: "isSignIn",
+    UID:"UID"
 }
 
 
@@ -56,6 +58,17 @@ export const successToast=(message)=>{
         color: '#ffffff',
         borderRadius: '8px',
     })
-
 }
 
+/**
+ user usage tables
+ */
+export const tables = {
+    users : "users",
+    projects: "projects",
+    models:"models",
+    server:"server"
+}
+
+// month array
+export const Month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

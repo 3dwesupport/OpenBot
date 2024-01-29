@@ -1,9 +1,9 @@
 import React, {useContext} from "react";
-import "../../common/card/card.css"
-import {CardData, localStorageKeys} from "../../../utils/constants";
+import "../../common/card/card.css";
+import {CardData, localStorageKeys, PathName} from "../../../utils/constants";
 import {CardComponent} from "../../common/card/card";
 import {StoreContext} from "../../../context/storeContext";
-import {Images} from "../../../utils/images";
+import {useNavigate} from "react-router-dom";
 
 /**
  * Function to display all openBot services on home page
@@ -13,6 +13,7 @@ import {Images} from "../../../utils/images";
 export function DashboardComponent() {
 
     const {user} = useContext(StoreContext);
+    const navigate = useNavigate();
 
     //function to handle click event on cards
     const handleCardClick = (clickedCard) => {
@@ -27,6 +28,9 @@ export function DashboardComponent() {
                 break;
             case CardData[2].text:
                 console.log(CardData[2].text);
+                break;
+            case CardData[5].text:
+                navigate(PathName.usageAnalysis);
                 break;
             default :
                 break;

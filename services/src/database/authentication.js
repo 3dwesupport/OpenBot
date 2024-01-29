@@ -3,7 +3,7 @@ import {getStorage} from "firebase/storage";
 import {getFirestore} from "firebase/firestore";
 import {localStorageKeys} from "../utils/constants";
 import Cookies from "js-cookie";
-import {getCustomToken} from "./APIs";
+import {getCustomToken} from "./APIs/profile";
 import {getAuth, signOut} from "firebase/auth";
 
 /**
@@ -49,6 +49,7 @@ export async function googleSigIn() {
             // domain: ".itinker.io",
             secure: true,
         };
+        localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
         let customToken = await getCustomToken(auth?.currentUser?.uid);
         Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
         Cookies.set(localStorageKeys.user, customToken, cookieOptions);

@@ -1,4 +1,3 @@
-import Header from "../../navbar/header";
 import React from "react";
 import {EditProfile} from "../../profile/editProfile";
 
@@ -11,7 +10,6 @@ const UserProfile = () => {
 
     return (
         <div style={{height: "100vh"}}>
-            <Header/>
             <EditProfile />
         </div>
     );

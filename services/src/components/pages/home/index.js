@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../../navbar/header";
 import {DashboardComponent} from "../../home/dashboard/dashboardComponent";
 
 /**
@@ -11,7 +10,6 @@ export const Home = () => {
 
     return (
         <div style={{height: "100vh"}}>
-            <Header/>
             <DashboardComponent/>
         </div>
     );

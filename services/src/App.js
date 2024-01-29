@@ -5,7 +5,7 @@ import {auth} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
 import {Constants, localStorageKeys} from "./utils/constants";
 import Cookies from "js-cookie";
-import {getCustomToken} from "./database/APIs";
+import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
 
 function App() {

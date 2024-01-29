@@ -9,8 +9,8 @@ import styles from "./editProfile.module.css";
 import {errorToast, successToast, Constants} from "../../utils/constants";
 import {Avatar} from "@mui/material";
 import firebase from "firebase/compat/app";
-import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs";
 import {FormComponent} from "../common/form/formComponent";
+import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs/profile";
 
 /**
  * Edit profile component
