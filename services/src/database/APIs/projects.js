@@ -1,4 +1,4 @@
-import {and, collection, getDocs, query, where} from "@firebase/firestore";
+import {and, arrayUnion, collection, getDocs, query, where} from "@firebase/firestore";
 import {localStorageKeys, Month, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
@@ -10,8 +10,10 @@ import {db} from "../authentication";
  */
 export async function getProjects(year, month) {
     return new Promise((resolve, reject) => {
-        getDocDetails("status.year", year, "status.month", month).then((res) => {
-            resolve(res);
+        getDocDetails().then((res) => {
+            const data = filterEarliestOccurrences(res);
+            let count = data.filter((item) => item.year === year && item.month === month);
+            resolve(count.length ?? 0);
         })
             .catch((e) => {
                 reject(e);
@@ -20,22 +22,44 @@ export async function getProjects(year, month) {
 }
 
 /**
- * function to get document details
- * @param fieldName
- * @param value
- * @param fieldMonth
- * @param monthValue
- * @returns {Promise<number>}
+ * function to filter unique project in the current month-year
+ * @param array
+ * @returns {*}
  */
-export async function getDocDetails(fieldName, value, fieldMonth, monthValue) {
+function filterEarliestOccurrences(array) {
+    const earliestOccurrences = new Map();
+    array.forEach((item) => {
+        const key = item.name;
+        const currentDate = new Date(`${item.year}-${item.month}`);
+
+        if (!earliestOccurrences.has(key) || currentDate < earliestOccurrences.get(key)) {
+            earliestOccurrences.set(key, currentDate);
+        }
+    });
+    // Filter based on the earliest date for each unique name
+    return array.filter((item) => {
+        const key = item.name;
+        const currentDate = new Date(`${item.year}-${item.month}`);
+        const earliestDate = earliestOccurrences.get(key);
+
+        return currentDate.getTime() === earliestDate.getTime();
+    });
+}
+
+
+/**
+ * function to get all document details
+ * @returns {Promise<*[]>}
+ */
+export async function getDocDetails() {
     try {
-        const ordersQuery = query(collection(db, tables.projects), and(where(fieldName, '==', value), where("uid", '==', localStorage.getItem(localStorageKeys.UID)), where(fieldMonth, '==', monthValue)));
+        const ordersQuery = query(collection(db, tables.projects), where("uid", '==', localStorage.getItem(localStorageKeys.UID)));
         const querySnapshot = await getDocs(ordersQuery);
-        let count = 0;
+        let array = [];
         querySnapshot.forEach((doc) => {
-            count += doc.data().status.update;
+            array.push({name: doc.data().name, year: doc.data().status.year, month: doc.data().status.month})
         });
-        return count
+        return array
     } catch (error) {
         console.log("error :", error);
     }
@@ -64,4 +88,18 @@ export async function getProjectsMonthlyBasis(year) {
             reject(error);
         }
     })
+}
+
+/**
+ * function to get years from firestore
+ * @returns {Promise<FieldValue>}
+ */
+export async function getYears() {
+    const docRef = collection(db, tables.projects); // Replace 'your_collection' with your actual collection name
+    const querySnapshot = await getDocs(docRef);
+    // Use array-union to get unique years
+    return querySnapshot.docs.reduce((acc, doc) => {
+        const year = doc.data().status.year;
+        return arrayUnion(acc, [year]);
+    }, []);
 }
