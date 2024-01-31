@@ -1,5 +1,5 @@
 import React from "react";
-import {CircularProgress} from "@mui/material";
+import {Backdrop, CircularProgress} from "@mui/material";
 
 /**
  * LoaderComponent is a React functional component that renders a circular progress indicator.
@@ -11,5 +11,10 @@ import {CircularProgress} from "@mui/material";
 export default function LoaderComponent(props){
     return <div>
        <CircularProgress style={{color:props.color}}  thickness={props.thickness}/>
+    {/*<Backdrop*/}
+    {/*    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>*/}
+    {/*    <CircularProgress color="inherit" />*/}
+    {/*</Backdrop>*/}
     </div>
+
 }

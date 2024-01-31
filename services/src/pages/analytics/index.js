@@ -4,6 +4,10 @@ import {getProjects, getProjectsMonthlyBasis} from "../../database/APIs/projects
 import {Month} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
+import './usageAnalysis.css'
+import {UsageAnalysisCardComponent} from "./usageAnalysisCard";
+import Card from "@mui/material/Card";
+import {BillingHeaderComponent} from "../../components/common/billingHeader/billingHeader";
 
 /**
  * function to display usage analytics stats
@@ -34,15 +38,18 @@ export function UsageAnalysis() {
     }, [])
     return (
         <>
-            <div style={{height: "100vh"}}>
-                <div>
-                    projects : {usageDetails?.projects}
-                    models : {usageDetails?.models}
-                    server : {usageDetails?.server}
-                </div>
-                <Chart usageDetails={usageDetails}/>
-            </div>
 
+            <BillingHeaderComponent/>
+            <div className={"userAnalysisContainer"}>
+                <div className={"cardChartContainer"}>
+                    <UsageAnalysisCardComponent/>
+                      <div className={"chartDiv"}>
+                        <Card style={{position: "relative", borderRadius: "2%"}}>
+                            <Chart usageDetails={usageDetails}/>
+                        </Card>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }

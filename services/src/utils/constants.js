@@ -14,8 +14,6 @@ export const localStorageKeys = {
     isSignIn: "isSignIn",
     UID: "UID"
 }
-
-
 // Array of card data
 export const CardData = [
     {bgColor: "#FFAB1A", image: Images.openbotCardIcon, text: "OpenBot Playground"},
@@ -26,6 +24,12 @@ export const CardData = [
     {bgColor: "#B73DDF", image: Images.graphCardIcon, text: "Usage Analytics"},
 ];
 
+export const UserAnalysisCardData=[
+    {text:"Number of Projects"},
+    {text: "Number of Models"},
+    {text:"Projects Run"},
+    {text:"Remote Server"},
+]
 
 export const Constants = {
     online: "online",

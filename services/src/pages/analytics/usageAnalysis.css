@@ -1,0 +1,23 @@
+.userAnalysisContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 50px;
+}
+.chartDiv{
+    box-shadow: 0 2px 7px rgba(0,0,0,.13);
+    width: 48%;
+}
+.analysisCardContainer{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+    box-shadow: 0 2px 7px rgba(0,0,0,.13);
+    width: 48%;
+    height: 380px;
+}
+
+
+
+
+

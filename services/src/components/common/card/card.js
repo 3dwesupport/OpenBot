@@ -3,7 +3,7 @@ import {Images} from "../../../utils/images";
 import React from "react";
 
 /**
- * function to display Card component
+ * function to display Card component on dashboard
  * @param value
  * @param handleCardClick
  * @param index

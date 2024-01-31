@@ -14,7 +14,6 @@ export function FormComponent(props) {
 
     const {
         userDetails,
-        userDOB,
         handleNameChange,
         handleDOBChange,
         handleSubmit,
@@ -35,7 +34,7 @@ export function FormComponent(props) {
                                      onDataChange={(name) => handleNameChange('lastName', name)}/>
             </div>
             <div className={"detailsDiv"}>
-                <InputFieldComponent value={userDOB} label="Date Of Birth" textType="date"
+                <InputFieldComponent value={userDetails.dob} label="Date Of Birth" textType="date"
                                      onDataChange={handleDOBChange}/>
             </div>
             <div className={"emailDiv"}>

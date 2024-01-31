@@ -1,0 +1,69 @@
+.billingHeaderDiv{
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fb;
+}
+.billingHeaderTextDiv{
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+}
+.billingHeaderText{
+    color: #000000;
+    font-size: 20px;
+}
+.modalDiv{
+    height: 28px;
+    width: 300px;
+    border: 2px solid whitesmoke;
+    display: flex;
+    flex-direction: row;
+    gap:70%;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #FFFFFF;
+}
+.yearDiv{
+    height: 28px;
+    width: 100px;
+    border: 2px solid whitesmoke;
+    display: flex;
+    flex-direction: row;
+    gap:20%;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #FFFFFF;
+}
+
+.calenderDiv{
+    display: flex;
+}
+.billingHeaderImage{
+    height: 8px;
+    width: 11px;
+}
+.modalMonth{
+    position: absolute !important;
+    top: 58%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+    width: 230px;
+    border-radius: 10px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    outline: 0;
+}
+.items{
+    font-size: 18px;
+
+}
+.modalMonth :hover{
+    background: #e8f6fe;
+    border:  #0071c5;
+    color: #0071c5;
+    border-radius: 10px;
+}
+

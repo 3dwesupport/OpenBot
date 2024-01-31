@@ -11,8 +11,9 @@ import {FirebaseStorage, auth, db} from "../authentication";
  * @returns {Promise<string>}
  */
 export async function uploadProfilePic(file, fileName) {
+
     if (fileName === undefined) {
-        return
+        return;
     }
     const fileRef = ref(FirebaseStorage, "profile_pictures/" + auth.currentUser.uid + ".jpg")
     await uploadBytes(fileRef, file);

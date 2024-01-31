@@ -1,18 +1,19 @@
 .chartYAxisLabel {
     position: absolute;
-    margin-left: 43px;
     display: flex;
     flex-direction: column;
     font-family: Gilroy-Medium, sans-serif;
     color: #969696;
+    padding-left: 25px;
+    gap: 15px;
 }
 
 .chartXAxisLabel {
     position: absolute;
     display: flex;
     justify-content: flex-end;
-    width: 600px;
-    bottom: 41px;
+    bottom: 40px;
+    width: 98%;
     font-family: Gilroy-Medium, sans-serif;
     color: #969696;
 }

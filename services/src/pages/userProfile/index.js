@@ -24,7 +24,6 @@ export function UserProfile() {
     const inputRef = useRef("-");
     const [isProfileLoader, setIsProfileLoader] = useState(false);
     const [file, setFile] = useState(user?.photoURL);
-    const [userDOB, setUserDOB] = useState("");
     const [isSaveDisabled, setIsSaveDisabled] = useState(false);
     const [userDetails, setUserDetails] = useState({
         displayName: user?.displayName,
@@ -32,6 +31,7 @@ export function UserProfile() {
         lastName: user?.displayName,
         email: user?.email,
         photoURL: user?.photoURL,
+        dob : ""
     })
     // useEffect to fetch and update user profile data when the 'user' object changes
     useEffect(() => {
@@ -46,12 +46,12 @@ export function UserProfile() {
                     getDateOfBirth(user.uid),
                     user.displayName ? user.displayName.split(' ') : [],
                 ]);
-                setUserDOB(dob);
                 setUserDetails((prevState) => ({
                     ...prevState,
                     firstName: names[0] || '',
                     lastName: names[1] || '',
                     photoURL: user.photoURL || prevState.photoURL,
+                    dob: dob,
                 }));
             } catch (error) {
                 console.error("Error fetching profile data:", error);
@@ -148,8 +148,11 @@ export function UserProfile() {
      * @param newDOB
      * @returns {Promise<void>}
      */
-    const handleDOBChange = async (newDOB) => {
-        setUserDOB(newDOB);
+    const handleDOBChange = (newDOB) => {
+        setUserDetails({
+            ...userDetails,
+            dob: newDOB
+        })
     };
 
     /**
@@ -179,7 +182,7 @@ export function UserProfile() {
 
                     // Refresh the user object
                     const updatedUser = auth.currentUser;
-                    await setDateOfBirth(toTimeStamp(userDOB));
+                    await setDateOfBirth(toTimeStamp(userDetails.dob));
                     successToast(Constants.ProfileSuccessMsg);
                 } catch (e) {
                     console.error("Error in updating profile:", e);
@@ -196,8 +199,8 @@ export function UserProfile() {
         <div style={{height: "100vh"}}>
             {isProfileLoader ?
                 <div className={styles.loader}>
-                    <LoaderComponent color="blue"/>
-                </div> :
+                    <LoaderComponent color='blue'/>
+                </div>:
                 <div className={styles.mainScreen}>
                     <div className={styles.parentDiv}>
                         <div className={styles.editProfileContainer}>
@@ -220,10 +223,8 @@ export function UserProfile() {
                             </div>
                         </div>
                         <div className={styles.childDiv}>
-                            <FormComponent userDetails={userDetails} handleNameChange={handleNameChange}
-                                           handleDOBChange={handleDOBChange}
-                                           handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} userDOB={userDOB}
-                                           user={user}/>
+                        <FormComponent userDetails={userDetails} handleNameChange={handleNameChange} handleDOBChange={handleDOBChange}
+                                       handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} user={user}/>
                         </div>
                     </div>
                 </div>
