@@ -12,29 +12,27 @@ import {useNavigate} from "react-router-dom";
 import "../common/dropdown/dropdown.css"
 import {ThemeProvider, createTheme} from '@mui/material/styles';
 
-
-const theme = createTheme();
-const StyledPopover = styled(Popover)(({theme}) => ({
-    '& .MuiPopover-paper': {
-        padding: '20px',
-        width: "20%",
-        borderRadius: "4%",
-        [theme.breakpoints.down('md')]: {
-            width: "120px",
-            height: "70px",
-            marginLeft: "2%",
-            paddingTop: "12px"
-        },
-
-    },
-}));
-
 export function ProfileModal(props) {
     const [anchorEl, setAnchorEl] = useState(null);
     const {user, setIsSignIn, userDetails} = props;
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const navigate = useNavigate();
     const open = Boolean(anchorEl);
+    const theme = createTheme();
+    const StyledPopover = styled(Popover)(({theme}) => ({
+        '& .MuiPopover-paper': {
+            padding: '20px',
+            width: "20%",
+            borderRadius: "4%",
+            [theme.breakpoints.down('md')]: {
+                width: "120px",
+                height: "70px",
+                marginLeft: "2%",
+                paddingTop: "12px"
+            },
+
+        },
+    }));
 
     const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
