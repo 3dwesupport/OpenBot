@@ -1,5 +1,5 @@
 import React from "react";
-import {DashboardComponent} from "../../home/dashboard/dashboardComponent";
+import {DashboardComponent} from "../../components/dashboard/dashboardComponent";
 
 /**
  * function to display home page
@@ -7,7 +7,6 @@ import {DashboardComponent} from "../../home/dashboard/dashboardComponent";
  * @constructor
  */
 export const Home = () => {
-
     return (
         <div style={{height: "100vh"}}>
             <DashboardComponent/>

@@ -1,16 +1,18 @@
 import {Images} from "./images";
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 export const PathName = {
     "home": "/",
     "editProfile": "/editProfile",
-    "usageAnalysis" : "/usageAnalysis"
+    "usageAnalysis": "/usageAnalysis",
+    "billingHistory": "/billingHistory"
 }
 export const localStorageKeys = {
     accessToken: "accessToken",
     user: "user",
     isSignIn: "isSignIn",
-    UID:"UID"
+    UID: "UID"
 }
 
 
@@ -32,8 +34,8 @@ export const Constants = {
     ProfileSuccessMsg: "Profile updated successfully!",
 }
 
-export const errorToast=(message)=>{
-    toast.error(message,{
+export const errorToast = (message) => {
+    toast.error(message, {
         position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,
@@ -46,7 +48,7 @@ export const errorToast=(message)=>{
     })
 
 }
-export const successToast=(message)=>{
+export const successToast = (message) => {
     toast.success(message, {
         position: 'top-center',
         autoClose: 3000,
@@ -64,10 +66,10 @@ export const successToast=(message)=>{
  user usage tables
  */
 export const tables = {
-    users : "users",
+    users: "users",
     projects: "projects",
-    models:"models",
-    server:"server"
+    models: "models",
+    server: "server"
 }
 
 // month array

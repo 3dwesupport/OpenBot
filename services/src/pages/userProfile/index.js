@@ -1,23 +1,24 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
+import {FormComponent} from "../../components/common/form/formComponent";
+import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs/profile";
+import firebase from "firebase/compat/app";
+import {errorToast, successToast} from "../../utils/constants";
+import LoaderComponent from "../../components/common/loader/loaderComponent";
+import {Avatar} from "@mui/material";
 import {Images} from "../../utils/images";
 import {StoreContext} from "../../context/storeContext";
-import {auth} from "../../database/authentication.js";
-import LoaderComponent from "../common/loader/loaderComponent";
-import Compressor from 'compressorjs';
+import {Constants} from "../../utils/constants";
+import styles from "./userProfile.module.css";
+import auth from "../../database/authentication"
 import heic2any from "heic2any";
-import styles from "./editProfile.module.css";
-import {errorToast, successToast, Constants} from "../../utils/constants";
-import {Avatar} from "@mui/material";
-import firebase from "firebase/compat/app";
-import {FormComponent} from "../common/form/formComponent";
-import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs/profile";
+import Compressor from 'compressorjs';
 
 /**
  * Edit profile component
  * @returns {Element}
  * @constructor
  */
-export function EditProfile() {
+export function UserProfile() {
     const {user} = useContext(StoreContext);
     const {isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
@@ -32,7 +33,7 @@ export function EditProfile() {
         email: user?.email,
         photoURL: user?.photoURL,
     })
- // useEffect to fetch and update user profile data when the 'user' object changes
+    // useEffect to fetch and update user profile data when the 'user' object changes
     useEffect(() => {
         if (!user) {
             return;
@@ -59,7 +60,6 @@ export function EditProfile() {
             }
         })();
     }, [user]);
-
 
 
     /**
@@ -188,12 +188,12 @@ export function EditProfile() {
             }
             setIsProfileLoader(false);
         } else {
-            errorToast( Constants.offlineMessage);
+            errorToast(Constants.offlineMessage);
         }
     }
 
     return (
-        <>
+        <div style={{height: "100vh"}}>
             {isProfileLoader ?
                 <div className={styles.loader}>
                     <LoaderComponent color="blue"/>
@@ -203,31 +203,32 @@ export function EditProfile() {
                         <div className={styles.editProfileContainer}>
                             <div className={styles.editProfileTextDiv}>Edit Profile</div>
                             <div className={styles.editProfileImageDiv}>
-                                    <div className={styles.profileImage}>
-                                    </div>
-                                    <Avatar className={styles.profileImage} style={{
-                                        borderRadius: "50%",
-                                        objectFit: "cover",
-                                        height: "100px",
-                                        width: "100px"
-                                    }}
-                                            src={userDetails?.photoURL}
-                                            alt={"user"}/>
+                                <div className={styles.profileImage}>
+                                </div>
+                                <Avatar className={styles.profileImage} style={{
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                    height: "100px",
+                                    width: "100px"
+                                }}
+                                        src={userDetails?.photoURL}
+                                        alt={"user"}/>
                                 <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
                                        accept={"image/*,.heic,.heif,.jpeg"}/>
-
                                 <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
                                      className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
                             </div>
                         </div>
                         <div className={styles.childDiv}>
-                        <FormComponent userDetails={userDetails} handleNameChange={handleNameChange} handleDOBChange={handleDOBChange}
-                                       handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} userDOB={userDOB} user={user}/>
+                            <FormComponent userDetails={userDetails} handleNameChange={handleNameChange}
+                                           handleDOBChange={handleDOBChange}
+                                           handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} userDOB={userDOB}
+                                           user={user}/>
                         </div>
                     </div>
                 </div>
             }
-        </>
+        </div>
     );
 }
 

@@ -1,9 +1,9 @@
+import React, {useEffect, useState} from "react";
+import {Chart} from "../../components/common/chart/chart";
 import {getProjects, getProjectsMonthlyBasis} from "../../database/APIs/projects";
-import {useEffect, useState} from "react";
 import {Month} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
-import {Chart} from "../common/chart/chart";
 
 /**
  * function to display usage analytics stats
@@ -34,12 +34,15 @@ export function UsageAnalysis() {
     }, [])
     return (
         <>
-            <div>
-                projects : {usageDetails?.projects}
-                models : {usageDetails?.models}
-                server : {usageDetails?.server}
+            <div style={{height: "100vh"}}>
+                <div>
+                    projects : {usageDetails?.projects}
+                    models : {usageDetails?.models}
+                    server : {usageDetails?.server}
+                </div>
+                <Chart usageDetails={usageDetails}/>
             </div>
-            <Chart usageDetails={usageDetails}/>
+
         </>
     )
 }

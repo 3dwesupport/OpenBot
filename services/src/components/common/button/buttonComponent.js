@@ -1,4 +1,4 @@
-import styles from "../../profile/editProfile.module.css";
+import styles from "../../../pages/userProfile/userProfile.module.css";
 import React from "react";
 
 /**
@@ -16,7 +16,6 @@ export default function ButtonComponent(props) {
         onClick,
         classStyle,
         disabled,
-
     } = props
     return (
         <div onClick={disabled ? null : onClick} className={styles.saveButton + " " + classStyle}>

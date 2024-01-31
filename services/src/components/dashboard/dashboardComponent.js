@@ -1,8 +1,8 @@
 import React, {useContext} from "react";
-import "../../common/card/card.css";
-import {CardData, localStorageKeys, PathName} from "../../../utils/constants";
-import {CardComponent} from "../../common/card/card";
-import {StoreContext} from "../../../context/storeContext";
+import "../common/card/card.css";
+import {CardData, localStorageKeys, PathName} from "../../utils/constants";
+import {CardComponent} from "../common/card/card";
+import {StoreContext} from "../../context/storeContext";
 import {useNavigate} from "react-router-dom";
 
 /**
