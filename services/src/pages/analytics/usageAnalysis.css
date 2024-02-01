@@ -16,6 +16,16 @@
     width: 48%;
     height: 380px;
 }
+@media only screen and (max-width: 768px) {
+   .analysisCardContainer{
+       width: 100%;
+       height: 310px;
+   }
+    .chartDiv{
+        width: 100%;
+    }
+
+}
 
 
 

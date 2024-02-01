@@ -4,7 +4,7 @@
     flex-direction: column;
     font-family: Gilroy-Medium, sans-serif;
     color: #969696;
-    padding-left: 25px;
+    padding-left: 45px;
     gap: 15px;
 }
 
@@ -12,8 +12,14 @@
     position: absolute;
     display: flex;
     justify-content: flex-end;
-    bottom: 40px;
-    width: 98%;
+    bottom: 28px;
+    width: 99%;
     font-family: Gilroy-Medium, sans-serif;
     color: #969696;
+}
+@media only screen and (max-width:768px) {
+    .chartXAxisLabel{
+        bottom: 26px;
+    }
+
 }

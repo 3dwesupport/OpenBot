@@ -1,7 +1,7 @@
 import React from "react";
 import {Modal} from "@mui/material";
 import "./modal.css"
-import ButtonComponent from "../button/buttonComponent";
+import ButtonComponent from "../button/button";
 
 /**
  * component to represent logout modal on the click of logout in dropdown

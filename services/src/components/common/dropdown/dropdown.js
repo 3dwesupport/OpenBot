@@ -23,7 +23,7 @@ export function DropdownComponent(props) {
             <div className={"dropdownDiv"}>
                 <span className={"dropdownText"}>{label}</span>
                 <img src={isHovered ? Images.hoverArrowLeftIcon : Images.arrowLeft}
-                   className={"arrowLeft"}  alt={"Arrow Icon"}/>
+                     className={"arrowLeft"} alt={"Arrow Icon"}/>
             </div>
         </div>
     )

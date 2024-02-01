@@ -1,9 +1,9 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {FormComponent} from "../../components/common/form/formComponent";
+import {FormComponent} from "../../components/common/form/form";
 import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs/profile";
 import firebase from "firebase/compat/app";
 import {errorToast, successToast} from "../../utils/constants";
-import LoaderComponent from "../../components/common/loader/loaderComponent";
+import LoaderComponent from "../../components/common/loader/loader";
 import {Avatar} from "@mui/material";
 import {Images} from "../../utils/images";
 import {StoreContext} from "../../context/storeContext";

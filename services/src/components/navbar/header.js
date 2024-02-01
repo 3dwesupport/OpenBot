@@ -68,7 +68,7 @@ export function RightSection(params) {
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
             {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <ProfileModal user={user} setIsSignIn={setIsSignIn} setUser={setUser}/> :
                 <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
-                    <span>Sign in</span>
+                    <span className={"buttonText"}>Sign in</span>
                 </button>}
         </div>
     )

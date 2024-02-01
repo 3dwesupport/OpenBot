@@ -1,11 +1,11 @@
 import React, {useState} from "react";
 import {Images} from "../../utils/images";
-import {DropdownComponent} from "../common/dropdown/dropdownComponent";
+import {DropdownComponent} from "../common/dropdown/dropdown";
 import styles from "./profileModal.module.css";
 import "./profileModal.module.css"
 import {Avatar, Popover, styled} from "@mui/material";
 import {LogoutComponent} from "../common/logout/modalComponent";
-import LoaderComponent from "../common/loader/loaderComponent";
+import LoaderComponent from "../common/loader/loader";
 import {PathName} from "../../utils/constants";
 import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";

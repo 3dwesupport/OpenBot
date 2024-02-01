@@ -36,12 +36,14 @@ export function UsageAnalysis() {
             })
         })
     }, [])
+
+
     return (
         <>
             <BillingHeaderComponent title={Constants.usageAnalysis}/>
             <div className={"userAnalysisContainer"}>
                 <div className={"cardChartContainer"}>
-                    <UsageAnalysisCardComponent/>
+                    <UsageAnalysisCardComponent usageDetails={usageDetails} />
                       <div className={"chartDiv"}>
                         <Card style={{position: "relative", borderRadius: "2%"}}>
                             <Chart usageDetails={usageDetails}/>

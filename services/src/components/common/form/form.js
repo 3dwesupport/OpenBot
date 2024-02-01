@@ -1,5 +1,5 @@
 import {InputFieldComponent} from "../inputField/inputField";
-import ButtonComponent from "../button/buttonComponent";
+import ButtonComponent from "../button/button";
 import React from "react";
 import './form.css';
 

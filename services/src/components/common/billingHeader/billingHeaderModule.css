@@ -13,6 +13,8 @@
 .billingHeaderText{
     color: #000000;
     font-size: 20px;
+    font-weight: bold;
+    font-family: Gilroy-SemiBold, sans-serif;
 }
 .modalDiv{
     height: 28px;
@@ -66,4 +68,29 @@
     color: #0071c5;
     border-radius: 10px;
 }
-
+@media only screen and (max-width: 768px){
+    .billingHeaderText{
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+.yearDiv{
+    height: 25px;
+    width: 65px;
+}
+    .modalDiv{
+         width: 140px;
+           gap: 50%;
+        height: 25px;
+    }
+    .billingHeaderImage{
+        height: 6px;
+        width: 9px;
+    }
+    .yearText{
+        font-size: 12px;
+    }
+    .monthText{
+        font-size: 12px;
+    }
+}
