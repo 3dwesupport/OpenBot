@@ -13,10 +13,10 @@ export function UsageAnalysisCardComponent(props) {
         <>
             <div className={"analysisCardContainer"}>
                 {UserAnalysisCardData.map((card, index) => (
-                    <Card  sx={{borderRadius: 2}} key={index}>
+                    <Card sx={{borderRadius: 2}} key={index}>
                         <span className={"analysisCardText"}> {card.text}</span>
                         <div className={"cardData"}>
-                            {index === 0 ? props.usageDetails.projects : index === 1 ? props.usageDetails.models : index === 2 ? props.usageDetails.server : props.usageDetails.runProjectCount}
+                            {index === 0 ? props.usageDetails.projects : index === 1 ? props.usageDetails.models : index === 2 ? 0 : index === 3 ? props.usageDetails.server : 0}
                         </div>
                     </Card>
                 ))}

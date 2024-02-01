@@ -26,6 +26,7 @@
     align-items: center;
     justify-content: space-around;
     background-color: #FFFFFF;
+    cursor: pointer;
 }
 .yearDiv{
     height: 28px;
@@ -37,6 +38,7 @@
     align-items: center;
     justify-content: space-around;
     background-color: #FFFFFF;
+    cursor: pointer;
 }
 
 .calenderDiv{
@@ -48,8 +50,22 @@
 }
 .modalMonth{
     position: absolute !important;
-    top: 58%;
+    top: 55%;
     left: 85%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    border-radius: 10px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    outline: 0;
+    cursor: pointer;
+    padding: 10px;
+}
+.modalYear{
+    position: absolute !important;
+    top: 25%;
+    left: 65%;
     transform: translate(-50%, -50%);
     width: 230px;
     border-radius: 10px;
@@ -57,12 +73,19 @@
     display: flex;
     flex-direction: column;
     outline: 0;
+    cursor: pointer;
 }
 .items{
     font-size: 18px;
 
 }
 .modalMonth :hover{
+    background: #e8f6fe;
+    border:  #0071c5;
+    color: #0071c5;
+    border-radius: 10px;
+}
+.modalYear :hover{
     background: #e8f6fe;
     border:  #0071c5;
     color: #0071c5;
@@ -92,5 +115,19 @@
     }
     .monthText{
         font-size: 12px;
+    }
+    .items{
+        font-size: 12px;
+    }
+    .modalMonth{
+        width: 105px;
+        top: 35%;
+        left: 75%;
+        padding:8px;
+    }
+    .modalYear{
+        width: 100px;
+        top: 15%;
+        left: 52%;
     }
 }

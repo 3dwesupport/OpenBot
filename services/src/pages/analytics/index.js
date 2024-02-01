@@ -16,6 +16,8 @@ import {BillingHeaderComponent} from "../../components/common/billingHeader/bill
  */
 export function UsageAnalysis() {
     let date = new Date();
+    const [isChangedMonth, setIsChangedMonth] = useState(Month[date.getMonth()]);
+    const [isChangedYear, setIsChangedYear] = useState(date.getFullYear());
     const [usageDetails, setUsageDetails] = useState({
         projects: 0,
         models: 0,
@@ -24,8 +26,13 @@ export function UsageAnalysis() {
         projectsMonthlyArray: Array(12).fill(0)
     })
 
+    function onDataChange(e) {
+        console.log("year:::", e);
+        Month.includes(e) ? setIsChangedMonth(e) : setIsChangedYear(e);
+    }
+
     useEffect(() => {
-        Promise.all([getProjects(date.getFullYear(), Month[date.getMonth()]), getModelDetails(date.getFullYear(), Month[date.getMonth()]), getServerDetails(date.getFullYear(), Month[date.getMonth()]), getProjectsMonthlyBasis(date.getFullYear())]).then((res) => {
+        Promise.all([getProjects(isChangedYear, isChangedMonth), getModelDetails(isChangedYear, isChangedMonth), getServerDetails(isChangedYear, isChangedMonth), getProjectsMonthlyBasis(isChangedYear)]).then((res) => {
             console.log("res:::", res);
             setUsageDetails({
                 ...usageDetails,
@@ -35,16 +42,15 @@ export function UsageAnalysis() {
                 projectsMonthlyArray: res[3]
             })
         })
-    }, [])
-
+    }, [isChangedMonth, isChangedYear])
 
     return (
         <>
-            <BillingHeaderComponent title={Constants.usageAnalysis}/>
+            <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange}/>
             <div className={"userAnalysisContainer"}>
                 <div className={"cardChartContainer"}>
-                    <UsageAnalysisCardComponent usageDetails={usageDetails} />
-                      <div className={"chartDiv"}>
+                    <UsageAnalysisCardComponent usageDetails={usageDetails}/>
+                    <div className={"chartDiv"}>
                         <Card style={{position: "relative", borderRadius: "2%"}}>
                             <Chart usageDetails={usageDetails}/>
                         </Card>

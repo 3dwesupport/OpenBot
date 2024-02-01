@@ -100,6 +100,7 @@ export async function getYears() {
     // Use array-union to get unique years
     return querySnapshot.docs.reduce((acc, doc) => {
         const year = doc.data().status.year;
-        return arrayUnion(acc, [year]);
+        let yearList = arrayUnion(acc, [year])
+        return yearList.yu[1];
     }, []);
 }

@@ -10,12 +10,14 @@
     padding: 20px;
     display: flex;
     font-weight: bold;
+    font-family: 'Gilroy-Medium', serif;
 }
 .cardData{
     display: flex;
     margin-top: 20px;
     align-items: center;
     justify-content: center;
+    font-size: 40px;
 }
 @media only screen and (max-width: 768px){
     .cardChartContainer{
