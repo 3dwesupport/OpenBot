@@ -20,7 +20,7 @@ export function CardComponent({value, handleCardClick, index}) {
     return (
         <Card sx={{
             width: "100%", display: "flex", flexDirection: "column", alignItems: "center", position: "relative",
-            justifyContent: "center", backgroundColor: value.bgColor, borderRadius: 3, height: "100%", gap: "4%"
+            justifyContent: "center", backgroundColor: value.bgColor, borderRadius: 3, height: "100%", gap: "4%",cursor:"pointer"
         }} onClick={handleClick}>
             {isCommonIconVisible && (
                 <div className={"newFileIcon"}>
