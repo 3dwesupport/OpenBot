@@ -44,7 +44,6 @@ export function ProfileModal(props) {
     // on the click of logout first it will navigate to dashboard then sign-out
     const handleLogoutClick = () => {
         setLogoutModalOpen(true);
-        handlePopoverClose();
     };
 
     const navigateAndSignOut = () => {
@@ -68,6 +67,7 @@ export function ProfileModal(props) {
             default:
                 break;
         }
+        handlePopoverClose();
     }
 
     /*StyledPopover for the dropdown menu*/

@@ -36,6 +36,10 @@ export const Constants = {
     offline: "offline",
     offlineMessage: "User is offline",
     ProfileSuccessMsg: "Profile updated successfully!",
+    signInMessage : "You need to sign in to access analysis",
+    usageAnalysis: "Usage Analysis",
+    billingHistory: "Billing History"
+
 }
 
 export const errorToast = (message) => {

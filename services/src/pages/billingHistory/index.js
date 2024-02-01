@@ -1,5 +1,7 @@
 import React from "react";
 import {TableComponent} from "../../components/common/table/tableComponent";
+import {BillingHeaderComponent} from "../../components/common/billingHeader/billingHeader";
+import {Constants} from "../../utils/constants";
 
 /**
  * function to render billing history
@@ -14,21 +16,21 @@ export function BillingHistory() {
             headerName: 'ID',
             headerAlign: 'center',
             align: 'center',
-            width: 150
+            flex: 1
         },
         {
             field: 'DATE',
             headerName: 'DATE',
             headerAlign: 'center',
             align: 'center',
-            width: 170
+            flex: 1
         },
         {
             field: 'AMOUNT',
             headerName: 'AMOUNT',
             headerAlign: 'center',
             align: 'center',
-            width: 150
+            flex: 1
         },
         {
             field: 'STATUS',
@@ -36,20 +38,21 @@ export function BillingHistory() {
             type: 'number',
             headerAlign: 'center',
             align: 'center',
-            width: 130
+            flex: 1
         },
         {
             field: 'INVOICE',
             headerName: 'INVOICE',
             headerAlign: 'center',
             align: 'center',
-            width: 170
+            flex: 1
         },
     ];
 
     const rows = [{id: 1, DATE: new Date().getDate(), AMOUNT: 100, STATUS: 'Jon', INVOICE: "link"}];
     return (
         <div style={{height: "100vh"}}>
+            <BillingHeaderComponent title={Constants.billingHistory}/>
             <TableComponent tableAttributes={BillingHistoryParams} rowsData={rows}/>
         </div>
     );

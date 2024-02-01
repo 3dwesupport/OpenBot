@@ -5,7 +5,7 @@ import './billingHeaderModule.css'
 import {Month} from "../../../utils/constants";
 
 export function BillingHeaderComponent(props) {
-    const {} = props
+    const {title} = props
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState('');
@@ -37,7 +37,7 @@ export function BillingHeaderComponent(props) {
             }
             <div className={"billingHeaderDiv"}>
                 <div  className={"billingHeaderTextDiv"}>
-                    <span className={"billingHeaderText"}>Usage Analysis</span>
+                    <span className={"billingHeaderText"}>{title}</span>
                     <div className={"calenderDiv"}>
                         <div className={"yearDiv"}>
                             <span>Year</span>

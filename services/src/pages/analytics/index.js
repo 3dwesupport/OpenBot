@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Chart} from "../../components/common/chart/chart";
 import {getProjects, getProjectsMonthlyBasis} from "../../database/APIs/projects";
-import {Month} from "../../utils/constants";
+import {Constants, Month} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
 import './usageAnalysis.css'
@@ -38,8 +38,7 @@ export function UsageAnalysis() {
     }, [])
     return (
         <>
-
-            <BillingHeaderComponent/>
+            <BillingHeaderComponent title={Constants.usageAnalysis}/>
             <div className={"userAnalysisContainer"}>
                 <div className={"cardChartContainer"}>
                     <UsageAnalysisCardComponent/>

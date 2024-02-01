@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import "../common/card/card.css";
-import {CardData, localStorageKeys, PathName} from "../../utils/constants";
+import {CardData, Constants, errorToast, localStorageKeys, PathName} from "../../utils/constants";
 import {CardComponent} from "../common/card/card";
 import {StoreContext} from "../../context/storeContext";
 import {useNavigate} from "react-router-dom";
@@ -30,7 +30,11 @@ export function DashboardComponent() {
                 console.log(CardData[2].text);
                 break;
             case CardData[5].text:
-                navigate(PathName.usageAnalysis);
+                if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
+                    navigate(PathName.usageAnalysis);
+                } else {
+                    errorToast(Constants.signInMessage);
+                }
                 break;
             default :
                 break;

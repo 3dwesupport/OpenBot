@@ -5,8 +5,8 @@ export function TableComponent(props) {
     const {tableAttributes, rowsData} = props;
 
     return (
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-            <div style={{width: "85%"}}>
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center", marginTop: "15px"}}>
+            <div style={{width: "90%"}}>
                 <DataGrid
                     disableColumnFilter
                     disableColumnSelector
