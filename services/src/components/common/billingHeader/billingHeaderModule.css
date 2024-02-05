@@ -50,22 +50,8 @@
 }
 .modalMonth{
     position: absolute !important;
-    top: 55%;
-    left: 85%;
-    transform: translate(-50%, -50%);
-    width: 220px;
-    border-radius: 10px;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    outline: 0;
-    cursor: pointer;
-    padding: 10px;
-}
-.modalYear{
-    position: absolute !important;
-    top: 25%;
-    left: 65%;
+    top: 390px;
+    right: 2px;
     transform: translate(-50%, -50%);
     width: 230px;
     border-radius: 10px;
@@ -75,8 +61,22 @@
     outline: 0;
     cursor: pointer;
 }
+.modalYear{
+    position: absolute !important;
+    top: 155px;
+    right: 190px;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    border-radius: 10px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    outline: 0;
+    cursor: pointer;
+}
 .items{
     font-size: 18px;
+    padding: 10px;
 
 }
 .modalMonth :hover{
@@ -84,6 +84,7 @@
     border:  #0071c5;
     color: #0071c5;
     border-radius: 10px;
+
 }
 .modalYear :hover{
     background: #e8f6fe;
