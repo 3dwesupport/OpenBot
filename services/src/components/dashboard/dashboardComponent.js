@@ -1,9 +1,10 @@
 import React, {useContext} from "react";
 import "../common/card/card.css";
-import {CardData, Constants, errorToast, localStorageKeys, PathName} from "../../utils/constants";
+import {CardData, Constants, errorToast, localStorageKeys, PathName, themes as Themes} from "../../utils/constants";
 import {CardComponent} from "../common/card/card";
 import {StoreContext} from "../../context/storeContext";
 import {useNavigate} from "react-router-dom";
+import {ThemeContext} from "../../App";
 
 /**
  * Function to display all openBot services on home page
@@ -14,6 +15,7 @@ export function DashboardComponent() {
 
     const {user} = useContext(StoreContext);
     const navigate = useNavigate();
+    const {theme} = useContext(ThemeContext);
 
     //function to handle click event on cards
     const handleCardClick = (clickedCard) => {
@@ -42,13 +44,13 @@ export function DashboardComponent() {
     };
 
     return (
-        <div className={"container"}>
+        <div className={"container"} style={{backgroundColor:theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
             {/* Title section */}
             {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <div className={"textDiv"}>
-                <div className="title">
-                    {/* Bold "WELCOME" */}
-                    <div style={{fontWeight: 'bold', display: 'inline'}}>WELCOME</div>
-                    , {user?.displayName}
+                <div className="title" style={{ color: theme === Themes.dark ? 'white' : 'black' }}>
+                    <div style={{ fontWeight: 'bold', display: 'inline' }}>
+                        WELCOME
+                    </div>, { user?.displayName}
                 </div>
             </div> : <div className={"textDiv"}/>}
             {/* Card container */}

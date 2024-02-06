@@ -1,17 +1,22 @@
 import './App.css';
 import {RouterComponent} from "./components/router/routes";
-import {useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 import {auth} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
-import {Constants, localStorageKeys} from "./utils/constants";
+import {Constants, localStorageKeys, themes as Themes} from "./utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
+
+
+export const ThemeContext= createContext(null);
 
 function App() {
     const [user, setUser] = useState(null);
     let isAndroid = /Android/i.test(navigator.userAgent);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
+    let onPageLoad = localStorage.getItem("theme") || ""
+    const [theme,setTheme]= useState(onPageLoad);
 
     const handleOnline = () => {
         setIsOnline(true)
@@ -54,11 +59,45 @@ function App() {
         }
     }, [])
 
+    // useEffect(() => {
+    //     let darkElement= document.body;
+    //     // to change the body theme
+    //     theme === Themes.dark ? darkElement.classList.add("dark-mode"): darkElement.classList.remove("dark-mode");
+    // }, [theme]);
+
+    useEffect(() => {
+        document.body.classList.toggle("dark-mode", theme === Themes.dark);
+    }, [theme]);
+
+
+    if (!localStorage.getItem("theme")) {
+        const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)"); //check system theme
+        //set system prefer theme in localstorage
+        localStorage.setItem("theme", darkThemeMq.matches ? Themes.dark : Themes.light);
+    }
+
+    //if theme is dark and when click on change theme then setTheme light and vice-versa.
+    const toggleTheme = () => {
+        if (theme === "light") {
+            setTheme("dark");
+            localStorage.setItem("theme", Themes.dark)
+            document.body.classList.replace("light", "dark"); // for background theme
+        } else {
+            setTheme("light");
+            localStorage.setItem("theme", Themes.light)
+            document.body.classList.replace("dark", "light"); //for background theme
+        }
+    };
+
     return (
+        <ThemeContext.Provider value={{theme,toggleTheme}}>
         <StoreProvider user={user} setUser={setUser} isOnline={isOnline}>
+            <div id={theme}>
             <RouterComponent/>
+            </div>
             <ToastContainer autoClose={5000}/>
         </StoreProvider>
+        </ThemeContext.Provider>
     );
 }
 

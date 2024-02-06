@@ -50,7 +50,13 @@
     width: 28px;
 }
 .dark_themeIcon{
+    height: 23px;
+    width: 23px;
+}
+.dark_themeIcon:hover{
     cursor: pointer;
+    height: 28px;
+    width: 28px;
 }
 
 .navbar_lineIcon {

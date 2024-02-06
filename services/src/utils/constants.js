@@ -82,3 +82,12 @@ export const tables = {
 
 // month array
 export const Month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/**
+ * dark and light theme constants
+ * @type {{light: string, dark: string}}
+ */
+export const themes ={
+    "light":"light",
+    "dark":"dark",
+}
