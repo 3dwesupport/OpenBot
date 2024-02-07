@@ -3,7 +3,7 @@ import {RouterComponent} from "./components/router/routes";
 import {createContext, useEffect, useState} from "react";
 import {auth} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
-import {Constants, localStorageKeys, themes as Themes} from "./utils/constants";
+import {Constants, localStorageKeys,Themes} from "./utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
@@ -58,12 +58,6 @@ function App() {
             });
         }
     }, [])
-
-    // useEffect(() => {
-    //     let darkElement= document.body;
-    //     // to change the body theme
-    //     theme === Themes.dark ? darkElement.classList.add("dark-mode"): darkElement.classList.remove("dark-mode");
-    // }, [theme]);
 
     useEffect(() => {
         document.body.classList.toggle("dark-mode", theme === Themes.dark);

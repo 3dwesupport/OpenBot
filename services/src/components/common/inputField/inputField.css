@@ -18,7 +18,10 @@
     font-size: 18px;
     padding: 8px;
 }
-
+.darkThemeInput{
+    background-color: rgb(65, 65, 65);
+    color:#FFFFFF;
+}
 
 @media only screen and (max-width: 768px) {
 

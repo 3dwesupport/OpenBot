@@ -1,7 +1,8 @@
 import {InputFieldComponent} from "../inputField/inputField";
 import ButtonComponent from "../button/button";
-import React from "react";
+import React, {useContext} from "react";
 import './form.css';
+import {ThemeContext} from "../../../App";
 
 
 /**
@@ -18,29 +19,29 @@ export function FormComponent(props) {
         handleDOBChange,
         handleSubmit,
         isSaveDisabled,
-        user
+        user,
+        theme,
     } = props
 
     return (
         <>
             <div className={"nameDiv"}>
                 <InputFieldComponent label="First Name" textType="text" value={userDetails.firstName}
-                                     onDataChange={(name) => handleNameChange('firstName', name)}
+                                     onDataChange={(name) => handleNameChange('firstName', name)} theme={theme}
                                      style={{
                                          border: userDetails?.firstName?.trim().length === 0 && "1px solid red",
                                          outline: userDetails?.firstName?.trim().length === 0 && "none",
                                      }}/>
                 <InputFieldComponent label="Last Name" textType="text" value={userDetails.lastName}
-                                     onDataChange={(name) => handleNameChange('lastName', name)}/>
+                                     onDataChange={(name) => handleNameChange('lastName', name)} theme={theme}/>
             </div>
             <div className={"detailsDiv"}>
-                <InputFieldComponent value={userDetails.dob} label="Date Of Birth" textType="date"
-                                     onDataChange={handleDOBChange}/>
+                <InputFieldComponent label="Date Of Birth" textType="date" value={userDetails.dob}
+                                     onDataChange={handleDOBChange} theme={theme}/>
             </div>
             <div className={"emailDiv"}>
-                <InputFieldComponent value={user?.email} label={"Email address"} style={{color: "grey"}}
-                                     textType={"email"}
-                                     disabled={true}/>
+                <InputFieldComponent label={"Email address"} textType={"email"} value={user?.email}
+                                     style={{color: "grey"}} disabled={true} theme={theme}/>
             </div>
             <div className={"buttonSection"}>
                 <ButtonComponent label={"Save"} onClick={handleSubmit} disabled={isSaveDisabled}/>

@@ -7,7 +7,7 @@ import ButtonComponent from "../button/button";
  * component to represent logout modal on the click of logout in dropdown
  */
 export function LogoutComponent(props) {
-    const {setLogoutModalOpen, logoutModalOpen, onClick} = props
+    const {setLogoutModalOpen, logoutModalOpen, onClick, theme} = props
 
     //handle the logout modal close
     const handleLogoutModalClose = () => {

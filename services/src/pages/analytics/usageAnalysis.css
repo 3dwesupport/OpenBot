@@ -1,3 +1,7 @@
+.mainContainer{
+    height: 100%;
+    width: 100%;
+}
 .userAnalysisContainer{
     display: flex;
     align-items: center;

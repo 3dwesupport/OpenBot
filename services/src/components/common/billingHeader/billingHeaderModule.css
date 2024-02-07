@@ -11,7 +11,6 @@
     justify-content: space-between;
 }
 .billingHeaderText{
-    color: #000000;
     font-size: 20px;
     font-weight: bold;
     font-family: Gilroy-SemiBold, sans-serif;
@@ -19,19 +18,18 @@
 .modalDiv{
     height: 28px;
     width: 300px;
-    border: 2px solid whitesmoke;
     display: flex;
     flex-direction: row;
     gap:70%;
     align-items: center;
     justify-content: space-around;
-    background-color: #FFFFFF;
+    background-color: #F1F1F1
+;
     cursor: pointer;
 }
 .yearDiv{
     height: 28px;
     width: 100px;
-    border: 2px solid whitesmoke;
     display: flex;
     flex-direction: row;
     gap:20%;
@@ -43,6 +41,7 @@
 
 .calenderDiv{
     display: flex;
+    gap: 1%;
 }
 .billingHeaderImage{
     height: 8px;

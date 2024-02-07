@@ -1,9 +1,10 @@
 import {Modal} from "@mui/material";
 import {Images} from "../../../utils/images";
-import React, {useEffect, useReducer} from "react";
+import React, {useContext, useEffect, useReducer} from "react";
 import './billingHeaderModule.css'
-import {Month} from "../../../utils/constants";
+import {Month, Themes} from "../../../utils/constants";
 import {getYears} from "../../../database/APIs/projects";
+import {ThemeContext} from "../../../App";
 
 
 let initialState = {
@@ -42,15 +43,13 @@ const reducer = (state, action) => {
 export function BillingHeaderComponent(props) {
     const {
         title,
-        onDataChange
+        onDataChange,
     } = props
     const [state, dispatch] = useReducer(reducer, initialState);
     const {selectedModal, selectedMonth, selectedYear, years} = state;
+    const {theme}=useContext(ThemeContext);
 
     const handleModalAction = (actionType, payload) => {
-        console.log('Action Type:::::::', actionType);
-        console.log('Payload::::::', payload);
-        console.log('Before dispatch - Selected Modal:', state.selectedModal);
         switch (actionType) {
             case actionTypes.OPEN_MODAL:
                 dispatch({type: actionTypes.OPEN_MODAL, payload});
@@ -73,6 +72,12 @@ export function BillingHeaderComponent(props) {
         }
         console.log('After dispatch - Selected Modal:', state.selectedModal);
     };
+
+    const commonDivStyle = {
+        backgroundColor: theme === Themes.dark ? 'rgb(65, 65, 65)' : 'white',
+        border: theme === Themes.dark ? '1px solid #555555' : '1px solid #F1F1F1',
+    };
+
 
     useEffect(() => {
         getYears().then((res) => {
@@ -108,16 +113,16 @@ export function BillingHeaderComponent(props) {
                 </Modal>
             )
             }
-            <div className={"billingHeaderDiv"}>
+            <div className={"billingHeaderDiv"} style={{ backgroundColor: theme === Themes.dark ? '#303030' : '',color: theme === Themes.dark ? '#FFFFFF' : '#303030' }}>
                 <div className={"billingHeaderTextDiv"}>
-                    <span className={"billingHeaderText"}>{title}</span>
+                    <span className={"billingHeaderText"} >{title}</span>
                     <div className={"calenderDiv"}>
-                        <div className={"yearDiv"} onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'year')}>
+                        <div className={"yearDiv"} style={commonDivStyle} onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'year')}>
                             {selectedYear ? selectedYear : (
                                 <span className={"yearText"}>{new Date().getFullYear()}</span>)}
                             <img className={"billingHeaderImage"} src={Images.billingHeader_icon} alt={"icon"}/>
                         </div>
-                        <div className={"modalDiv"} onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'month')}>
+                        <div className={"modalDiv"} style={commonDivStyle} onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'month')}>
                             {selectedMonth ? (<span>{selectedMonth}</span>) : (
                                 <span className={"monthText"}>{Month[new Date().getMonth()]}</span>)}
                             <img className={"billingHeaderImage"} src={Images.billingHeader_icon} alt={"icon"}/>

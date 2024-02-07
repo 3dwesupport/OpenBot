@@ -1,13 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Chart} from "../../components/common/chart/chart";
 import {getProjects, getProjectsMonthlyBasis} from "../../database/APIs/projects";
-import {Constants, Month} from "../../utils/constants";
+import {Constants, Month, Themes} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
 import './usageAnalysis.css'
 import {UsageAnalysisCardComponent} from "./usageAnalysisCard";
 import Card from "@mui/material/Card";
 import {BillingHeaderComponent} from "../../components/common/billingHeader/billingHeader";
+import {ThemeContext} from "../../App";
 
 /**
  * function to display usage analytics stats
@@ -15,6 +16,7 @@ import {BillingHeaderComponent} from "../../components/common/billingHeader/bill
  * @constructor
  */
 export function UsageAnalysis() {
+    const{theme} = useContext(ThemeContext);
     let date = new Date();
     const [isChangedMonth, setIsChangedMonth] = useState(Month[date.getMonth()]);
     const [isChangedYear, setIsChangedYear] = useState(date.getFullYear());
@@ -45,18 +47,21 @@ export function UsageAnalysis() {
     }, [isChangedMonth, isChangedYear])
 
     return (
-        <>
+       <>
+           <div style={{height:"100vh", backgroundColor: theme === Themes.dark ? '#303030' : ''}}>
             <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange}/>
             <div className={"userAnalysisContainer"}>
                 <div className={"cardChartContainer"}>
                     <UsageAnalysisCardComponent usageDetails={usageDetails}/>
                     <div className={"chartDiv"}>
-                        <Card style={{position: "relative", borderRadius: "2%"}}>
+                        <Card style={{position: "relative", borderRadius: "2%", backgroundColor:theme === Themes.dark ? '#292929' : '#FFFFFF' }}>
                             <Chart usageDetails={usageDetails}/>
                         </Card>
                     </div>
                 </div>
             </div>
-        </>
+           </div>
+
+      </>
     )
 }

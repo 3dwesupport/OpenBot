@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {Images} from "../../utils/images";
 import {DropdownComponent} from "../common/dropdown/dropdown";
 import styles from "./profileModal.module.css";
@@ -6,15 +6,16 @@ import "./profileModal.module.css"
 import {Avatar, Popover, styled} from "@mui/material";
 import {LogoutComponent} from "../common/logout/modalComponent";
 import LoaderComponent from "../common/loader/loader";
-import {PathName} from "../../utils/constants";
+import {PathName, themes as Themes} from "../../utils/constants";
 import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";
 import "../common/dropdown/dropdown.css"
 import {ThemeProvider, createTheme} from '@mui/material/styles';
+import {ThemeContext} from "../../App";
 
 export function ProfileModal(props) {
     const [anchorEl, setAnchorEl] = useState(null);
-    const {user, setIsSignIn, userDetails} = props;
+    const {user, setIsSignIn} = props;
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const navigate = useNavigate();
     const open = Boolean(anchorEl);
@@ -30,7 +31,6 @@ export function ProfileModal(props) {
                 marginLeft: "2%",
                 paddingTop: "12px"
             },
-
         },
     }));
 
@@ -74,7 +74,7 @@ export function ProfileModal(props) {
     return (
         <div>
             <ThemeProvider theme={theme}>
-                {<StyledPopover open={open} anchorEl={anchorEl} onClose={handlePopoverClose}
+                {<StyledPopover  theme={theme}  open={open} anchorEl={anchorEl} onClose={handlePopoverClose}
                                 anchorOrigin={{vertical: 'bottom', horizontal: 'right',}}
                                 transformOrigin={{vertical: 'top', horizontal: 'right'}}>
                     <div className={"dropdownItem"}>

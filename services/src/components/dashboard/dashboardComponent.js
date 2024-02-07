@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import "../common/card/card.css";
-import {CardData, Constants, errorToast, localStorageKeys, PathName, themes as Themes} from "../../utils/constants";
+import {CardData, Constants, errorToast, localStorageKeys, PathName, Themes} from "../../utils/constants";
 import {CardComponent} from "../common/card/card";
 import {StoreContext} from "../../context/storeContext";
 import {useNavigate} from "react-router-dom";
@@ -47,7 +47,7 @@ export function DashboardComponent() {
         <div className={"container"} style={{backgroundColor:theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
             {/* Title section */}
             {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <div className={"textDiv"}>
-                <div className="title" style={{ color: theme === Themes.dark ? 'white' : 'black' }}>
+                <div className="title" style={{ color: theme === Themes.dark ? '#FFFFFF' : '#303030' }}>
                     <div style={{ fontWeight: 'bold', display: 'inline' }}>
                         WELCOME
                     </div>, { user?.displayName}

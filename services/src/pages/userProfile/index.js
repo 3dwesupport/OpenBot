@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {FormComponent} from "../../components/common/form/form";
 import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs/profile";
 import firebase from "firebase/compat/app";
-import {errorToast, successToast} from "../../utils/constants";
+import {errorToast, successToast, Themes} from "../../utils/constants";
 import LoaderComponent from "../../components/common/loader/loader";
 import {Avatar} from "@mui/material";
 import {Images} from "../../utils/images";
@@ -12,6 +12,7 @@ import styles from "./userProfile.module.css";
 import auth from "../../database/authentication"
 import heic2any from "heic2any";
 import Compressor from 'compressorjs';
+import {ThemeContext} from "../../App";
 
 /**
  * Edit profile component
@@ -19,6 +20,7 @@ import Compressor from 'compressorjs';
  * @constructor
  */
 export function UserProfile() {
+    const{theme} = useContext(ThemeContext);
     const {user} = useContext(StoreContext);
     const {isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
@@ -39,7 +41,6 @@ export function UserProfile() {
             return;
         }
         setIsProfileLoader(true);
-
         (async () => {
             try {
                 const [dob, names] = await Promise.all([
@@ -196,7 +197,7 @@ export function UserProfile() {
     }
 
     return (
-        <div style={{height: "100vh"}}>
+        <div style={{height: "100vh" , backgroundColor: theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
             {isProfileLoader ?
                 <div className={styles.loader}>
                     <LoaderComponent color='blue'/>
@@ -204,7 +205,7 @@ export function UserProfile() {
                 <div className={styles.mainScreen}>
                     <div className={styles.parentDiv}>
                         <div className={styles.editProfileContainer}>
-                            <div className={styles.editProfileTextDiv}>Edit Profile</div>
+                            <div className={styles.editProfileTextDiv} style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030' }}> Edit Profile</div>
                             <div className={styles.editProfileImageDiv}>
                                 <div className={styles.profileImage}>
                                 </div>
@@ -224,7 +225,7 @@ export function UserProfile() {
                         </div>
                         <div className={styles.childDiv}>
                         <FormComponent userDetails={userDetails} handleNameChange={handleNameChange} handleDOBChange={handleDOBChange}
-                                       handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} user={user}/>
+                                       handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} user={user} theme={theme}/>
                         </div>
                     </div>
                 </div>

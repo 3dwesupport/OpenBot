@@ -87,7 +87,7 @@ export const Month = ["January", "February", "March", "April", "May", "June", "J
  * dark and light theme constants
  * @type {{light: string, dark: string}}
  */
-export const themes ={
+export const Themes ={
     "light":"light",
     "dark":"dark",
 }
