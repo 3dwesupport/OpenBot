@@ -1,4 +1,4 @@
-import {and, arrayUnion, collection, getDocs, query, where} from "@firebase/firestore";
+import {and, collection, getDocs, query, where} from "@firebase/firestore";
 import {localStorageKeys, Month, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
@@ -92,15 +92,30 @@ export async function getProjectsMonthlyBasis(year) {
 
 /**
  * function to get years from firestore
- * @returns {Promise<FieldValue>}
+ * @returns {Promise<unknown[]>}
  */
 export async function getYears() {
-    const docRef = collection(db, tables.projects); // Replace 'your_collection' with your actual collection name
-    const querySnapshot = await getDocs(docRef);
-    // Use array-union to get unique years
-    return querySnapshot.docs.reduce((acc, doc) => {
-        const year = doc.data().status.year;
-        let yearList = arrayUnion(acc, [year])
-        return yearList.yu[1];
-    }, []);
+    const uid = localStorage.getItem(localStorageKeys.UID);
+    const ordersQuery = query(collection(db, tables.projects), where("uid", '==', uid));
+    const serverQuery = query(collection(db, tables.server), where("uid", '==', uid));
+    const modelsQuery = query(collection(db, tables.models), where("uid", '==', uid));
+    const [ordersSnapshot, serverSnapshot, modelsSnapshot] = await Promise.all([
+        getDocs(ordersQuery),
+        getDocs(serverQuery),
+        getDocs(modelsQuery),
+    ]);
+
+    const uniqueYearsSet = new Set();
+    function processSnapshot(snapshot) {
+        snapshot.forEach((doc) => {
+            const status = doc.data().status;
+            if (status && status.year) {
+                uniqueYearsSet.add(status.year);
+            }
+        });
+    }
+    processSnapshot(ordersSnapshot);
+    processSnapshot(serverSnapshot);
+    processSnapshot(modelsSnapshot);
+    return Array.from(uniqueYearsSet);
 }
