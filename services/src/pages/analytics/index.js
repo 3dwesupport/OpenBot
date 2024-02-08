@@ -16,7 +16,7 @@ import {ThemeContext} from "../../App";
  * @constructor
  */
 export function UsageAnalysis() {
-    const{theme} = useContext(ThemeContext);
+    const {theme} = useContext(ThemeContext);
     let date = new Date();
     const [isChangedMonth, setIsChangedMonth] = useState(Month[date.getMonth()]);
     const [isChangedYear, setIsChangedYear] = useState(date.getFullYear());
@@ -47,21 +47,25 @@ export function UsageAnalysis() {
     }, [isChangedMonth, isChangedYear])
 
     return (
-       <>
-           <div style={{height:"100vh", backgroundColor: theme === Themes.dark ? '#303030' : ''}}>
-            <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange}/>
-            <div className={"userAnalysisContainer"}>
-                <div className={"cardChartContainer"}>
-                    <UsageAnalysisCardComponent usageDetails={usageDetails}/>
-                    <div className={"chartDiv"}>
-                        <Card style={{position: "relative", borderRadius: "2%", backgroundColor:theme === Themes.dark ? '#292929' : '#FFFFFF' }}>
-                            <Chart usageDetails={usageDetails}/>
-                        </Card>
+        <>
+            <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#303030' : ''}}>
+                <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange}/>
+                <div className={"userAnalysisContainer"}>
+                    <div className={"cardChartContainer"}>
+                        <UsageAnalysisCardComponent usageDetails={usageDetails}/>
+                        <div className={"chartDiv"}>
+                            <Card style={{
+                                position: "relative",
+                                borderRadius: "2%",
+                                backgroundColor: theme === Themes.dark ? '#292929' : '#FFFFFF'
+                            }}>
+                                <Chart usageDetails={usageDetails}/>
+                            </Card>
+                        </div>
                     </div>
                 </div>
             </div>
-           </div>
 
-      </>
+        </>
     )
 }

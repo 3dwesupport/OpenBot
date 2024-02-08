@@ -1,53 +1,58 @@
-.billingHeaderDiv{
-    margin-top: 30px;
+.billingHeaderDiv {
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #f8f9fb;
+    height: 100px;
 }
-.billingHeaderTextDiv{
+
+.billingHeaderTextDiv {
     width: 90%;
     display: flex;
     justify-content: space-between;
 }
-.billingHeaderText{
+
+.billingHeaderText {
     font-size: 20px;
     font-weight: bold;
     font-family: Gilroy-SemiBold, sans-serif;
 }
-.modalDiv{
+
+.modalDiv {
     height: 28px;
     width: 300px;
     display: flex;
     flex-direction: row;
-    gap:70%;
+    gap: 70%;
     align-items: center;
     justify-content: space-around;
-    background-color: #F1F1F1
-;
+    background-color: #F1F1F1;
     cursor: pointer;
 }
-.yearDiv{
+
+.yearDiv {
     height: 28px;
     width: 100px;
     display: flex;
     flex-direction: row;
-    gap:20%;
+    gap: 20%;
     align-items: center;
     justify-content: space-around;
     background-color: #FFFFFF;
     cursor: pointer;
 }
 
-.calenderDiv{
+.calenderDiv {
     display: flex;
     gap: 1%;
 }
-.billingHeaderImage{
+
+.billingHeaderImage {
     height: 8px;
     width: 11px;
 }
-.modalMonth{
+
+.modalMonth {
     position: absolute !important;
     top: 390px;
     right: 2px;
@@ -60,7 +65,8 @@
     outline: 0;
     cursor: pointer;
 }
-.modalYear{
+
+.modalYear {
     position: absolute !important;
     top: 155px;
     right: 190px;
@@ -73,61 +79,77 @@
     outline: 0;
     cursor: pointer;
 }
-.items{
+
+.items {
     font-size: 18px;
     padding: 10px;
 
 }
-.modalMonth :hover{
+
+.modalMonth :hover {
     background: #e8f6fe;
-    border:  #0071c5;
+    border: #0071c5;
     color: #0071c5;
     border-radius: 10px;
 
 }
-.modalYear :hover{
+
+.modalYear :hover {
     background: #e8f6fe;
-    border:  #0071c5;
+    border: #0071c5;
     color: #0071c5;
     border-radius: 10px;
 }
-@media only screen and (max-width: 768px){
-    .billingHeaderText{
+
+@media only screen and (max-width: 768px) {
+    .billingHeaderText {
         font-size: 16px;
         display: flex;
         align-items: center;
     }
-.yearDiv{
-    height: 25px;
-    width: 65px;
-}
-    .modalDiv{
-         width: 140px;
-           gap: 50%;
+
+    .yearDiv {
+        height: 25px;
+        width: 65px;
+    }
+
+    .modalDiv {
+        width: 140px;
+        gap: 50%;
         height: 25px;
     }
-    .billingHeaderImage{
+
+    .billingHeaderImage {
         height: 6px;
         width: 9px;
     }
-    .yearText{
+
+    .yearText {
         font-size: 12px;
     }
-    .monthText{
+
+    .monthText {
         font-size: 12px;
     }
-    .items{
+
+    .items {
         font-size: 12px;
     }
-    .modalMonth{
+
+    .modalMonth {
         width: 105px;
         top: 35%;
         left: 75%;
-        padding:8px;
+        padding: 8px;
     }
-    .modalYear{
+
+    .modalYear {
         width: 100px;
         top: 15%;
         left: 52%;
+    }
+
+    .billingHeaderDiv {
+        height: 60px;
     }
 }
