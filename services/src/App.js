@@ -3,20 +3,20 @@ import {RouterComponent} from "./components/router/routes";
 import {createContext, useEffect, useState} from "react";
 import {auth} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
-import {Constants, localStorageKeys,Themes} from "./utils/constants";
+import {Constants, localStorageKeys, Themes} from "./utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
 
 
-export const ThemeContext= createContext(null);
+export const ThemeContext = createContext(null);
 
 function App() {
     const [user, setUser] = useState(null);
     let isAndroid = /Android/i.test(navigator.userAgent);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     let onPageLoad = localStorage.getItem("theme") || ""
-    const [theme,setTheme]= useState(onPageLoad);
+    const [theme, setTheme] = useState(onPageLoad);
 
     const handleOnline = () => {
         setIsOnline(true)
@@ -84,13 +84,13 @@ function App() {
     };
 
     return (
-        <ThemeContext.Provider value={{theme,toggleTheme}}>
-        <StoreProvider user={user} setUser={setUser} isOnline={isOnline}>
-            <div id={theme}>
-            <RouterComponent/>
-            </div>
-            <ToastContainer autoClose={5000}/>
-        </StoreProvider>
+        <ThemeContext.Provider value={{theme, toggleTheme}}>
+            <StoreProvider user={user} setUser={setUser} isOnline={isOnline}>
+                <div id={theme}>
+                    <RouterComponent/>
+                </div>
+                <ToastContainer autoClose={5000}/>
+            </StoreProvider>
         </ThemeContext.Provider>
     );
 }

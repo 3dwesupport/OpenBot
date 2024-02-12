@@ -33,7 +33,7 @@ export function BillingHeaderComponent(props) {
             case actionTypes.SET_YEARS:
                 return {...state, years: action.payload};
             default:
-                return ;
+                return;
         }
     };
     const [state, dispatch] = useReducer(reducer, initialState);

@@ -1,5 +1,6 @@
 import React from "react";
 import {DashboardComponent} from "../../components/dashboard/dashboardComponent";
+import {SubscriptionCookie} from "../../components/common/cookie/subscriptionCookie";
 
 /**
  * function to display home page
@@ -10,6 +11,7 @@ export const Home = () => {
     return (
         <div style={{height: "100vh"}}>
             <DashboardComponent/>
+            <SubscriptionCookie/>
         </div>
     );
 }
