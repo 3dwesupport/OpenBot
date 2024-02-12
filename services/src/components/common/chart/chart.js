@@ -40,7 +40,7 @@ export function Chart(props) {
                     },
                     tickFontSize: 12,
                     scaleType: 'point',
-                    data: date.getMonth() < 6 ? Month.slice(0, 6) : Month.slice(-6),
+                    data: date.getMonth() < 6 ? Month.slice(0, 6).map(month => month.slice(0,3)) : Month.slice(-6).map(month => month.slice(0, 3)),
                 }]}
                 yAxis={[{
                     tickLabelStyle: {
