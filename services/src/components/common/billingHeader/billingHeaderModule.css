@@ -28,6 +28,7 @@
     justify-content: space-around;
     background-color: #F1F1F1;
     cursor: pointer;
+    font-family: Gilroy-SemiBold, serif;
 }
 
 .yearDiv {
@@ -40,6 +41,7 @@
     justify-content: space-around;
     background-color: #FFFFFF;
     cursor: pointer;
+    font-family: Gilroy-SemiBold, serif;
 }
 
 .calenderDiv {
@@ -52,54 +54,86 @@
     width: 11px;
 }
 
-.modalMonth {
+.lightThemeModalMonth {
     position: absolute !important;
     top: 390px;
     right: 2px;
     transform: translate(-50%, -50%);
     width: 230px;
     border-radius: 10px;
-    background-color: #fff;
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    outline: 0;
+    cursor: pointer;
+}
+.darkThemeModalMonth{
+    position: absolute !important;
+    top: 390px;
+    right: 2px;
+    transform: translate(-50%, -50%);
+    width: 230px;
+    border-radius: 10px;
+    background-color: #303030;
     display: flex;
     flex-direction: column;
     outline: 0;
     cursor: pointer;
 }
 
-.modalYear {
+.lightThemeModalYear {
     position: absolute !important;
     top: 155px;
     right: 190px;
     transform: translate(-50%, -50%);
     width: 220px;
     border-radius: 10px;
-    background-color: #fff;
+    background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
     outline: 0;
     cursor: pointer;
 }
-
+.darkThemeModalYear{
+    position: absolute !important;
+    top: 155px;
+    right: 190px;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    border-radius: 10px;
+    background-color: #303030;
+    display: flex;
+    flex-direction: column;
+    outline: 0;
+    cursor: pointer;
+}
 .items {
     font-size: 18px;
     padding: 10px;
-
 }
 
-.modalMonth :hover {
+.lightThemeModalMonth :hover {
     background: #e8f6fe;
     border: #0071c5;
-    color: #0071c5;
+    color: #0071c5!important;
     border-radius: 10px;
-
 }
 
-.modalYear :hover {
+.lightThemeModalYear :hover {
     background: #e8f6fe;
     border: #0071c5;
-    color: #0071c5;
+    color: #0071c5!important;
     border-radius: 10px;
 }
+.darkThemeModalMonth :hover{
+    background: #0071c5;
+    border-radius: 10px;
+}
+.darkThemeModalYear:hover{
+    background: #0071c5;
+    border-radius: 10px;
+}
+
 
 @media only screen and (max-width: 768px) {
     .billingHeaderText {
@@ -136,14 +170,14 @@
         font-size: 12px;
     }
 
-    .modalMonth {
+    .lightThemeModalMonth {
         width: 105px;
         top: 35%;
         left: 75%;
         padding: 8px;
     }
 
-    .modalYear {
+    .lightThemeModalYear {
         width: 100px;
         top: 15%;
         left: 52%;

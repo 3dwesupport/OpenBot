@@ -4,14 +4,9 @@ import React, {useContext, useEffect, useReducer} from "react";
 import './billingHeaderModule.css'
 import {Month, Themes} from "../../../utils/constants";
 import {getYears} from "../../../database/APIs/projects";
-import {ThemeContext} from "../../../App";
 
 export function BillingHeaderComponent(props) {
-    const {
-        title,
-        onDataChange,
-    } = props
-    const {theme} = useContext(ThemeContext);
+    const {title,onDataChange,theme} = props
     let initialState = {
         selectedModal: null,
         selectedMonth: '',
@@ -87,9 +82,9 @@ export function BillingHeaderComponent(props) {
         <>
             {selectedModal === 'year' && (
                 <Modal open={true} onClose={() => handleModalAction(actionTypes.CLOSE_MODAL)}>
-                    <div className={"modalYear"}>
+                    <div className={theme === Themes.dark ? "darkThemeModalYear" : "lightThemeModalYear"}>
                         {years.map((year, index) => (
-                            <div className={"items"} key={index}
+                            <div className={"items"} key={index} style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}
                                  onClick={() => handleModalAction(actionTypes.SELECT_YEAR, year)}>
                                 {year}
                             </div>
@@ -98,9 +93,9 @@ export function BillingHeaderComponent(props) {
                 </Modal>)}
             {selectedModal === 'month' && (
                 <Modal open={true} onClose={() => handleModalAction(actionTypes.CLOSE_MODAL)}>
-                    <div className={"modalMonth"}>
+                    <div className={theme === Themes.dark ? "darkThemeModalMonth" : "lightThemeModalMonth"}>
                         {Month.map((month, index) => (
-                            <div className={"items"} key={index}
+                            <div className={"items"} key={index} style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}
                                  onClick={() => handleModalAction(actionTypes.SELECT_MONTH, month)}>
                                 {month}
                             </div>
@@ -120,13 +115,13 @@ export function BillingHeaderComponent(props) {
                              onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'year')}>
                             {selectedYear ? selectedYear : (
                                 <span className={"yearText"}>{new Date().getFullYear()}</span>)}
-                            <img className={"billingHeaderImage"} src={Images.billingHeader_icon} alt={"icon"}/>
+                            <img className={"billingHeaderImage"} src={ theme === Themes.dark ? Images.lightThemeArrowDownIcon : Images.billingHeader_icon} alt={"icon"} />
                         </div>
                         <div className={"modalDiv"} style={commonDivStyle}
                              onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'month')}>
                             {selectedMonth ? (<span>{selectedMonth}</span>) : (
                                 <span className={"monthText"}>{Month[new Date().getMonth()]}</span>)}
-                            <img className={"billingHeaderImage"} src={Images.billingHeader_icon} alt={"icon"}/>
+                            <img className={"billingHeaderImage"} src={ theme === Themes.dark ? Images.lightThemeArrowDownIcon : Images.billingHeader_icon} alt={"icon"}/>
                         </div>
                     </div>
                 </div>

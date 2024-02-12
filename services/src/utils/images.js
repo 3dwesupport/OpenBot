@@ -21,6 +21,7 @@ import hoverArrowLeftIcon from'../assets/images/hoverArrowLeft_icon.png'
 import openInNewFileIcon from'../assets/images/openInNewFile_icon.png'
 import lightChartArrow from "../assets/images/chart-arrow.png"
 import billingHeader_icon from'../assets/images/billingHeaderIcon.png'
+import lightThemeArrowDownIcon from '../assets/images/lightThemeArrowDown_icon.png'
 export const Images = {
     openBotLogo:openBotLogo,
     lightTheme_icon:lightTheme_icon,
@@ -45,4 +46,5 @@ export const Images = {
     openInNewFileIcon:openInNewFileIcon,
     lightChartArrow:lightChartArrow,
     billingHeader_icon:billingHeader_icon,
+    lightThemeArrowDownIcon:lightThemeArrowDownIcon,
 }

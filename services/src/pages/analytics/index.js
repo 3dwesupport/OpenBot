@@ -49,7 +49,7 @@ export function UsageAnalysis() {
     return (
         <>
             <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#303030' : ''}}>
-                <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange}/>
+                <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange} theme={theme}/>
                 <div className={"userAnalysisContainer"}>
                     <div className={"cardChartContainer"}>
                         <UsageAnalysisCardComponent usageDetails={usageDetails}/>
@@ -65,7 +65,6 @@ export function UsageAnalysis() {
                     </div>
                 </div>
             </div>
-
         </>
     )
 }
