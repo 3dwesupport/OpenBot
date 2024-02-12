@@ -57,7 +57,8 @@ export function UsageAnalysis() {
                             <Card style={{
                                 position: "relative",
                                 borderRadius: "2%",
-                                backgroundColor: theme === Themes.dark ? '#292929' : '#FFFFFF'
+                                backgroundColor: theme === Themes.dark ? '#292929' : '#FFFFFF',
+                                height:"100%",
                             }}>
                                 <Chart usageDetails={usageDetails}/>
                             </Card>

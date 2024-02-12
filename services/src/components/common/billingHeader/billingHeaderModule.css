@@ -172,15 +172,26 @@
 
     .lightThemeModalMonth {
         width: 105px;
-        top: 35%;
-        left: 75%;
+        top: 310px;
+        left: 315px;
         padding: 8px;
     }
 
     .lightThemeModalYear {
         width: 100px;
-        top: 15%;
-        left: 52%;
+        top:120px!important;
+        left: 210px!important;
+    }
+    .darkThemeModalMonth{
+        width: 105px;
+        top: 310px;
+        left: 315px;
+        padding: 8px;
+    }
+    .darkThemeModalYear{
+        width: 100px;
+        top:120px!important;
+        left: 210px!important;
     }
 
     .billingHeaderDiv {

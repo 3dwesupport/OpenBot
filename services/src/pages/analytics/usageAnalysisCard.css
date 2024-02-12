@@ -6,17 +6,16 @@
 }
 
 .analysisCardText {
+    width: 85%;
     font-size: 15px;
-    padding: 20px;
-    display: flex;
     font-weight: bold;
     font-family: 'Gilroy-Medium', serif;
+    position: absolute;
+    top: 0;
+    padding: 15px;
 }
+
 .cardData{
-    display: flex;
-    margin-top: 20px;
-    align-items: center;
-    justify-content: center;
     font-size: 40px;
     font-family: Gilroy-SemiBold, serif!important;
 }

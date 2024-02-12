@@ -1,6 +1,6 @@
 import {Modal} from "@mui/material";
 import {Images} from "../../../utils/images";
-import React, {useContext, useEffect, useReducer} from "react";
+import React, {useEffect, useReducer} from "react";
 import './billingHeaderModule.css'
 import {Month, Themes} from "../../../utils/constants";
 import {getYears} from "../../../database/APIs/projects";
@@ -38,8 +38,6 @@ export function BillingHeaderComponent(props) {
     };
     const [state, dispatch] = useReducer(reducer, initialState);
     const {selectedModal, selectedMonth, selectedYear, years} = state;
-
-
     const handleModalAction = (actionType, payload) => {
         switch (actionType) {
             case actionTypes.OPEN_MODAL:

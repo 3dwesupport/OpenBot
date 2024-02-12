@@ -3,7 +3,6 @@ import style from "./chart.module.css"
 import {Images} from "../../../utils/images";
 import {LineChart} from "@mui/x-charts/LineChart";
 import {Month} from "../../../utils/constants";
-import {useMediaQuery, useTheme} from "@mui/material";
 
 /**
  * function to display chart component
@@ -14,8 +13,6 @@ import {useMediaQuery, useTheme} from "@mui/material";
 export function Chart(props) {
     const {usageDetails} = props;
     let date = new Date();
-    const themes = useTheme();
-    const isMobile = useMediaQuery(themes.breakpoints.down('md'));
     const firstHalfY = usageDetails?.projectsMonthlyArray.slice(0, 6);
     const secondHalfY = usageDetails?.projectsMonthlyArray.slice(0, -6);
     return (
@@ -26,7 +23,6 @@ export function Chart(props) {
                 />
             </div>
             <LineChart
-                height={isMobile ? 310 : 380}
                 margin={{top: 80}}
                 series={[{
                     data: date.getMonth() < 6 ? firstHalfY : secondHalfY,
