@@ -2,18 +2,29 @@ import React, {useContext, useState} from "react";
 import {Snackbar} from "@mui/material";
 import {Images} from "../../../utils/images";
 import {ThemeContext} from "../../../App";
-import {Themes} from "../../../utils/constants";
+import {PathName, Themes} from "../../../utils/constants";
+import {useNavigate} from "react-router-dom";
 
-export function SubscriptionCookie() {
+/**
+ * function to display upgrade plan cookie
+ * @returns {Element}
+ * @constructor
+ */
+export function SubscriptionCookie(props) {
     const [open, setOpen] = useState(true);
     const {theme} = useContext(ThemeContext);
+    const navigate = useNavigate();
 
     const handleClose = () => {
         setOpen(false);
     };
 
+    const handleUserPlan = () => {
+        navigate(PathName.billing);
+    }
+
     const action = (
-        <div style={{
+        <div onClick={handleUserPlan} style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-around",

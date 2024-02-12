@@ -5,6 +5,7 @@ import {UsageAnalysis} from "../../pages/analytics";
 import Header from "../navbar/header";
 import {BillingHistory} from "../../pages/billingHistory";
 import {UserProfile} from "../../pages/userProfile";
+import {Billing} from "../../pages/billing";
 
 /**
  * Router to maintain different paths of the application
@@ -30,6 +31,10 @@ export const RouterComponent = () => {
                 <Route
                     path={PathName.billingHistory}
                     element={<Layout><BillingHistory/></Layout>}
+                />
+                <Route
+                    path={PathName.billing}
+                    element={<Layout><Billing/></Layout>}
                 />
             </Routes>
         </BrowserRouter>

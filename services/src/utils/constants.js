@@ -6,8 +6,10 @@ export const PathName = {
     "home": "/",
     "editProfile": "/editProfile",
     "usageAnalysis": "/usageAnalysis",
-    "billingHistory": "/billingHistory"
+    "billingHistory": "/billingHistory",
+    "billing": "/billing"
 }
+
 export const localStorageKeys = {
     accessToken: "accessToken",
     user: "user",
@@ -24,11 +26,11 @@ export const CardData = [
     {bgColor: "#B73DDF", image: Images.graphCardIcon, text: "Usage Analytics"},
 ];
 
-export const UserAnalysisCardData=[
-    {text:"Number of Projects"},
+export const UserAnalysisCardData = [
+    {text: "Number of Projects"},
     {text: "Number of Models"},
-    {text:"Projects Run"},
-    {text:"Remote Server"},
+    {text: "Projects Run"},
+    {text: "Remote Server"},
 ]
 
 export const Constants = {
@@ -36,10 +38,10 @@ export const Constants = {
     offline: "offline",
     offlineMessage: "User is offline",
     ProfileSuccessMsg: "Profile updated successfully!",
-    signInMessage : "You need to sign in to access analysis",
+    signInMessage: "You need to sign in to access analysis",
     usageAnalysis: "Usage Analysis",
-    billingHistory: "Billing History"
-
+    billingHistory: "Billing History",
+    billingTitle: "Choose your plan"
 }
 
 export const errorToast = (message) => {
@@ -70,6 +72,37 @@ export const successToast = (message) => {
     })
 }
 
+export const userPlan = [
+    {
+        title: "FREE PLAN",
+        cost: "$0",
+        description: "Free plan provides the usage of openBot services including blockly, webserver and apps. ",
+        services: [
+            "Blockly",
+            "Webserver",
+            "Controller App",
+            "IOS App"
+        ],
+        planType: "CURRENT PLAN",
+        backgroundColor: "#FFFFFF",
+        color: "black"
+    },
+    {
+        title: "PREMIUM PLAN",
+        cost: "$50",
+        description: "Free plan provides the usage of openBot services including blockly, webserver and apps. ",
+        services: [
+            "Blockly",
+            "Webserver",
+            "Controller App",
+            "Android App"
+        ],
+        planType: "UPGRADE PLAN",
+        backgroundColor: "#0071C5",
+        color: "#FFFFFF"
+    }
+]
+
 /**
  user usage tables
  */
@@ -87,7 +120,7 @@ export const Month = ["January", "February", "March", "April", "May", "June", "J
  * dark and light theme constants
  * @type {{light: string, dark: string}}
  */
-export const Themes ={
-    "light":"light",
-    "dark":"dark",
+export const Themes = {
+    "light": "light",
+    "dark": "dark",
 }
