@@ -22,7 +22,7 @@ export function SubscriptionCookie() {
             borderRadius: "4px",
             height: "25px",
             fontFamily: "Gilroy-Medium', serif",
-            width: "110px",
+            width: "120px",
             cursor: "pointer"
         }}>
             <img src={Images.upgradePlanIcon} alt={"Upgrade"} width={13}/>
@@ -39,16 +39,21 @@ export function SubscriptionCookie() {
                         color: "#969696",
                         fontSize: "13px",
                         fontFamily: "Gilroy-Medium, sans-serif",
+                        justifyContent: "space-around",
+                        minWidth: '240px',
                     },
                     '@media screen and (min-width: 600px)': {
                         '& .MuiSnackbarContent-root': {
                             minWidth: '360px',
                         },
                     },
-                    "& .MuiSnackbar-anchorOriginBottomCenter": {
-                        left: "50%",
-                        right: "auto"
+                    ".css-1kr9x0n-MuiSnackbarContent-action": {
+                        marginLeft: 0,
+                        paddingLeft: 0
                     },
+                    left: "50%",
+                    right: "auto",
+                    transform: "translateX(-50%)",
                 }}
                 anchorOrigin={{
                     vertical: 'bottom',
