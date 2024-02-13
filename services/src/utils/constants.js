@@ -38,7 +38,7 @@ export const Constants = {
     offline: "offline",
     offlineMessage: "User is offline",
     ProfileSuccessMsg: "Profile updated successfully!",
-    signInMessage: "You need to sign in to access analysis",
+    signInMessage: "You need to sign in to analyse usage",
     usageAnalysis: "Usage Analysis",
     billingHistory: "Billing History",
     billingTitle: "Choose your plan"
