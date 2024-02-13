@@ -7,15 +7,47 @@
 }
 
 .cardChildDiv {
-    box-shadow: 0 2px 7px rgba(0,0,0,.13);
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 60px;
+    gap: 40px;
+    font-family: Gilroy-Medium, sans-serif;
 }
 
-.descriptionDiv{
+.descriptionDiv {
     display: flex;
     flex-direction: column;
     gap: 15px;
+}
+
+.planTitle {
+    font-weight: bold;
+}
+
+.planCostDiv {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.planButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 30px;
+}
+
+.planServices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+@media only screen and (max-width: 768px) {
+    .choosePlanDiv {
+        width: 100%;
+    }
 }

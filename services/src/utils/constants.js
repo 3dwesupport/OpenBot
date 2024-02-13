@@ -85,7 +85,10 @@ export const userPlan = [
         ],
         planType: "CURRENT PLAN",
         backgroundColor: "#FFFFFF",
-        color: "black"
+        buttonBackgroundColor: "#F0F0F0",
+        color: "black",
+        buttonColor: "#ACABAB",
+        checkSign: Images.blackCheckMark
     },
     {
         title: "PREMIUM PLAN",
@@ -99,7 +102,10 @@ export const userPlan = [
         ],
         planType: "UPGRADE PLAN",
         backgroundColor: "#0071C5",
-        color: "#FFFFFF"
+        buttonBackgroundColor: "#FFFFFF",
+        color: "#FFFFFF",
+        buttonColor: "#0071C5",
+        checkSign: Images.whiteCheckMark,
     }
 ]
 

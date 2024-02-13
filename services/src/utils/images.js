@@ -23,6 +23,8 @@ import lightChartArrow from "../assets/images/chart-arrow.png"
 import billingHeader_icon from '../assets/images/billingHeaderIcon.png'
 import upgradePlanIcon from "../assets/images/upgrade-plan-icon.png"
 import lightThemeArrowDownIcon from "../assets/images/lightThemeArrowDown_icon.png"
+import blackCheckMark from "../assets/images/black-check-mark.png";
+import whiteCheckMark from "../assets/images/white-check-mark.png"
 
 export const Images = {
     openBotLogo: openBotLogo,
@@ -49,5 +51,7 @@ export const Images = {
     lightChartArrow: lightChartArrow,
     billingHeader_icon: billingHeader_icon,
     lightThemeArrowDownIcon: lightThemeArrowDownIcon,
-    upgradePlanIcon: upgradePlanIcon
+    upgradePlanIcon: upgradePlanIcon,
+    blackCheckMark: blackCheckMark,
+    whiteCheckMark: whiteCheckMark
 }
