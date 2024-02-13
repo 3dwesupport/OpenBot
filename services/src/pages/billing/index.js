@@ -9,7 +9,8 @@ export function Billing() {
 
     return (
         <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? "#202020" : "#FFFFFF"}}>
-            <div className={style.billingParentDiv}>
+            <div className={style.billingParentDiv}
+                 style={{backgroundColor: theme === Themes.dark ? "#202020" : "#FFFFFF"}}>
                 <div className={style.billingChildDiv}>
                     <div className={style.billingTitle}
                          style={{color: theme === Themes.dark ? "#FFFFFF" : "black"}}>{Constants.billingTitle}</div>
