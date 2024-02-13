@@ -6,6 +6,8 @@ import Header from "../navbar/header";
 import {BillingHistory} from "../../pages/billingHistory";
 import {UserProfile} from "../../pages/userProfile";
 import {Billing} from "../../pages/billing";
+import {SubscriptionCookie} from "../common/cookie/subscriptionCookie";
+import React from "react";
 
 /**
  * Router to maintain different paths of the application
@@ -44,6 +46,7 @@ export const RouterComponent = () => {
 const Layout = ({children}) => (
     <>
         <Header/>
+        <SubscriptionCookie/>
         {children}
     </>
 );
