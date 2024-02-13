@@ -1,12 +1,17 @@
 import React from "react";
 import style from "./card.module.css";
+import {Themes} from "../../../utils/constants";
+import {Images} from "../../../utils/images";
 
 export function BillingCard(props) {
-    const {cardDetails} = props;
+    const {cardDetails, theme} = props;
 
     return (
         <div className={style.choosePlanDiv}
-             style={{backgroundColor: cardDetails.backgroundColor, color: cardDetails.color}}>
+             style={{
+                 backgroundColor: theme === Themes.dark ? cardDetails.darkBackgroundColor : cardDetails.lightBackgroundColor,
+                 color: theme === Themes.dark ? "#FFFFFF" : cardDetails.color
+             }}>
             <div className={style.cardChildDiv}>
                 <div className={style.descriptionDiv}>
                     <div className={style.planTitle}>{cardDetails.title}</div>
@@ -19,7 +24,8 @@ export function BillingCard(props) {
                 <div className={style.planServices}>
                     {cardDetails.services.map((item, key) =>
                         <div key={key} style={{display: "flex", gap: "10px"}}>
-                            <img src={cardDetails.checkSign} width={"20px"} alt={"check"}/>
+                            <img src={theme === Themes.dark ? Images.whiteCheckMark : cardDetails.checkSign}
+                                 width={"20px"} alt={"check"}/>
                             {item}
                         </div>
                     )}

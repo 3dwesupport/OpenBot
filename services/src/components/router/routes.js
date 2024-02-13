@@ -20,7 +20,8 @@ export const RouterComponent = () => {
             <Routes>
                 <Route
                     path={PathName.home}
-                    element={<Layout><Home/></Layout>}
+                    element={<Layout><Home/><SubscriptionCookie/>
+                    </Layout>}
                 />
                 <Route
                     path={PathName.editProfile}
@@ -28,11 +29,13 @@ export const RouterComponent = () => {
                 />
                 <Route
                     path={PathName.usageAnalysis}
-                    element={<Layout><UsageAnalysis/></Layout>}
+                    element={<Layout><UsageAnalysis/><SubscriptionCookie/>
+                    </Layout>}
                 />
                 <Route
                     path={PathName.billingHistory}
-                    element={<Layout><BillingHistory/></Layout>}
+                    element={<Layout><BillingHistory/><SubscriptionCookie/>
+                    </Layout>}
                 />
                 <Route
                     path={PathName.billing}
@@ -46,7 +49,6 @@ export const RouterComponent = () => {
 const Layout = ({children}) => (
     <>
         <Header/>
-        <SubscriptionCookie/>
         {children}
     </>
 );

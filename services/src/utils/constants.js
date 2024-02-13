@@ -85,7 +85,8 @@ export const userPlan = [
             "Upload 2 AI models from Playground"
         ],
         planType: "CURRENT PLAN",
-        backgroundColor: "#FFFFFF",
+        lightBackgroundColor: "#FFFFFF",
+        darkBackgroundColor : "#292929",
         buttonBackgroundColor: "#F0F0F0",
         color: "black",
         buttonColor: "#ACABAB",
@@ -103,7 +104,8 @@ export const userPlan = [
             "Upload unlimited models from Playground"
         ],
         planType: "UPGRADE PLAN",
-        backgroundColor: "#0071C5",
+        lightBackgroundColor: "#0071C5",
+        darkBackgroundColor : "#0071C5",
         buttonBackgroundColor: "#FFFFFF",
         color: "#FFFFFF",
         buttonColor: "#0071C5",
