@@ -76,12 +76,13 @@ export const userPlan = [
     {
         title: "FREE PLAN",
         cost: "$0",
-        description: "Free plan provides the usage of openBot services including blockly, webserver and apps. ",
+        description: "The Free Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
         services: [
-            "Blockly",
-            "Webserver",
-            "Controller App",
-            "IOS App"
+            "Compile 5 projects using OpenBot Playground",
+            "1 hour limit for OpenBot Web-controller",
+            "Run 5 projects through the app by scanning QR code",
+            "Train 2 AI models using training service",
+            "Upload 2 AI models from Playground"
         ],
         planType: "CURRENT PLAN",
         backgroundColor: "#FFFFFF",
@@ -93,12 +94,13 @@ export const userPlan = [
     {
         title: "PREMIUM PLAN",
         cost: "$50",
-        description: "Free plan provides the usage of openBot services including blockly, webserver and apps. ",
+        description: "The Premium Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
         services: [
-            "Blockly",
-            "Webserver",
-            "Controller App",
-            "Android App"
+            "Unlimited compiling of projects using OpenBot Playground",
+            "Unlimited usage of OpenBot Web-controller",
+            "Run unlimited projects from app by scanning QR code",
+            "Train unlimited AI models using training service",
+            "Upload unlimited models from Playground"
         ],
         planType: "UPGRADE PLAN",
         backgroundColor: "#0071C5",
