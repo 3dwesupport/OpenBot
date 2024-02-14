@@ -4,6 +4,11 @@ import {Constants, Themes, userPlan} from "../../utils/constants";
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
 
+/**
+ * function to display plans and subscriptions
+ * @returns {Element}
+ * @constructor
+ */
 export function Billing() {
     const {theme} = useContext(ThemeContext);
 

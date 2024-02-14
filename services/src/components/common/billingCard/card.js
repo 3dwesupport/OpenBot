@@ -2,9 +2,12 @@ import React from "react";
 import style from "./card.module.css";
 import {Themes} from "../../../utils/constants";
 import {Images} from "../../../utils/images";
+import {useMediaQuery, useTheme} from "@mui/material";
 
 export function BillingCard(props) {
     const {cardDetails, theme} = props;
+    const themes = useTheme();
+    const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
 
     return (
         <div className={style.choosePlanDiv}
@@ -16,7 +19,8 @@ export function BillingCard(props) {
                 <div className={style.descriptionDiv}>
                     <div className={style.planTitle}>{cardDetails.title}</div>
                     <div className={style.planCostDiv}>
-                        <span style={{fontSize: "40px", fontWeight: "bold"}}>{cardDetails.cost}</span>
+                        <span
+                            style={{fontSize: isMobile ? "30px" : "40px", fontWeight: "bold"}}>{cardDetails.cost}</span>
                         <span>/month</span>
                     </div>
                     <div>{cardDetails.description}</div>

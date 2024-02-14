@@ -50,4 +50,11 @@
     .choosePlanDiv {
         width: 100%;
     }
+
+    .cardChildDiv {
+        box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
+        padding: 20px;
+        gap: 25px;
+        font-size: 14px;
+    }
 }
