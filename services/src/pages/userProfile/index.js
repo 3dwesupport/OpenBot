@@ -9,7 +9,7 @@ import {Images} from "../../utils/images";
 import {StoreContext} from "../../context/storeContext";
 import {Constants} from "../../utils/constants";
 import styles from "./userProfile.module.css";
-import auth from "../../database/authentication"
+import {auth} from "../../database/authentication"
 import heic2any from "heic2any";
 import Compressor from 'compressorjs';
 import {ThemeContext} from "../../App";
@@ -20,7 +20,7 @@ import {ThemeContext} from "../../App";
  * @constructor
  */
 export function UserProfile() {
-    const{theme} = useContext(ThemeContext);
+    const {theme} = useContext(ThemeContext);
     const {user} = useContext(StoreContext);
     const {isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
@@ -33,14 +33,16 @@ export function UserProfile() {
         lastName: user?.displayName,
         email: user?.email,
         photoURL: user?.photoURL,
-        dob : ""
+        dob: ""
     })
+    const [isPrevDOB, setIsPrevDob] = useState(undefined);
+
     // useEffect to fetch and update user profile data when the 'user' object changes
     useEffect(() => {
+        setIsProfileLoader(true);
         if (!user) {
             return;
         }
-        setIsProfileLoader(true);
         (async () => {
             try {
                 const [dob, names] = await Promise.all([
@@ -54,6 +56,7 @@ export function UserProfile() {
                     photoURL: user.photoURL || prevState.photoURL,
                     dob: dob,
                 }));
+                setIsPrevDob(dob);
             } catch (error) {
                 console.error("Error fetching profile data:", error);
             } finally {
@@ -161,12 +164,10 @@ export function UserProfile() {
      * @returns {Promise<void>}
      */
     async function handleSubmit() {
-        setIsProfileLoader(true);
-        console.log('save button clicked');
-
         if (isOnline) {
+            setIsProfileLoader(true);
             // Check if there are changes in profile picture or display name
-            if (file !== undefined || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}`) {
+            if (file !== undefined || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}` || isPrevDOB !== userDetails?.dob) {
                 try {
                     let photoURL = user.photoURL;
 
@@ -174,15 +175,11 @@ export function UserProfile() {
                     if (file) {
                         photoURL = await uploadProfilePic(file, file.name || 'user profile image');
                     }
-
                     // Update profile information
                     await auth.currentUser?.updateProfile({
                         photoURL: photoURL,
                         displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
-                    });
-
-                    // Refresh the user object
-                    const updatedUser = auth.currentUser;
+                    })
                     await setDateOfBirth(toTimeStamp(userDetails.dob));
                     successToast(Constants.ProfileSuccessMsg);
                 } catch (e) {
@@ -197,15 +194,17 @@ export function UserProfile() {
     }
 
     return (
-        <div style={{height: "100vh" , backgroundColor: theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
+        <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
             {isProfileLoader ?
                 <div className={styles.loader}>
                     <LoaderComponent color='blue'/>
-                </div>:
+                </div> :
                 <div className={styles.mainScreen}>
                     <div className={styles.parentDiv}>
                         <div className={styles.editProfileContainer}>
-                            <div className={styles.editProfileTextDiv} style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030' }}> Edit Profile</div>
+                            <div className={styles.editProfileTextDiv}
+                                 style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}> Edit Profile
+                            </div>
                             <div className={styles.editProfileImageDiv}>
                                 <div className={styles.profileImage}>
                                 </div>
@@ -224,8 +223,10 @@ export function UserProfile() {
                             </div>
                         </div>
                         <div className={styles.childDiv}>
-                        <FormComponent userDetails={userDetails} handleNameChange={handleNameChange} handleDOBChange={handleDOBChange}
-                                       handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} user={user} theme={theme}/>
+                            <FormComponent userDetails={userDetails} handleNameChange={handleNameChange}
+                                           handleDOBChange={handleDOBChange}
+                                           handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} user={user}
+                                           theme={theme}/>
                         </div>
                     </div>
                 </div>
