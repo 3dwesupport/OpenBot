@@ -13,7 +13,7 @@ export function UsageAnalysisCardComponent(props) {
     const {theme} =useContext(ThemeContext);
     return (
         <>
-            <div className={"analysisCardContainer"} style={{ backgroundColor: theme === Themes.dark ? '#303030' : '#FFFFFF' }}>
+            <div className={"analysisCardContainer"} style={{ backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF' }}>
                 {UserAnalysisCardData.map((card, index) => (
                     <Card sx={{borderRadius: 2, boxShadow: 5 , display: 'flex', alignItems:'center', justifyContent:'center', position:'relative' ,
                         backgroundColor: theme === Themes.dark ? '#292929' : '#FFFFFF'}} key={index}>

@@ -40,7 +40,7 @@ export function LogoSection() {
  * @constructor
  */
 export function RightSection(params) {
-    const {setIsSignIn, isOnline, setUser, user,theme,toggleTheme} = params
+    const {setIsSignIn, isOnline, setUser, user, theme, toggleTheme} = params
 
     //function to handle sign-in on clicking button
     function handelSignIn() {
@@ -64,11 +64,12 @@ export function RightSection(params) {
 
     return (
         <div className={"navbar_rightSectionDiv"}>
-            <img title={"Theme"} alt="icon"  onClick={toggleTheme}
-                 src={ theme === 'dark' ? Images.darkThemeIcon : Images.lightTheme_icon}
-                 className={ `${theme === 'dark' ? "light_themeIcon" : "dark_themeIcon" }`}/>
+            <img title={"Theme"} alt="icon" onClick={toggleTheme}
+                 src={theme === 'dark' ? Images.darkThemeIcon : Images.lightTheme_icon}
+                 className={`${theme === 'dark' ? "light_themeIcon" : "dark_themeIcon"}`}/>
             <img alt="Icon" className={"navbar_lineIcon"} src={Images.line_icon}></img>
-            {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <ProfileModal user={user} setIsSignIn={setIsSignIn} setUser={setUser}/> :
+            {localStorage.getItem(localStorageKeys.isSignIn) === "true" ?
+                <ProfileModal user={user} setIsSignIn={setIsSignIn} setUser={setUser}/> :
                 <button onClick={handelSignIn} className={"navbar_buttonIcon"}>
                     <span className={"buttonText"}>Sign in</span>
                 </button>}
@@ -83,7 +84,7 @@ export function RightSection(params) {
  */
 function Header() {
     const {user, setUser, setIsSignIn, isSignIn, isOnline} = useContext(StoreContext);
-    const{theme,toggleTheme} = useContext(ThemeContext);
+    const {theme, toggleTheme} = useContext(ThemeContext);
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
@@ -103,4 +104,5 @@ function Header() {
         </div>
     );
 }
+
 export default Header;

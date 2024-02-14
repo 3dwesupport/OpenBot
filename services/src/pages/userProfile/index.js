@@ -194,12 +194,13 @@ export function UserProfile() {
     }
 
     return (
-        <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
+        <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
             {isProfileLoader ?
                 <div className={styles.loader}>
                     <LoaderComponent color='blue'/>
                 </div> :
-                <div className={styles.mainScreen}>
+                <div className={styles.mainScreen}
+                     style={{backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
                     <div className={styles.parentDiv}>
                         <div className={styles.editProfileContainer}>
                             <div className={styles.editProfileTextDiv}

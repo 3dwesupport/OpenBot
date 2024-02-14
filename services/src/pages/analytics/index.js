@@ -29,13 +29,11 @@ export function UsageAnalysis() {
     })
 
     function onDataChange(e) {
-        console.log("year:::", e);
         Month.includes(e) ? setIsChangedMonth(e) : setIsChangedYear(e);
     }
 
     useEffect(() => {
         Promise.all([getProjects(isChangedYear, isChangedMonth), getModelDetails(isChangedYear, isChangedMonth), getServerDetails(isChangedYear, isChangedMonth), getProjectsMonthlyBasis(isChangedYear)]).then((res) => {
-            console.log("res:::", res);
             setUsageDetails({
                 ...usageDetails,
                 projects: res[0],
@@ -48,9 +46,10 @@ export function UsageAnalysis() {
 
     return (
         <>
-            <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#303030' : ''}}>
+            <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#202020' : ''}}>
                 <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange} theme={theme}/>
-                <div className={"userAnalysisContainer"}>
+                <div className={"userAnalysisContainer"}
+                     style={{backgroundColor: theme === Themes.dark ? '#202020' : ''}}>
                     <div className={"cardChartContainer"}>
                         <UsageAnalysisCardComponent usageDetails={usageDetails}/>
                         <div className={"chartDiv"}>
@@ -58,7 +57,7 @@ export function UsageAnalysis() {
                                 position: "relative",
                                 borderRadius: "2%",
                                 backgroundColor: theme === Themes.dark ? '#292929' : '#FFFFFF',
-                                height:"100%",
+                                height: "100%",
                             }}>
                                 <Chart usageDetails={usageDetails}/>
                             </Card>

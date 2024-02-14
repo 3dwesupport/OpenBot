@@ -44,7 +44,7 @@ export function DashboardComponent() {
     };
 
     return (
-        <div className={"container"} style={{backgroundColor:theme === Themes.dark ? '#303030' : '#FFFFFF'}}>
+        <div className={"container"} style={{backgroundColor:theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
             {/* Title section */}
             {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <div className={"textDiv"}>
                 <div className="title" style={{ color: theme === Themes.dark ? '#FFFFFF' : '#303030' }}>
