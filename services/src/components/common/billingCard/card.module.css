@@ -1,18 +1,18 @@
 .choosePlanDiv {
     width: 48%;
     border-radius: 10px;
-    height: 100%;
-    display: flex;
-    justify-content: center;
+    height: 450px;
+    overflow: scroll;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
 }
 
 .cardChildDiv {
-    box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
-    padding: 20px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
     gap: 40px;
     font-family: Gilroy-Medium, sans-serif;
+    flex: 1;
 }
 
 .descriptionDiv {
@@ -46,13 +46,12 @@
 }
 
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 821px) {
     .choosePlanDiv {
         width: 100%;
     }
 
     .cardChildDiv {
-        box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
         padding: 20px;
         gap: 25px;
         font-size: 14px;

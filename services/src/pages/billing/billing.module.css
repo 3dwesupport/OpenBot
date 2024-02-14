@@ -27,11 +27,10 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    /*height: 700px;*/
 }
 
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 821px) {
     .billingPlanDiv {
         flex-direction: column;
         gap: 25px;

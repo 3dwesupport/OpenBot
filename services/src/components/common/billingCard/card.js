@@ -8,12 +8,13 @@ export function BillingCard(props) {
     const {cardDetails, theme} = props;
     const themes = useTheme();
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
+    const tablet = useMediaQuery(themes.breakpoints.down('md'));
 
     return (
         <div className={style.choosePlanDiv}
              style={{
                  backgroundColor: theme === Themes.dark ? cardDetails.darkBackgroundColor : cardDetails.lightBackgroundColor,
-                 color: theme === Themes.dark ? "#FFFFFF" : cardDetails.color
+                 color: theme === Themes.dark ? "#FFFFFF" : cardDetails.color,
              }}>
             <div className={style.cardChildDiv}>
                 <div className={style.descriptionDiv}>
@@ -29,7 +30,7 @@ export function BillingCard(props) {
                     {cardDetails.services.map((item, key) =>
                         <div key={key} style={{display: "flex", gap: "10px"}}>
                             <img src={theme === Themes.dark ? Images.whiteCheckMark : cardDetails.checkSign}
-                                 width={"20px"} alt={"check"}/>
+                                 width={"20px"} height={"20px"} alt={"check"}/>
                             {item}
                         </div>
                     )}
