@@ -8,7 +8,6 @@ export function BillingCard(props) {
     const {cardDetails, theme} = props;
     const themes = useTheme();
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
-    const tablet = useMediaQuery(themes.breakpoints.down('md'));
 
     return (
         <div className={style.choosePlanDiv}

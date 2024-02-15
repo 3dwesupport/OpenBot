@@ -6,7 +6,7 @@ import "./profileModal.module.css"
 import {Avatar, Popover, styled} from "@mui/material";
 import {LogoutComponent} from "../common/logout/modalComponent";
 import LoaderComponent from "../common/loader/loader";
-import {PathName, themes as Themes} from "../../utils/constants";
+import {PathName, Themes} from "../../utils/constants";
 import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";
 import "../common/dropdown/dropdown.css"
@@ -19,19 +19,18 @@ export function ProfileModal(props) {
     const [logoutModalOpen, setLogoutModalOpen] = useState(false);
     const navigate = useNavigate();
     const open = Boolean(anchorEl);
-    const theme = createTheme();
+    const themes = createTheme();
+    const {theme} = useContext(ThemeContext);
     const StyledPopover = styled(Popover)(({theme}) => ({
         '& .MuiPopover-paper': {
-            padding: '20px',
-            width: "20%",
-            borderRadius: "4%",
-            [theme.breakpoints.down('md')]: {
-                width: "120px",
-                height: "70px",
-                marginLeft: "2%",
-                paddingTop: "12px"
-            },
+            width: "270px",
+            borderRadius: "10px",
         },
+        '@media screen and (max-width: 768px)': {
+            '& .MuiPopover-paper': {
+                width: "160px",
+            },
+        }
     }));
 
     const handlePopoverOpen = (event) => {
@@ -73,20 +72,24 @@ export function ProfileModal(props) {
     /*StyledPopover for the dropdown menu*/
     return (
         <div>
-            <ThemeProvider theme={theme}>
-                {<StyledPopover  theme={theme}  open={open} anchorEl={anchorEl} onClose={handlePopoverClose}
+            <ThemeProvider theme={themes}>
+                {<StyledPopover theme={themes} open={open} anchorEl={anchorEl} onClose={handlePopoverClose}
                                 anchorOrigin={{vertical: 'bottom', horizontal: 'right',}}
                                 transformOrigin={{vertical: 'top', horizontal: 'right'}}>
-                    <div className={"dropdownItem"}>
+                    <div className={"dropdownItem"}
+                         style={{backgroundColor: theme === Themes.dark ? "rgb(48, 48, 48)" : "#FFFFFF"}}>
                         <DropdownComponent icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverEditProfileIcon}
+                                           darkThemeIcon={Images.whiteUserIcon}
                                            label="Edit Profile" className={"dropdownIconDiv"}
                                            onClick={() => handleProfileOptionsClick("Edit Profile")}/>
                         <DropdownComponent label="Transaction History" hoverIcon={Images.hoverTransactionHistoryIcon}
                                            icon={Images.transactionHistoryIcon}
+                                           darkThemeIcon={Images.whiteTransactionIcon}
                                            onClick={() => handleProfileOptionsClick("Transaction History")}
                                            className={"dropdownIconDiv"}/>
                         <DropdownComponent label="Logout" icon={Images.logOutIcon} hoverIcon={Images.hoverLogoutIcon}
                                            onClick={() => handleProfileOptionsClick("Logout")}
+                                           darkThemeIcon={Images.whiteLogoutIcon}
                                            className={"dropdownIconDiv"}/>
                     </div>
                 </StyledPopover>}
@@ -104,7 +107,7 @@ export function ProfileModal(props) {
                 // display the logout modal if open
                 logoutModalOpen &&
                 <LogoutComponent onClick={navigateAndSignOut} setLogoutModalOpen={setLogoutModalOpen}
-                                 logoutModalOpen={logoutModalOpen}/>
+                                 logoutModalOpen={logoutModalOpen} theme={theme}/>
             }
         </div>
     );
