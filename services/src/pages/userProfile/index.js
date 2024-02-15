@@ -21,7 +21,7 @@ import {ThemeContext} from "../../App";
  */
 export function UserProfile() {
     const {theme} = useContext(ThemeContext);
-    const {user, isOnline} = useContext(StoreContext);
+    const {user, isOnline, setIsUserProfile, isUserProfile} = useContext(StoreContext);
     const inputRef = useRef("-");
     const [isProfileLoader, setIsProfileLoader] = useState(false);
     const [file, setFile] = useState(user?.photoURL);
@@ -39,32 +39,30 @@ export function UserProfile() {
     // useEffect to fetch and update user profile data when the 'user' object changes
     useEffect(() => {
         setIsProfileLoader(true);
-        if (!user) {
-            return;
+        if (user) {
+            (async () => {
+                try {
+                    const [dob, names] = await Promise.all([
+                        getDateOfBirth(user?.uid),
+                        user?.displayName ? user?.displayName.split(' ') : [],
+                    ]);
+                    setUserDetails((prevState) => ({
+                        ...prevState,
+                        firstName: names[0] || '',
+                        lastName: names[1] || '',
+                        photoURL: user?.photoURL || prevState?.photoURL,
+                        dob: dob,
+                    }));
+                    setIsPrevDob(dob);
+                } catch (error) {
+                    console.error("Error fetching profile data:", error);
+                    setIsProfileLoader(false);
+                } finally {
+                    setIsProfileLoader(false);
+                }
+            })();
         }
-
-        (async () => {
-            try {
-                const [dob, names] = await Promise.all([
-                    getDateOfBirth(user.uid),
-                    user.displayName ? user.displayName.split(' ') : [],
-                ]);
-                setUserDetails((prevState) => ({
-                    ...prevState,
-                    firstName: names[0] || '',
-                    lastName: names[1] || '',
-                    photoURL: user.photoURL || prevState.photoURL,
-                    dob: dob,
-                }));
-                setIsPrevDob(dob);
-            } catch (error) {
-                console.error("Error fetching profile data:", error);
-            } finally {
-                setIsProfileLoader(false);
-            }
-        })();
     }, [user]);
-
 
     /**
      * function to compress the profile image
@@ -165,10 +163,10 @@ export function UserProfile() {
      */
     async function handleSubmit() {
         if (isOnline) {
-            setIsProfileLoader(true);
             // Check if there are changes in profile picture or display name
             if (file !== undefined || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}` || isPrevDOB !== userDetails?.dob) {
                 try {
+                    setIsProfileLoader(true);
                     let photoURL = user.photoURL;
 
                     // Upload new profile picture if a new file is selected
@@ -176,18 +174,21 @@ export function UserProfile() {
                         photoURL = await uploadProfilePic(file, file.name || 'user profile image');
                     }
                     // Update profile information
-                    await auth.currentUser?.updateProfile({
+                    await auth.currentUser.updateProfile({
                         photoURL: photoURL,
                         displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
                     })
                     await setDateOfBirth(toTimeStamp(userDetails.dob));
+
                     successToast(Constants.ProfileSuccessMsg);
                 } catch (e) {
                     console.error("Error in updating profile:", e);
-                    // TODO: Show failure toast for profile update
+                    setIsProfileLoader(false);
+                    errorToast(Constants.profileErrorMsg);
+                } finally {
+                    setIsUserProfile(!isUserProfile);
                 }
             }
-            setIsProfileLoader(false);
         } else {
             errorToast(Constants.offlineMessage);
         }

@@ -8,6 +8,36 @@ import {ProfileModal} from "../profile/profileModal";
 import {useNavigate} from "react-router-dom";
 import {ThemeContext} from "../../App";
 
+
+/**
+ * Dashboard header which contains logo, theme and profile signIn
+ * @returns {Element}
+ * @constructor
+ */
+function Header() {
+    const {user, setUser, setIsSignIn, isSignIn, isOnline, isUserProfile} = useContext(StoreContext);
+    const {theme, toggleTheme} = useContext(ThemeContext);
+
+    useEffect(() => {
+        auth.onAuthStateChanged((res) => {
+            console.log("set user profile")
+            setUser({
+                photoURL: res?.photoURL,
+                displayName: res?.displayName,
+                email: res?.email,
+                uid: res?.uid
+            });
+        })
+    }, [isUserProfile]);
+    return (
+        <div className={"navbar_navbarDiv"}>
+            <LogoSection/>
+            <RightSection user={user} setIsSignIn={setIsSignIn} isSignIn={isSignIn} setUser={setUser}
+                          isOnline={isOnline} theme={theme} toggleTheme={toggleTheme}/>
+        </div>
+    );
+}
+
 /**
  * Logo component which contains Dashboard logo and name
  * @returns {Element}
@@ -76,34 +106,6 @@ export function RightSection(params) {
                 </button>}
         </div>
     )
-}
-
-/**
- * Dashboard header which contains logo, theme and profile signIn
- * @returns {Element}
- * @constructor
- */
-function Header() {
-    const {user, setUser, setIsSignIn, isSignIn, isOnline} = useContext(StoreContext);
-    const {theme, toggleTheme} = useContext(ThemeContext);
-
-    useEffect(() => {
-        auth.onAuthStateChanged((res) => {
-            setUser({
-                photoURL: res?.photoURL,
-                displayName: res?.displayName,
-                email: res?.email,
-                uid: res?.uid
-            });
-        })
-    }, []);
-    return (
-        <div className={"navbar_navbarDiv"}>
-            <LogoSection/>
-            <RightSection user={user} setIsSignIn={setIsSignIn} isSignIn={isSignIn} setUser={setUser}
-                          isOnline={isOnline} theme={theme} toggleTheme={toggleTheme}/>
-        </div>
-    );
 }
 
 export default Header;

@@ -41,7 +41,8 @@ export const Constants = {
     signInMessage: "You need to sign in to analyse usage",
     usageAnalysis: "Usage Analysis",
     billingHistory: "Billing History",
-    billingTitle: "Choose your plan"
+    billingTitle: "Choose your plan",
+    profileErrorMsg: "There was an error in updating profile",
 }
 
 export const errorToast = (message) => {
