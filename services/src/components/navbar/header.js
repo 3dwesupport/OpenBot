@@ -50,6 +50,7 @@ export function RightSection(params) {
                     photoURL: res.user?.photoURL,
                     displayName: res.user?.displayName,
                     email: res.user?.email,
+                    uid: res.user?.uid
                 });
                 setIsSignIn(true);
             })

@@ -21,8 +21,7 @@ import {ThemeContext} from "../../App";
  */
 export function UserProfile() {
     const {theme} = useContext(ThemeContext);
-    const {user} = useContext(StoreContext);
-    const {isOnline} = useContext(StoreContext);
+    const {user, isOnline} = useContext(StoreContext);
     const inputRef = useRef("-");
     const [isProfileLoader, setIsProfileLoader] = useState(false);
     const [file, setFile] = useState(user?.photoURL);
@@ -43,6 +42,7 @@ export function UserProfile() {
         if (!user) {
             return;
         }
+
         (async () => {
             try {
                 const [dob, names] = await Promise.all([

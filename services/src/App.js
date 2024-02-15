@@ -44,6 +44,7 @@ function App() {
                         photoURL: result.user?.photoURL,
                         displayName: result.user?.displayName,
                         email: result.user?.email,
+                        uid: result.user?.uid
                     });
                     const cookieOptions = {
                         // domain: '.openbot.org',
