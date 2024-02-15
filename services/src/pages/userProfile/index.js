@@ -167,19 +167,18 @@ export function UserProfile() {
             if (file !== undefined || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}` || isPrevDOB !== userDetails?.dob) {
                 try {
                     setIsProfileLoader(true);
-                    let photoURL = user.photoURL;
-
                     // Upload new profile picture if a new file is selected
-                    if (file) {
-                        photoURL = await uploadProfilePic(file, file.name || 'user profile image');
-                    }
-                    // Update profile information
-                    await auth.currentUser.updateProfile({
-                        photoURL: photoURL,
-                        displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
+                    await uploadProfilePic(file, file.name || 'user profile image').then(async (photoURL) => {
+                        if (user.photoURL === file) {
+                            photoURL = file;
+                        }
+                        // Update profile information
+                        await auth.currentUser.updateProfile({
+                            photoURL: photoURL,
+                            displayName: `${userDetails?.firstName} ${userDetails?.lastName}`,
+                        })
                     })
                     await setDateOfBirth(toTimeStamp(userDetails.dob));
-
                     successToast(Constants.ProfileSuccessMsg);
                 } catch (e) {
                     console.error("Error in updating profile:", e);
