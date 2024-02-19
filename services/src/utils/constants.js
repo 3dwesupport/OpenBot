@@ -43,6 +43,8 @@ export const Constants = {
     billingHistory: "Billing History",
     billingTitle: "Choose your plan",
     profileErrorMsg: "There was an error in updating profile",
+    free : "free",
+    premium : "premium"
 }
 
 export const errorToast = (message) => {
@@ -87,7 +89,7 @@ export const userPlan = [
         ],
         planType: "CURRENT PLAN",
         lightBackgroundColor: "#FFFFFF",
-        darkBackgroundColor : "#303030",
+        darkBackgroundColor: "#303030",
         buttonBackgroundColor: "#F0F0F0",
         color: "black",
         buttonColor: "#ACABAB",
@@ -106,7 +108,7 @@ export const userPlan = [
         ],
         planType: "UPGRADE PLAN",
         lightBackgroundColor: "#0071C5",
-        darkBackgroundColor : "#0071C5",
+        darkBackgroundColor: "#0071C5",
         buttonBackgroundColor: "#FFFFFF",
         color: "#FFFFFF",
         buttonColor: "#0071C5",
@@ -121,7 +123,8 @@ export const tables = {
     users: "users",
     projects: "projects",
     models: "models",
-    server: "server"
+    server: "server",
+    subscription: "subscription"
 }
 
 // month array

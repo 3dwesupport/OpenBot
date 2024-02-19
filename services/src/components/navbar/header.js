@@ -20,7 +20,6 @@ function Header() {
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
-            console.log("set user profile")
             setUser({
                 photoURL: res?.photoURL,
                 displayName: res?.displayName,

@@ -79,10 +79,13 @@ export function BillingHeaderComponent(props) {
         <>
             {selectedModal === 'year' && (
                 <Modal open={true} onClose={() => handleModalAction(actionTypes.CLOSE_MODAL)}>
-                    <div className={theme === Themes.dark ? "darkThemeModalYear" : "lightThemeModalYear"}>
+                    <div className={"modelYear"} style={{backgroundColor: theme === Themes.dark ? "#303030" : ""}}>
                         {years.map((year, index) => (
-                            <div className={"items"} key={index}
-                                 style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}
+                            <div className={theme === Themes.dark ? "darkItems" : "items"} key={index}
+                                 style={{
+                                     color: theme === Themes.dark ? '#FFFFFF' : '#303030',
+                                     backgroundColor: theme === Themes.dark ? "#303030" : "#FFFFFF"
+                                 }}
                                  onClick={() => handleModalAction(actionTypes.SELECT_YEAR, year)}>
                                 {year}
                             </div>
@@ -91,9 +94,9 @@ export function BillingHeaderComponent(props) {
                 </Modal>)}
             {selectedModal === 'month' && (
                 <Modal open={true} onClose={() => handleModalAction(actionTypes.CLOSE_MODAL)}>
-                    <div className={theme === Themes.dark ? "darkThemeModalMonth" : "lightThemeModalMonth"}>
+                    <div className={"modelMonth"} style={{backgroundColor: theme === Themes.dark ? "#303030" : ""}}>
                         {Month.map((month, index) => (
-                            <div className={"items"} key={index}
+                            <div className={theme === Themes.dark ? "darkItems" : "items"} key={index}
                                  style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}
                                  onClick={() => handleModalAction(actionTypes.SELECT_MONTH, month)}>
                                 {month}

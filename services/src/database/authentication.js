@@ -1,10 +1,11 @@
 import firebase from "firebase/compat/app";
 import {getStorage} from "firebase/storage";
 import {getFirestore} from "firebase/firestore";
-import {localStorageKeys} from "../utils/constants";
+import {Constants, localStorageKeys} from "../utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./APIs/profile";
 import {getAuth, signOut} from "firebase/auth";
+import {addSubscription} from "./APIs/subscription";
 
 /**
  * Firebase Configuration
@@ -49,6 +50,7 @@ export async function googleSigIn() {
             // domain: ".itinker.io",
             secure: true,
         };
+        await addSubscription(auth?.currentUser?.uid, Constants.free);
         localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
         let customToken = await getCustomToken(auth?.currentUser?.uid);
         Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
