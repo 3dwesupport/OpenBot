@@ -135,9 +135,9 @@ export function ModelUploadingComponent(params) {
     async function handleSubmit() {
         if (isOnline) {
             if (localStorage.getItem("isSigIn") === "true") {
+                setFileUploadLoader(true);
                 handleUserRestriction(Constants.models).then(async (res) => {
                     if (res === true) {
-                        setFileUploadLoader(true);
                         const data = {
                             fileData: file,
                             name: modelDetails.displayName
@@ -157,8 +157,8 @@ export function ModelUploadingComponent(params) {
                                 configData.push(newModelData)
                                 await uploadToGoogleDrive(JSON.stringify(configData), Constants.json).then(async () => {
                                     localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData))
-                                    setFileUploadLoader(false);
                                     await uploadModelDetails(newModelData.name).then()
+                                    setFileUploadLoader(false);
                                     handleClose()
                                 })
                                     .catch((err) => {
