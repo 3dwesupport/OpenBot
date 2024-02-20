@@ -38,7 +38,7 @@ export async function getModelsCount() {
         try {
             const ordersQuery = query(collection(db, tables.models), and(where("uid", '==', auth?.currentUser.uid), where("created_at", '>=', startDate), where("created_at", '<=', endDate)));
             const snapshot = await getCountFromServer(ordersQuery);
-            return snapshot.data().count;
+            return {count: snapshot.data().count, planType: items.planType, planEndDate: endDate};
         } catch (e) {
             console.log(e);
         }

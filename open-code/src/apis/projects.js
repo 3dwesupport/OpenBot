@@ -97,7 +97,7 @@ export const getDocDetails = async (value, table, fieldName) => {
 
 /**
  * function to get projects compile time
- * @returns {Promise<number>}
+ * @returns {Promise<{planType: *, count: number}>}
  */
 export const sumUploadCode = async () => {
     const details = getCookie(localStorageKeys.planDetails)
@@ -108,7 +108,7 @@ export const sumUploadCode = async () => {
         try {
             const ordersQuery = query(collection(db, tables.projectsActivity), and(where("uid", '==', auth?.currentUser.uid), where("updated_at", '>=', startDate), where("updated_at", '<=', endDate)));
             const snapshot = await getCountFromServer(ordersQuery);
-            return snapshot.data().count;
+            return {count: snapshot.data().count, planType: items.planType, planEndDate: endDate};
         } catch (e) {
             console.log(e);
         }
