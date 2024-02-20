@@ -125,7 +125,8 @@ export const tables = {
     projects: "projects",
     models: "models",
     server: "server",
-    subscription: "subscription"
+    subscription: "subscription",
+    projectsActivity: "projectActivity",
 }
 
 // month array

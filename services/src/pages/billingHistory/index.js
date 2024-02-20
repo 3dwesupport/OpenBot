@@ -4,6 +4,7 @@ import {BillingHeaderComponent} from "../../components/common/billingHeader/bill
 import {Constants, localStorageKeys} from "../../utils/constants";
 import {ThemeContext} from "../../App";
 import {SubscriptionCookie} from "../../components/common/cookie/subscriptionCookie";
+import Cookies from "js-cookie";
 
 /**
  * function to render billing history
@@ -50,7 +51,7 @@ export function BillingHistory() {
             flex: 1
         },
     ];
-    const plan = localStorage.getItem(localStorageKeys.planDetails);
+    const plan = Cookies.get(localStorageKeys.planDetails);
     const type = plan ? JSON.parse(plan) : ""
 
 

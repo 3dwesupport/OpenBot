@@ -27,18 +27,23 @@ export async function addSubscription(uid, planType) {
                 return await addDoc(collection(db, tables.subscription),
                     subscriptionDetails
                 ).then(() => {
-                    return {planType: planType, planEndDate: endDate}
+                    return {planType: planType, planEndDate: endDate, planStartDate: startDate}
                 });
             } else {
                 const dateObject = new Date(docDetails?.data.planEndDate.seconds * 1000 + docDetails?.data.planEndDate.nanoseconds / 1e6);
-                return {planType: docDetails?.data.planType, planEndDate: dateObject.toISOString()}
+                const startDateObject = new Date(docDetails?.data.planStartDate.seconds * 1000 + docDetails?.data.planStartDate.nanoseconds / 1e6);
+                return {
+                    planType: docDetails?.data.planType,
+                    planEndDate: dateObject.toISOString(),
+                    planStartDate: startDateObject.toISOString()
+                }
             }
         } else {
             if (docDetails === null) {
                 return await addDoc(collection(db, tables.subscription),
                     subscriptionDetails
                 ).then(() => {
-                    return {planType: planType, planEndDate: endDate}
+                    return {planType: planType, planEndDate: endDate, planStartDate: startDate}
                 });
             } else {
                 let updatedData = docDetails?.data;
@@ -49,7 +54,7 @@ export async function addSubscription(uid, planType) {
                 return await updateDoc(subscriptionRef,
                     updatedData
                 ).then(() => {
-                    return {planType: planType, planEndDate: endDate}
+                    return {planType: planType, planEndDate: endDate, planStartDate: startDate}
                 });
             }
         }

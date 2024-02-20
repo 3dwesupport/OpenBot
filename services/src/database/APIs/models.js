@@ -1,5 +1,5 @@
 import {and, collection, getCountFromServer, getDocs, query, where} from "@firebase/firestore";
-import {localStorageKeys, tables} from "../../utils/constants";
+import {localStorageKeys, Month, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
 /**
@@ -11,8 +11,11 @@ import {db} from "../authentication";
 export async function getModelDetails(year, month) {
     return new Promise(async (resolve, reject) => {
         try {
-            const ordersQuery = query(collection(db, tables.models), and(where("status.year", '==', year), where("uid", '==', localStorage.getItem(localStorageKeys.UID)), where("status.month", '==', month)));
-            let snapshot = await getCountFromServer(ordersQuery);
+            let monthIndex = Month.indexOf(month);
+            const startDate = new Date(year, monthIndex, 1, 0, 0, 0, 0); // Set the day to 1
+            const endDate = new Date(year, monthIndex + 1, 1, 0, 0, 0, 0); // Set the day to 1 of the next month
+            const ordersQuery = query(collection(db, tables.models), and(where("created_at", '>=', startDate), where("created_at", '<', endDate), where("uid", '==', localStorage.getItem(localStorageKeys.UID))));
+            const snapshot = await getCountFromServer(ordersQuery);
             resolve(snapshot.data().count);
         } catch (e) {
             console.log(e);

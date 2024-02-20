@@ -51,7 +51,7 @@ export async function googleSigIn() {
             secure: true,
         };
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
-            localStorage.setItem(localStorageKeys.planDetails, JSON.stringify(res));
+            Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
         });
         localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
         let customToken = await getCustomToken(auth?.currentUser?.uid);
@@ -76,7 +76,7 @@ export async function googleSignOut() {
             // domain: ".itinker.io",
             secure: true,
         };
-        localStorage.setItem(localStorageKeys.planDetails, "");
+        Cookies.remove(localStorageKeys.planDetails);
         localStorage.setItem(localStorageKeys.UID, "");
         Cookies.remove(localStorageKeys.user, cookieOptions)
         Cookies.remove(localStorageKeys.accessToken, cookieOptions);

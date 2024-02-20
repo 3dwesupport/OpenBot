@@ -10,6 +10,7 @@ import Card from "@mui/material/Card";
 import {BillingHeaderComponent} from "../../components/common/billingHeader/billingHeader";
 import {ThemeContext} from "../../App";
 import {SubscriptionCookie} from "../../components/common/cookie/subscriptionCookie";
+import Cookies from "js-cookie";
 
 /**
  * function to display usage analytics stats
@@ -28,7 +29,7 @@ export function UsageAnalysis() {
         runProjectCount: 0,
         projectsMonthlyArray: Array(12).fill(0)
     })
-    const plan = localStorage.getItem(localStorageKeys.planDetails);
+    const plan = Cookies.get(localStorageKeys.planDetails);
     const type = plan ? JSON.parse(plan) : ""
 
     function onDataChange(e) {

@@ -1,4 +1,4 @@
-import {and, collection, getDocs, query, where} from "@firebase/firestore";
+import {and, collection, getCountFromServer, getDocs, query, where} from "@firebase/firestore";
 import {localStorageKeys, Month, tables} from "../../utils/constants";
 import {db} from "../authentication";
 
@@ -10,10 +10,8 @@ import {db} from "../authentication";
  */
 export async function getProjects(year, month) {
     return new Promise((resolve, reject) => {
-        getDocDetails().then((res) => {
-            const data = filterEarliestOccurrences(res);
-            let count = data.filter((item) => item.year === year && item.month === month);
-            resolve(count.length ?? 0);
+        getDocDetails(year, month).then((res) => {
+            resolve(res);
         })
             .catch((e) => {
                 reject(e);
@@ -22,44 +20,17 @@ export async function getProjects(year, month) {
 }
 
 /**
- * function to filter unique project in the current month-year
- * @param array
- * @returns {*}
- */
-function filterEarliestOccurrences(array) {
-    const earliestOccurrences = new Map();
-    array.forEach((item) => {
-        const key = item.name;
-        const currentDate = new Date(`${item.year}-${item.month}`);
-
-        if (!earliestOccurrences.has(key) || currentDate < earliestOccurrences.get(key)) {
-            earliestOccurrences.set(key, currentDate);
-        }
-    });
-    // Filter based on the earliest date for each unique name
-    return array.filter((item) => {
-        const key = item.name;
-        const currentDate = new Date(`${item.year}-${item.month}`);
-        const earliestDate = earliestOccurrences.get(key);
-
-        return currentDate.getTime() === earliestDate.getTime();
-    });
-}
-
-
-/**
  * function to get all document details
- * @returns {Promise<*[]>}
+ * @returns {Promise<number>}
  */
-export async function getDocDetails() {
+export async function getDocDetails(year, month) {
+    let monthIndex = Month.indexOf(month);
     try {
-        const ordersQuery = query(collection(db, tables.projects), where("uid", '==', localStorage.getItem(localStorageKeys.UID)));
-        const querySnapshot = await getDocs(ordersQuery);
-        let array = [];
-        querySnapshot.forEach((doc) => {
-            array.push({name: doc.data().name, year: doc.data().status.year, month: doc.data().status.month})
-        });
-        return array
+        const startDate = new Date(year, monthIndex, 1, 0, 0, 0, 0); // Set the day to 1
+        const endDate = new Date(year, monthIndex + 1, 1, 0, 0, 0, 0); // Set the day to 1 of the next month
+        const ordersQuery = query(collection(db, tables.projects), and(where("created_at", '>=', startDate), where("created_at", '<', endDate), where("uid", '==', localStorage.getItem(localStorageKeys.UID))));
+        const snapshot = await getCountFromServer(ordersQuery);
+        return snapshot.data().count;
     } catch (error) {
         console.log("error :", error);
     }
@@ -73,13 +44,16 @@ export async function getDocDetails() {
 export async function getProjectsMonthlyBasis(year) {
     return new Promise(async (resolve, reject) => {
         try {
-            const ordersQuery = query(collection(db, tables.projects), and(where("status.year", '==', year), where("uid", '==', localStorage.getItem(localStorageKeys.UID))));
+            const startDate = new Date(`${year}-01-01T00:00:00.000Z`);
+            const endDate = new Date(`${year + 1}-01-01T00:00:00.000Z`);
+            const ordersQuery = query(collection(db, tables.projectsActivity), and(where("updated_at", '>=', startDate), where("updated_at", '<', endDate), where("uid", '==', localStorage.getItem(localStorageKeys.UID))));
             const querySnapshot = await getDocs(ordersQuery);
             let updates = Array(12).fill(0);
             querySnapshot.forEach((doc) => {
-                const monthIndex = Month.indexOf(doc.data().status.month);
+                const dateObject = new Date(doc.data().updated_at.seconds * 1000 + doc.data().updated_at.nanoseconds / 1e6);
+                let monthIndex = dateObject.getMonth();
                 if (monthIndex !== -1) {
-                    updates[monthIndex] += doc.data().status.update;
+                    updates[monthIndex] += 1;
                 }
             });
             resolve(updates);
@@ -106,14 +80,20 @@ export async function getYears() {
     ]);
 
     const uniqueYearsSet = new Set();
+
     function processSnapshot(snapshot) {
         snapshot.forEach((doc) => {
-            const status = doc.data().status;
-            if (status && status.year) {
-                uniqueYearsSet.add(status.year);
+            const dateObject = new Date(doc.data()?.created_at?.seconds * 1000 + doc.data()?.created_at?.nanoseconds / 1e6);
+            const startTime = new Date(doc.data()?.startTime?.seconds * 1000 + doc.data()?.startTime?.nanoseconds / 1e6);
+            if (!isNaN(dateObject.getTime())) {
+                uniqueYearsSet.add(dateObject?.getFullYear());
+            }
+            if (!isNaN(startTime.getTime())) {
+                uniqueYearsSet.add(startTime?.getFullYear());
             }
         });
     }
+
     processSnapshot(ordersSnapshot);
     processSnapshot(serverSnapshot);
     processSnapshot(modelsSnapshot);
