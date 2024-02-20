@@ -6,7 +6,6 @@ import Header from "../navbar/header";
 import {BillingHistory} from "../../pages/billingHistory";
 import {UserProfile} from "../../pages/userProfile";
 import {Billing} from "../../pages/billing";
-import {SubscriptionCookie} from "../common/cookie/subscriptionCookie";
 import React from "react";
 
 /**
@@ -20,7 +19,7 @@ export const RouterComponent = () => {
             <Routes>
                 <Route
                     path={PathName.home}
-                    element={<Layout><Home/><SubscriptionCookie/>
+                    element={<Layout><Home/>
                     </Layout>}
                 />
                 <Route
@@ -29,12 +28,12 @@ export const RouterComponent = () => {
                 />
                 <Route
                     path={PathName.usageAnalysis}
-                    element={<Layout><UsageAnalysis/><SubscriptionCookie/>
+                    element={<Layout><UsageAnalysis/>
                     </Layout>}
                 />
                 <Route
                     path={PathName.billingHistory}
-                    element={<Layout><BillingHistory/><SubscriptionCookie/>
+                    element={<Layout><BillingHistory/>
                     </Layout>}
                 />
                 <Route

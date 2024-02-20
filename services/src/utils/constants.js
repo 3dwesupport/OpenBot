@@ -14,7 +14,8 @@ export const localStorageKeys = {
     accessToken: "accessToken",
     user: "user",
     isSignIn: "isSignIn",
-    UID: "UID"
+    UID: "UID",
+    planDetails:"planDetails"
 }
 // Array of card data
 export const CardData = [

@@ -7,7 +7,7 @@ import {Constants, tables} from "../../utils/constants";
  * function to add user subscription in firebase firestore
  * @param uid
  * @param planType
- * @returns {Promise<void>}
+ * @returns {Promise<{type: (string|*), planEndDate: *}>}
  */
 export async function addSubscription(uid, planType) {
     const startDate = new Date();
@@ -16,35 +16,40 @@ export async function addSubscription(uid, planType) {
     const subscriptionDetails = {
         uid: uid,
         planType: planType,
-        startDate: startDate,
-        endDate: endDate,
+        planStartDate: startDate,
+        planEndDate: endDate,
         planId: nanoid(),
-        planParameters : {
-
-        }
     }
     try {
         let docDetails = await getDocDetails(uid);
         if (planType === Constants.free) {
             if (docDetails === null) {
-                await addDoc(collection(db, tables.subscription),
+                return await addDoc(collection(db, tables.subscription),
                     subscriptionDetails
-                ).then();
+                ).then(() => {
+                    return {planType: planType, planEndDate: endDate}
+                });
+            } else {
+                const dateObject = new Date(docDetails?.data.planEndDate.seconds * 1000 + docDetails?.data.planEndDate.nanoseconds / 1e6);
+                return {planType: docDetails?.data.planType, planEndDate: dateObject.toISOString()}
             }
         } else {
             if (docDetails === null) {
-                await addDoc(collection(db, tables.subscription),
+                return await addDoc(collection(db, tables.subscription),
                     subscriptionDetails
-                ).then();
+                ).then(() => {
+                    return {planType: planType, planEndDate: endDate}
+                });
             } else {
                 let updatedData = docDetails?.data;
                 updatedData.planType = Constants.premium;
-                updatedData.startDate = startDate;
-                updatedData.endDate = endDate;
+                updatedData.planStartDate = startDate;
+                updatedData.planEndDate = endDate;
                 const subscriptionRef = doc(db, tables.subscription, docDetails?.id);
-                await updateDoc(subscriptionRef,
+                return await updateDoc(subscriptionRef,
                     updatedData
                 ).then(() => {
+                    return {planType: planType, planEndDate: endDate}
                 });
             }
         }

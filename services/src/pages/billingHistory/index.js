@@ -1,8 +1,9 @@
 import React, {useContext} from "react";
 import {TableComponent} from "../../components/common/table/tableComponent";
 import {BillingHeaderComponent} from "../../components/common/billingHeader/billingHeader";
-import {Constants} from "../../utils/constants";
+import {Constants, localStorageKeys} from "../../utils/constants";
 import {ThemeContext} from "../../App";
+import {SubscriptionCookie} from "../../components/common/cookie/subscriptionCookie";
 
 /**
  * function to render billing history
@@ -49,10 +50,14 @@ export function BillingHistory() {
             flex: 1
         },
     ];
+    const plan = localStorage.getItem(localStorageKeys.planDetails);
+    const type = plan ? JSON.parse(plan) : ""
+
 
     const rows = [{id: 1, DATE: new Date().getDate(), AMOUNT: 100, STATUS: 'Jon', INVOICE: "link"}];
     return (
         <div style={{height: "100vh"}}>
+            {type?.planType === Constants.free && <SubscriptionCookie/>}
             <BillingHeaderComponent title={Constants.billingHistory} theme={theme}/>
             <TableComponent theme={theme} tableAttributes={BillingHistoryParams} rowsData={rows}/>
         </div>
