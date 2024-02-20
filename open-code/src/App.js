@@ -5,6 +5,7 @@ import {createContext, useEffect, useState} from "react";
 import {localStorageKeys, Themes} from "./utils/constants";
 import {auth, googleSignOut} from "./services/firebase";
 import {ToastContainer} from "react-toastify";
+import {getCookie} from "./services/workspace";
 
 export const ThemeContext = createContext(null);
 
@@ -59,26 +60,6 @@ function App() {
         }
     }, [])
 
-    /**
-     * function to get cookie from storage
-     * @param cname
-     * @returns {string}
-     */
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let splitParams = decodedCookie.split(';');
-        for (let i = 0; i < splitParams.length; i++) {
-            let cookieName = splitParams[i];
-            while (cookieName.charAt(0) === ' ') {
-                cookieName = cookieName.substring(1);
-            }
-            if (cookieName.indexOf(name) === 0) {
-                return cookieName.substring(name.length, cookieName.length);
-            }
-        }
-        return "";
-    }
 
     /**
      * function to delete a cookie

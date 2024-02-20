@@ -10,9 +10,11 @@ import {
     setDoc,
 } from "firebase/firestore";
 import {getAuth, signOut} from "firebase/auth";
-import {localStorageKeys, tables} from "../utils/constants";
+import {Constants, localStorageKeys, tables} from "../utils/constants";
 import {setConfigData} from "./workspace";
 import configData from "../config.json";
+import {Cookies} from "react-cookie-consent";
+import {addSubscription} from "../apis/subscription";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -65,6 +67,15 @@ export async function googleSigIn() {
         const signIn = await auth.signInWithPopup(provider);
         localStorage.setItem("isSigIn", "true");
         localStorage.setItem(localStorageKeys.accessToken, signIn.credential?.accessToken);
+        const cookieOptions = {
+            // domain: '.openbot.org',
+            domain: 'localhost',
+            // domain: ".itinker.io",
+            secure: true,
+        };
+        await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
+            Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+        });
         await setConfigData();
         return signIn
     }

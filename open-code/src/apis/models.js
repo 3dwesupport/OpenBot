@@ -1,10 +1,11 @@
 import {
     addDoc, and,
-    collection, getAggregateFromServer, getCountFromServer, query, sum, where,
+    collection, getCountFromServer, query, where,
 } from "firebase/firestore";
 import {auth, db} from "../services/firebase";
-import {Month, tables} from "../utils/constants";
+import {localStorageKeys, Month, tables} from "../utils/constants";
 import {nanoid} from "nanoid";
+import {getCookie} from "../services/workspace";
 
 /**
  * function to upload model details to firebase firestore
@@ -13,15 +14,10 @@ import {nanoid} from "nanoid";
  */
 export async function uploadModelDetails(modelName) {
     const date = new Date();
-    const year = date.getFullYear();
-    const getMonth = date.getMonth();
     const details = {
         name: modelName,
         uid: auth?.currentUser.uid,
-        status: {
-            year: year,
-            month: Month[getMonth],
-        },
+        created_at: date,
         id: nanoid()
     }
     try {
@@ -34,11 +30,17 @@ export async function uploadModelDetails(modelName) {
 }
 
 export async function getModelsCount() {
-    try {
-        const ordersQuery = query(collection(db, tables.models), and(where("uid", '==', auth?.currentUser.uid)));
-        const snapshot = await getCountFromServer(ordersQuery);
-        return snapshot.data().count;
-    } catch (e) {
-        console.log(e);
+    const details = getCookie(localStorageKeys.planDetails)
+    if (details) {
+        const items = JSON.parse(details);
+        const startDate = new Date(items?.planStartDate);
+        const endDate = new Date(items.planEndDate);
+        try {
+            const ordersQuery = query(collection(db, tables.models), and(where("uid", '==', auth?.currentUser.uid), where("created_at", '>=', startDate), where("created_at", '<=', endDate)));
+            const snapshot = await getCountFromServer(ordersQuery);
+            return snapshot.data().count;
+        } catch (e) {
+            console.log(e);
+        }
     }
 }

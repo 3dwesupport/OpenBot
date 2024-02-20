@@ -414,7 +414,7 @@ function handleChildBlockInWorkspace(array, child) {
 export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
         return sumUploadCode().then((res) => {
-            return res < 15;
+            return res < 10;
         })
     } else {
         return getModelsCount().then((res) => {
@@ -422,6 +422,28 @@ export async function handleUserRestriction(type) {
         })
     }
 }
+
+/**
+ * function to get cookie from storage
+ * @param cname
+ * @returns {string}
+ */
+export function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let splitParams = decodedCookie.split(';');
+    for (let i = 0; i < splitParams.length; i++) {
+        let cookieName = splitParams[i];
+        while (cookieName.charAt(0) === ' ') {
+            cookieName = cookieName.substring(1);
+        }
+        if (cookieName.indexOf(name) === 0) {
+            return cookieName.substring(name.length, cookieName.length);
+        }
+    }
+    return "";
+}
+
 
 export {
     autoSync,
