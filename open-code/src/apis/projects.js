@@ -20,7 +20,8 @@ export async function setProjectDetails(projectName) {
     const details = {
         projectName: projectName,
         uid: auth?.currentUser.uid,
-        projectId: nanoid()
+        projectId: nanoid(),
+        created_at: date
     };
 
     const projectActivity = {
