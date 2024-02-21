@@ -109,7 +109,7 @@
     background-color: rgb(89, 98, 107) !important;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767px) {
     .billingHeaderText {
         font-size: 16px;
         display: flex;
@@ -141,23 +141,27 @@
     }
 
     .items {
-        font-size: 10px;
+        font-size: 12px;
+    }
+
+    .darkItems {
+        font-size: 12px;
     }
 
     .modelYear {
         width: 100px;
-        top: 160px !important;
+        top: 120px !important;
         left: 210px !important;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
     }
 
     .modelMonth {
         width: 120px;
-        top: 330px;
+        top: 290px;
         left: 290px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding-top: 8px;
+        padding-bottom: 8px;
     }
 
     .billingHeaderDiv {
