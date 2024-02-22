@@ -1,5 +1,6 @@
 import React from "react";
 import {Backdrop, CircularProgress} from "@mui/material";
+import style from "./loader.module.css";
 
 /**
  * LoaderComponent is a React functional component that renders a circular progress indicator.
@@ -8,13 +9,21 @@ import {Backdrop, CircularProgress} from "@mui/material";
  * @param {number} props.thickness - Thickness of the circular progress indicator.
  * @returns {JSX.Element} - Rendered React element representing the circular loader.
  */
-export default function LoaderComponent(props){
+export default function LoaderComponent(props) {
     return <div>
-       <CircularProgress style={{color:props.color}}  thickness={props.thickness}/>
-    {/*<Backdrop*/}
-    {/*    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>*/}
-    {/*    <CircularProgress color="inherit" />*/}
-    {/*</Backdrop>*/}
+        <CircularProgress style={{color: props.color}} thickness={props.thickness}/>
     </div>
+}
 
+export function AnalyticsLoader() {
+    return (
+        <Backdrop open={true} sx={{zIndex: 999}}>
+            <div className={style.loadingWave}>
+                <div className={style.loadingBar}></div>
+                <div className={style.loadingBar}></div>
+                <div className={style.loadingBar}></div>
+                <div className={style.loadingBar}></div>
+            </div>
+        </Backdrop>
+    );
 }

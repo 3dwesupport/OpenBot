@@ -1,8 +1,7 @@
 import {InputFieldComponent} from "../inputField/inputField";
 import ButtonComponent from "../button/button";
-import React, {useContext} from "react";
+import React from "react";
 import './form.css';
-import {ThemeContext} from "../../../App";
 
 
 /**

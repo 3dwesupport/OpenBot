@@ -1,4 +1,4 @@
-import {and, collection, getCountFromServer, getDocs, query, where} from "@firebase/firestore";
+import {and, collection, getCountFromServer, query, where} from "@firebase/firestore";
 import {localStorageKeys, Month, tables} from "../../utils/constants";
 import {db} from "../authentication";
 

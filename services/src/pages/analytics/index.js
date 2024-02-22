@@ -11,6 +11,7 @@ import {BillingHeaderComponent} from "../../components/common/billingHeader/bill
 import {ThemeContext} from "../../App";
 import {SubscriptionCookie} from "../../components/common/cookie/subscriptionCookie";
 import Cookies from "js-cookie";
+import {AnalyticsLoader} from "../../components/common/loader/loader";
 
 /**
  * function to display usage analytics stats
@@ -22,6 +23,7 @@ export function UsageAnalysis() {
     let date = new Date();
     const [isChangedMonth, setIsChangedMonth] = useState(Month[date.getMonth()]);
     const [isChangedYear, setIsChangedYear] = useState(date.getFullYear());
+    const [isAnalyticsLoader, setIsAnalyticsLoader] = useState(false);
     const [usageDetails, setUsageDetails] = useState({
         projects: 0,
         models: 0,
@@ -37,6 +39,7 @@ export function UsageAnalysis() {
     }
 
     useEffect(() => {
+        setIsAnalyticsLoader(true);
         Promise.all([getProjects(isChangedYear, isChangedMonth), getModelDetails(isChangedYear, isChangedMonth), getServerDetails(isChangedYear, isChangedMonth), getProjectsMonthlyBasis(isChangedYear)]).then((res) => {
             setUsageDetails({
                 ...usageDetails,
@@ -45,12 +48,14 @@ export function UsageAnalysis() {
                 server: res[2],
                 projectsMonthlyArray: res[3]
             })
+            setIsAnalyticsLoader(false);
         })
     }, [isChangedMonth, isChangedYear])
 
     return (
         <>
             {type?.planType === Constants.free && <SubscriptionCookie/>}
+            {isAnalyticsLoader && <AnalyticsLoader/>}
             <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#202020' : ''}}>
                 <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange} theme={theme}/>
                 <div className={"userAnalysisContainer"}
