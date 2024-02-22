@@ -414,13 +414,13 @@ function handleChildBlockInWorkspace(array, child) {
 export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
         return sumUploadCode().then((res) => {
-            if (res?.planEndDate >= new Date()) return false;
+            if (new Date() >= new Date(res?.planEndDate)) return false;
             if (res.planType === Constants.free) return res.count < 10;
             return true;
         })
     } else {
         return getModelsCount().then((res) => {
-            if (res?.planEndDate >= new Date()) return false;
+            if (new Date() >= new Date(res?.planEndDate)) return false;
             if (res.planType === Constants.free) return res.count < 5;
             return true;
         })

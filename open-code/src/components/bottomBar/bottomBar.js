@@ -101,7 +101,6 @@ export const BottomBar = () => {
                 setIsLoader(true);
                 handleUserRestriction(Constants.projects).then(
                     (response) => {
-                        console.log("response::", response);
                         if (response === true) {
                             //javaScript generator
                             let code = javascriptGenerator.workspaceToCode(
