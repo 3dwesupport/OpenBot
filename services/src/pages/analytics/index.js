@@ -50,6 +50,10 @@ export function UsageAnalysis() {
             })
             setIsAnalyticsLoader(false);
         })
+            .catch((e) => {
+                console.log(e);
+                setIsAnalyticsLoader(false);
+            })
     }, [isChangedMonth, isChangedYear])
 
     return (
