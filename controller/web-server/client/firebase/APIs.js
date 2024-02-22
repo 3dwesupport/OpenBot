@@ -1,6 +1,8 @@
-import {addDoc, and, collection, doc, getDoc, getDocs, query, where} from '@firebase/firestore'
+import {addDoc, and, collection, getDocs, query, where} from '@firebase/firestore'
 import {auth, db} from './authentication'
-import {localStorageKeys, Month, tables} from '../utils/constants'
+import {Constants, localStorageKeys, tables} from '../utils/constants'
+import {nanoid} from 'nanoid'
+import {getCookie} from '../index'
 
 /**
  * function to upload user usage on monthly basis on firebase firestore
@@ -8,7 +10,7 @@ import {localStorageKeys, Month, tables} from '../utils/constants'
  * @param serverStartTime
  * @param serverEndTime
  */
-export async function uploadServerUsage (serverStartTime, serverEndTime) {
+export async function uploadServerUsage(serverStartTime, serverEndTime) {
     const user = JSON.parse(localStorage.getItem(localStorageKeys.user))
     const details = {
         startTime: serverStartTime,
@@ -27,17 +29,52 @@ export async function uploadServerUsage (serverStartTime, serverEndTime) {
 }
 
 /**
- * function to get document details from the firebase firestore
- * @param value
- * @param table
- * @param fieldName
+ * function to get user current plan
+ * @returns {Promise<undefined|*>}
+ */
+export async function getUserPlan() {
+    const startDate = new Date()
+    const endDate = new Date(startDate)
+    endDate.setDate(startDate.getDate() + 30)
+    const subscriptionDetails = {
+        uid: auth.currentUser?.uid,
+        planType: Constants.free,
+        planStartDate: startDate,
+        planEndDate: endDate,
+        planId: nanoid()
+    }
+    try {
+        const docDetails = await getDocDetails(subscriptionDetails?.uid)
+        if (docDetails === null) {
+            return await addDoc(collection(db, tables.subscription),
+                subscriptionDetails
+            ).then(() => {
+                return {planType: subscriptionDetails.planType, planEndDate: endDate, planStartDate: startDate}
+            })
+        } else {
+            const dateObject = new Date(docDetails?.data.planEndDate.seconds * 1000 + docDetails?.data.planEndDate.nanoseconds / 1e6)
+            const startDateObject = new Date(docDetails?.data.planStartDate.seconds * 1000 + docDetails?.data.planStartDate.nanoseconds / 1e6)
+            return {
+                planType: docDetails?.data.planType,
+                planEndDate: dateObject.toISOString(),
+                planStartDate: startDateObject.toISOString()
+            }
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+/**
+ * function to get user plan subscription details
+ * @param uid
  * @returns {Promise<null>}
  */
-const getDocDetails = async (value, table, fieldName) => {
+export const getDocDetails = async (uid) => {
     try {
-        const ordersQuery = query(collection(db, table), and(where(fieldName, '==', value), where('uid', '==', auth?.currentUser.uid)));
-        const querySnapshot = await getDocs(ordersQuery)
-        let response = null
+        const ordersQuery = query(collection(db, tables.subscription), where("uid", '==', uid));
+        const querySnapshot = await getDocs(ordersQuery);
+        let response = null;
         querySnapshot.forEach((doc) => {
             return response = {
                 data: doc.data(),
@@ -46,29 +83,29 @@ const getDocDetails = async (value, table, fieldName) => {
         })
         return response
     } catch (error) {
-        console.log('error :', error)
+        console.log("error :", error);
     }
 }
 
-/**
- * function to get user current plan
- * @returns {Promise<undefined|*>}
- */
-export async function getUserPlan () {
-    const usersRef = doc(db, 'users', auth?.currentUser?.uid)
-    try {
-        const docSnapshot = await getDoc(usersRef)
-        if (!docSnapshot.exists()) {
-            return undefined
+
+export async function getServerDetails() {
+    const details = getCookie(localStorageKeys.planDetails)
+    if (details) {
+        const items = JSON.parse(details)
+        const startDate = new Date(items?.planStartDate)
+        const endDate = new Date(items.planEndDate)
+        try {
+            const ordersQuery = query(collection(db, tables.server), and(where("startTime", '>=', startDate), where("startTime", '<', endDate), where("uid", '==', auth?.currentUser.uid)));
+            const querySnapshot = await getDocs(ordersQuery);
+            let duration = 0;
+            querySnapshot.forEach((doc) => {
+                const startTime = new Date(doc.data()?.startTime.seconds * 1000 + doc.data()?.startTime.nanoseconds / 1e6);
+                const endTime = new Date(doc.data()?.endTime.seconds * 1000 + doc.data()?.endTime.nanoseconds / 1e6);
+                duration += (new Date(endTime) - new Date(startTime)) / (1000 * 60) // in minutes
+            });
+            return duration
+        } catch (error) {
+            console.log("error :", error);
         }
-        const subscriptionData = docSnapshot.data()?.subscription
-        if (subscriptionData?.paid) {
-            if (new Date() <= subscriptionData.planEndDate) {
-                return subscriptionData.planEndDate
-            }
-        }
-    } catch (error) {
-        console.error('Error retrieving user plan:', error)
     }
-    return undefined
 }

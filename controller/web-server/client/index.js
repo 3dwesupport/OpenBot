@@ -12,12 +12,12 @@ import {Keyboard} from './keyboardHandlers/keyboard.js'
 import {BotMessageHandler} from './keyboardHandlers/bot-message-handler'
 import {Commands} from './keyboardHandlers/commands'
 import {RemoteKeyboard} from './keyboardHandlers/remote_keyboard'
-import {uploadServerUsage, getUserPlan} from './firebase/APIs'
+import {uploadServerUsage, getUserPlan, getServerDetails} from './firebase/APIs'
 import {WebRTC} from './webRTC/webrtc.js'
 import {signInWithCustomToken} from 'firebase/auth'
 import Cookies from 'js-cookie'
 import {auth, googleSigIn, googleSignOut} from './firebase/authentication'
-import {localStorageKeys} from './utils/constants'
+import {Constants, localStorageKeys} from './utils/constants'
 
 const connection = new Connection();
 (async () => {
@@ -94,7 +94,6 @@ function handleSignInButtonClick() {
                 signInBtn.innerText = user.displayName
                 localStorage.setItem(localStorageKeys.user, JSON.stringify(user))
                 localStorage.setItem(localStorageKeys.isSignIn, true.toString())
-                sendId()
             })
             .catch((error) => {
                 // Handle any errors that might occur during sign-in
@@ -121,8 +120,6 @@ function sendId() {
  */
 function signOut() {
     signedInUser = null
-    localStorage.setItem(localStorageKeys.user, null)
-    localStorage.setItem(localStorageKeys.isSignIn, false.toString())
     const signInBtn = document.getElementsByClassName('google-sign-in-button')[0]
     signInBtn.innerText = 'Sign in with Google'
     if (getCookie(localStorageKeys.serverStartTime)) {
@@ -130,10 +127,10 @@ function signOut() {
         uploadServerUsage(new Date(getCookie(localStorageKeys.serverStartTime)), time).then(() => {
             deleteCookie(localStorageKeys.serverStartTime)
             deleteCookie(localStorageKeys.serverEndTime)
-            googleSignOut()
+            googleSignOut().then()
         })
     } else {
-        googleSignOut()
+        googleSignOut().then()
     }
 }
 
@@ -241,9 +238,7 @@ function handleSingleSignOn() {
             localStorage.setItem(localStorageKeys.user, JSON.stringify(res.user))
             localStorage.setItem(localStorageKeys.isSignIn, true.toString())
             getUserPlan().then((res) => {
-                if (res !== undefined) {
-                    Cookies.set(localStorageKeys.subscriptionEndTime, res)
-                }
+                Cookies.set(localStorageKeys.planDetails, JSON.stringify(res))
                 checkPlanExpiration()
             })
             deleteCookie(localStorageKeys.user)
@@ -301,13 +296,7 @@ function handleAuthChangedOnRefresh() {
                             deleteCookie(localStorageKeys.serverEndTime)
                         })
                     }
-                    restrictUserOnExpiration()
-                    getUserPlan().then((res) => {
-                        if (res !== undefined) {
-                            Cookies.set(localStorageKeys.subscriptionEndTime, res)
-                        }
-                        checkPlanExpiration()
-                    })
+                    checkPlanExpiration()
                 }
             })
         }, 1000)
@@ -326,29 +315,29 @@ window.onunload = function () {
 /**
  * function to check whether user subscription expires or not
  */
-export function checkPlanExpiration() {
+export function checkPlanExpiration () {
     if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
-        if (getCookie(localStorageKeys.subscriptionEndTime)) {
-            const endTimeCheckInterval = setInterval(() => {
-                const currentTime = new Date()
-                // Check if the end time has been reached
-                if (currentTime >= new Date(decodeURIComponent(getCookie(localStorageKeys.subscriptionEndTime)))) {
-                    clearInterval(endTimeCheckInterval)
-                    showExpirationWrapper()
-                }
-            }, 100) // 1 minute in milliseconds
-        }
-    }
-}
-
-/**
- * function to restrict user for sending room key to remote server
- */
-export function restrictUserOnExpiration() {
-    if (getCookie(localStorageKeys.subscriptionEndTime)) {
-        const currentTime = new Date()
-        if (currentTime < new Date(decodeURIComponent(getCookie(localStorageKeys.subscriptionEndTime)))) {
-            sendId()
+        const details = getCookie(localStorageKeys.planDetails)
+        if (details) {
+            const items = JSON.parse(details)
+            let isExpired = false
+            let isIdSend = false
+            getServerDetails().then((res) => {
+                const endTimeCheckInterval = setInterval(() => {
+                    if (new Date() >= new Date(items?.planEndDate)) { // If subscription time is reached
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (items?.planType === Constants.free && res >= 60) { // If free 60 minutes are over
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (!isExpired && !isIdSend) {
+                        sendId()
+                        isIdSend = true
+                    }
+                }, 100)// 1 minute in milliseconds
+            })
         }
     }
 }
