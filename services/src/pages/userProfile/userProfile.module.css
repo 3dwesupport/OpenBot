@@ -23,9 +23,11 @@
     display: flex;
     padding-top: 2%;
     align-items: flex-end;
-    width: 100px;
     justify-content: flex-end;
+}
 
+.mainImageDiv {
+    display: flex;
 }
 
 .profileImage {
@@ -36,7 +38,6 @@
     object-fit: cover;
     justify-content: center;
     align-items: center;
-
 }
 
 .icon {
@@ -105,13 +106,13 @@
         padding-top: 9%;
         padding-left: 12%;
     }
-    .editProfileContainer {
-        display: flex;
-        height: 2%;
-    }
 
     .editProfileImageDiv {
-        padding-top: 60px;
+        padding-top: 30px;
+    }
+
+    .mainImageDiv {
+        justify-content: center;
     }
 
 }

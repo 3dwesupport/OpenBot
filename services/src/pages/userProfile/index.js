@@ -206,21 +206,22 @@ export function UserProfile() {
                             <div className={styles.editProfileTextDiv}
                                  style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}> Edit Profile
                             </div>
-                            <div className={styles.editProfileImageDiv}>
-                                <div className={styles.profileImage}>
+                            <div className={styles.mainImageDiv}>
+                                <div className={styles.editProfileImageDiv}>
+                                    <Avatar className={styles.profileImage} style={{
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                        height: "100px",
+                                        width: "100px"
+                                    }}
+                                            src={userDetails?.photoURL}
+                                            alt={"user"}/>
+                                    <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}}
+                                           type={"file"}
+                                           accept={"image/*,.heic,.heif,.jpeg"}/>
+                                    <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
+                                         className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
                                 </div>
-                                <Avatar className={styles.profileImage} style={{
-                                    borderRadius: "50%",
-                                    objectFit: "cover",
-                                    height: "100px",
-                                    width: "100px"
-                                }}
-                                        src={userDetails?.photoURL}
-                                        alt={"user"}/>
-                                <input ref={inputRef} onChange={changeUserImage} style={{display: "none"}} type={"file"}
-                                       accept={"image/*,.heic,.heif,.jpeg"}/>
-                                <img onClick={() => inputRef?.current?.click()} alt="edit profile icon"
-                                     className={styles.editProfileIcon} src={Images.EditProfileIcon}/>
                             </div>
                         </div>
                         <div className={styles.childDiv}>
