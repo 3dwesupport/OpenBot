@@ -12,7 +12,7 @@ import {ToastContainer} from "react-toastify";
 export const ThemeContext = createContext(null);
 
 function App() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState();
     let isAndroid = /Android/i.test(navigator.userAgent);
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     let onPageLoad = localStorage.getItem("theme") || ""

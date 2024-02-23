@@ -82,9 +82,9 @@ export const userPlan = [
         cost: "$0",
         description: "The Free Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
         services: [
-            "Compile 5 projects using OpenBot Playground",
+            "Compile code 25 times using OpenBot Playground",
             "1 hour limit for OpenBot Web-controller",
-            "Run 5 projects through the app by scanning QR code",
+            "Run 15 projects through the app by scanning QR code",
             "Train 2 AI models using training service",
             "Upload 2 AI models from Playground"
         ],
@@ -95,6 +95,24 @@ export const userPlan = [
         color: "black",
         buttonColor: "#ACABAB",
         checkSign: Images.blackCheckMark
+    },{
+        title: "STANDARD PLAN",
+        cost: "$10",
+        description: "The Standard Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
+        services: [
+            "Compile code 60 times using OpenBot Playground",
+            "5 day limit for OpenBot Web-controller",
+            "Run 35 projects through the app by scanning QR code",
+            "Train 10 AI models using training service",
+            "Upload 10 AI models from Playground"
+        ],
+        planType: "UPGRADE PLAN",
+        lightBackgroundColor: "#0071C5",
+        darkBackgroundColor: "#0071C5",
+        buttonBackgroundColor: "#FFFFFF",
+        color: "#FFFFFF",
+        buttonColor: "#0071C5",
+        checkSign: Images.whiteCheckMark,
     },
     {
         title: "PREMIUM PLAN",

@@ -94,7 +94,7 @@ export function ProfileModal(props) {
                     </div>
                 </StyledPopover>}
             </ThemeProvider>
-            {user ? (
+            {user?.photoURL ? (
                 //display user profile information in right section of header
                 <div onClick={handlePopoverOpen} className={styles.dropdown}>
                     <Avatar className={styles.profileModalIcon} src={user?.photoURL} alt="User"/>
