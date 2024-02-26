@@ -24,7 +24,7 @@ export function UserProfile() {
     const {user, isOnline, setIsUserProfile, isUserProfile} = useContext(StoreContext);
     const inputRef = useRef("-");
     const [isProfileLoader, setIsProfileLoader] = useState(false);
-    const [file, setFile] = useState(user?.photoURL);
+    const [file, setFile] = useState(user?.photoURL && user.photoURL);
     const [isSaveDisabled, setIsSaveDisabled] = useState(false);
     const [userDetails, setUserDetails] = useState({
         displayName: user?.displayName,
@@ -164,7 +164,7 @@ export function UserProfile() {
     async function handleSubmit() {
         if (isOnline) {
             // Check if there are changes in profile picture or display name
-            if (file !== undefined || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}` || isPrevDOB !== userDetails?.dob) {
+            if (user.photoURL !== file || user.displayName !== `${userDetails?.firstName} ${userDetails?.lastName}` || isPrevDOB !== userDetails?.dob) {
                 try {
                     setIsProfileLoader(true);
                     // Upload new profile picture if a new file is selected

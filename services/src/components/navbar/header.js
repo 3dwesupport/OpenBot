@@ -27,7 +27,8 @@ function Header() {
                 uid: res?.uid
             });
         })
-    }, [isUserProfile]);
+    }, [isUserProfile, setUser]);
+
     return (
         <div className={"navbar_navbarDiv"}>
             <LogoSection/>
