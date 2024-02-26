@@ -13,8 +13,8 @@ import {Month} from "../../../utils/constants";
 export function Chart(props) {
     const {usageDetails} = props;
     let date = new Date();
-    const firstHalfY = usageDetails?.projectsMonthlyArray.slice(0, 6);
-    const secondHalfY = usageDetails?.projectsMonthlyArray.slice(0, -6);
+    const firstHalfY = usageDetails?.slice(0, 6);
+    const secondHalfY = usageDetails?.slice(0, -6);
     return (
         <>
             <div className={style.chartYAxisLabel}>

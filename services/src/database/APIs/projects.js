@@ -41,7 +41,7 @@ export async function getDocDetails(year, month) {
  * @param year
  * @returns {Promise<unknown>}
  */
-export async function getProjectsMonthlyBasis(year) {
+export async function getBlocklyCompilingCount(year) {
     return new Promise(async (resolve, reject) => {
         try {
             const startDate = new Date(`${year}-01-01T00:00:00.000Z`);

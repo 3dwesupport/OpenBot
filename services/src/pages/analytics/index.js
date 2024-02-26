@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {Chart} from "../../components/common/chart/chart";
-import {getProjects, getProjectsMonthlyBasis} from "../../database/APIs/projects";
-import {Constants, localStorageKeys, Month, Themes} from "../../utils/constants";
+import {getBlocklyCompilingCount, getProjects} from "../../database/APIs/projects";
+import {Constants, localStorageKeys, Month, Themes, UserAnalysisCardData} from "../../utils/constants";
 import {getModelDetails} from "../../database/APIs/models";
 import {getServerDetails} from "../../database/APIs/remoteServer";
 import './usageAnalysis.css'
@@ -25,11 +25,8 @@ export function UsageAnalysis() {
     const [isChangedYear, setIsChangedYear] = useState(date.getFullYear());
     const [isAnalyticsLoader, setIsAnalyticsLoader] = useState(false);
     const [usageDetails, setUsageDetails] = useState({
-        projects: 0,
-        models: 0,
-        server: 0,
-        runProjectCount: 0,
-        projectsMonthlyArray: Array(12).fill(0)
+        cardData: UserAnalysisCardData,
+        chartData: Array(12).fill(0)
     })
     const plan = Cookies.get(localStorageKeys.planDetails);
     const type = plan ? JSON.parse(plan) : ""
@@ -40,14 +37,24 @@ export function UsageAnalysis() {
 
     useEffect(() => {
         setIsAnalyticsLoader(true);
-        Promise.all([getProjects(isChangedYear, isChangedMonth), getModelDetails(isChangedYear, isChangedMonth), getServerDetails(isChangedYear, isChangedMonth), getProjectsMonthlyBasis(isChangedYear)]).then((res) => {
+        Promise.all([getProjects(isChangedYear, isChangedMonth), getModelDetails(isChangedYear, isChangedMonth), getServerDetails(isChangedYear, isChangedMonth), getBlocklyCompilingCount(isChangedYear)]).then((res) => {
             setUsageDetails({
                 ...usageDetails,
-                projects: res[0],
-                models: res[1],
-                server: res[2],
-                projectsMonthlyArray: res[3]
+                cardData: usageDetails.cardData.map((item, index) => {
+                    switch (index) {
+                        case 0 :
+                            return {...item, value: res[0]}
+                        case 1:
+                            return {...item, value: res[1]};
+                        case 3:
+                            return {...item, value: res[2]};
+                        default:
+                            return item;
+                    }
+                }),
+                chartData: res[3]
             })
+
             setIsAnalyticsLoader(false);
         })
             .catch((e) => {
@@ -65,7 +72,7 @@ export function UsageAnalysis() {
                 <div className={"userAnalysisContainer"}
                      style={{backgroundColor: theme === Themes.dark ? '#202020' : ''}}>
                     <div className={"cardChartContainer"}>
-                        <UsageAnalysisCardComponent usageDetails={usageDetails}/>
+                        <UsageAnalysisCardComponent usageDetails={usageDetails.cardData}/>
                         <div className={"chartDiv"}>
                             <Card style={{
                                 position: "relative",
@@ -73,7 +80,7 @@ export function UsageAnalysis() {
                                 backgroundColor: theme === Themes.dark ? '#292929' : '#FFFFFF',
                                 height: "100%",
                             }}>
-                                <Chart usageDetails={usageDetails}/>
+                                <Chart usageDetails={usageDetails.chartData}/>
                             </Card>
                         </div>
                     </div>

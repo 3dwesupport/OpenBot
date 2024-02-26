@@ -15,7 +15,7 @@ export const localStorageKeys = {
     user: "user",
     isSignIn: "isSignIn",
     UID: "UID",
-    planDetails:"planDetails"
+    planDetails: "planDetails"
 }
 // Array of card data
 export const CardData = [
@@ -28,10 +28,10 @@ export const CardData = [
 ];
 
 export const UserAnalysisCardData = [
-    {text: "Number of Projects"},
-    {text: "Number of Models"},
-    {text: "Projects Run"},
-    {text: "Remote Server"},
+    {text: "Number of projects", emptyMessage: "No projects yet", value: 0},
+    {text: "Number of models", emptyMessage: "No models yet", value: 0},
+    {text: "Number of projects Run", emptyMessage: "No projects run yet", value: 0},
+    {text: "Remote Server", emptyMessage: "No duration yet", value: 0},
 ]
 
 export const Constants = {
@@ -44,8 +44,8 @@ export const Constants = {
     billingHistory: "Billing History",
     billingTitle: "Choose your plan",
     profileErrorMsg: "There was an error in updating profile",
-    free : "free",
-    premium : "premium"
+    free: "free",
+    premium: "premium"
 }
 
 export const errorToast = (message) => {
@@ -95,7 +95,7 @@ export const userPlan = [
         color: "black",
         buttonColor: "#ACABAB",
         checkSign: Images.blackCheckMark
-    },{
+    }, {
         title: "STANDARD PLAN",
         cost: "$10",
         description: "The Standard Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
