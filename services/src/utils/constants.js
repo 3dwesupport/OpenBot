@@ -30,8 +30,8 @@ export const CardData = [
 export const UserAnalysisCardData = [
     {text: "Number of projects", emptyMessage: "No projects yet", value: 0},
     {text: "Number of models", emptyMessage: "No models yet", value: 0},
-    {text: "Number of projects Run", emptyMessage: "No projects run yet", value: 0},
-    {text: "Remote Server", emptyMessage: "No duration yet", value: 0},
+    {text: "Number of projects run", emptyMessage: "No projects run yet", value: 0},
+    {text: "Web server", emptyMessage: "No duration yet", value: 0},
 ]
 
 export const Constants = {
