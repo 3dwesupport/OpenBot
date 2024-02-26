@@ -34,7 +34,7 @@ export function UsageAnalysisCardComponent(props) {
                                 {card.emptyMessage}
                             </div> :
                             <div className={"cardData"} style={{color: theme === Themes.dark ? '#FFFFFF' : '#000000'}}>
-                                {card.value}
+                                {card.value} {index === 3 && <span style={{fontSize: "20px"}}>sec</span>}
                             </div>
                         }
                     </Card>
