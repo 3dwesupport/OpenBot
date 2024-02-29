@@ -26,7 +26,7 @@ export function DashboardComponent() {
                 break;
             case CardData[1].text:
                 console.log(CardData[1].text);
-                // window.open("http://localhost:8080/", '_blank');
+                window.open("http://localhost:8080/", '_blank');
                 break;
             case CardData[2].text:
                 console.log(CardData[2].text);
@@ -44,13 +44,14 @@ export function DashboardComponent() {
     };
 
     return (
-        <div className={"container"} style={{backgroundColor:theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
+        <div className={"container"} style={{backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
             {/* Title section */}
             {localStorage.getItem(localStorageKeys.isSignIn) === "true" ? <div className={"textDiv"}>
-                <div className="title" style={{ color: theme === Themes.dark ? '#FFFFFF' : '#303030' }}>
-                    <div style={{ fontWeight: 'bold', display: 'inline' }}>
+                <div className="title" style={{color: theme === Themes.dark ? '#FFFFFF' : '#303030'}}>
+                    <div style={{fontWeight: 'bold', display: 'inline'}}>
                         WELCOME
-                    </div>, { user?.displayName}
+                    </div>
+                    , {user?.displayName}
                 </div>
             </div> : <div className={"textDiv"}/>}
             {/* Card container */}
