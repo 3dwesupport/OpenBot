@@ -80,7 +80,7 @@ export const userPlan = [
     {
         title: "FREE PLAN",
         cost: "$0",
-        description: "The Free Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
+        description: "The Free Plan gives access to OpenBot services, including the Playground, Web Controller, Model training, Android app, and IOS app. ",
         services: [
             "Compile code 25 times using OpenBot Playground",
             "1 hour limit for OpenBot Web-controller",
@@ -98,7 +98,7 @@ export const userPlan = [
     }, {
         title: "STANDARD PLAN",
         cost: "$10",
-        description: "The Standard Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
+        description: "The Standard Plan gives access to OpenBot services, including the Playground, Web Controller, Model training, Android app, and IOS app. ",
         services: [
             "Compile code 60 times using OpenBot Playground",
             "5 day limit for OpenBot Web-controller",
@@ -117,7 +117,7 @@ export const userPlan = [
     {
         title: "PREMIUM PLAN",
         cost: "$50",
-        description: "The Premium Plan gives access to OpenBot services, including the Playground, Web Controller, Android app, and iOS app. ",
+        description: "The Premium Plan gives access to OpenBot services, including the Playground, Web Controller, Model training, Android app, and IOS app. ",
         services: [
             "Unlimited compiling of projects using OpenBot Playground",
             "Unlimited usage of OpenBot Web-controller",
