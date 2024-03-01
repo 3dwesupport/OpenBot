@@ -1,7 +1,7 @@
 .choosePlanDiv {
     width: 31%;
     border-radius: 10px;
-    height: 570px;
+    height: 470px;
     overflow: scroll;
     box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
 }
@@ -49,7 +49,7 @@
 @media only screen and (max-width: 821px) {
     .choosePlanDiv {
         width: 100%;
-        height: 410px;
+        height: 350px;
     }
 
     .cardChildDiv {

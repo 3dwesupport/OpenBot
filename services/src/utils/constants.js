@@ -82,11 +82,9 @@ export const userPlan = [
         cost: "$0",
         description: "The Free Plan gives access to OpenBot services, including the Playground, Web Controller, Model training, Android app, and IOS app. ",
         services: [
-            "Compile code 25 times using OpenBot Playground",
+            "Compile blockly code 50 times using OpenBot Playground",
             "1 hour limit for OpenBot Web-controller",
-            "Run 15 projects through the app by scanning QR code",
             "Train 2 AI models using training service",
-            "Upload 2 AI models from Playground"
         ],
         planType: "CURRENT PLAN",
         lightBackgroundColor: "#FFFFFF",
@@ -100,11 +98,9 @@ export const userPlan = [
         cost: "$10",
         description: "The Standard Plan gives access to OpenBot services, including the Playground, Web Controller, Model training, Android app, and IOS app. ",
         services: [
-            "Compile code 60 times using OpenBot Playground",
-            "5 day limit for OpenBot Web-controller",
-            "Run 35 projects through the app by scanning QR code",
+            "Compile blockly code 200 times using OpenBot Playground",
+            "50 hours limit for OpenBot Web-controller",
             "Train 10 AI models using training service",
-            "Upload 10 AI models from Playground"
         ],
         planType: "UPGRADE PLAN",
         lightBackgroundColor: "#0071C5",
@@ -119,11 +115,9 @@ export const userPlan = [
         cost: "$50",
         description: "The Premium Plan gives access to OpenBot services, including the Playground, Web Controller, Model training, Android app, and IOS app. ",
         services: [
-            "Unlimited compiling of projects using OpenBot Playground",
-            "Unlimited usage of OpenBot Web-controller",
-            "Run unlimited projects from app by scanning QR code",
-            "Train unlimited AI models using training service",
-            "Upload unlimited models from Playground"
+            "Compile blockly code 1500 times of projects using OpenBot Playground",
+            "20 days usage of OpenBot Web-controller",
+            "Train 30 AI models using training service",
         ],
         planType: "UPGRADE PLAN",
         lightBackgroundColor: "#0071C5",
