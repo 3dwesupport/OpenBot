@@ -415,8 +415,30 @@ export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
         return sumUploadCode().then((res) => {
             if (new Date() >= new Date(res?.planEndDate)) return false;
-            if (res.planType === Constants.free) return res.count < 10;
-            return true;
+            // if (res.planType === Constants.free) return res.count < 4;
+            // return true;
+
+            switch(res.planType){
+                case Constants.free :
+                    console.log(res.count);
+                        return res.count<10;
+                case Constants.standard :
+                    return res.count<200;
+
+                case Constants.premium :
+                    return res.count<1500;
+
+                default :
+                    return true;
+            }
+
+            // else if(Constants.subscribeButton === true){
+            //     // if standard plan then $10
+            //     if(res.planType === Constants.standard) return res.count<200;
+            //     // else premium plan then $50 .
+            //     else if(res.planType === Constants.premium) return res.count<1500;
+            // }
+
         })
     } else {
         return getModelsCount().then((res) => {

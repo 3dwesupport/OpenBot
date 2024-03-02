@@ -161,7 +161,9 @@ export const Constants = {
     subscriptionContinueService: "To continue using OpenBot Playground, you",
     subscriptionContinueInfo: "will need to upgrade your plan.",
     subscribeButton: "Subscribe Now",
-    free: "free"
+    free: "free",
+    standard:"standard",
+    premium:"premium"
 }
 
 export const Month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
