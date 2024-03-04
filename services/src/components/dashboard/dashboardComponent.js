@@ -29,6 +29,9 @@ export function DashboardComponent() {
                 window.open("http://localhost:8080/", '_blank');
                 break;
             case CardData[2].text:
+                const training_file = "github/isl-org/OpenBot/blob/master/policy/policy_learning.ipynb";
+                const colabUrl = `https://colab.research.google.com/${training_file}`;
+                window.open(colabUrl, '_blank');
                 console.log(CardData[2].text);
                 break;
             case CardData[5].text:
