@@ -19,7 +19,8 @@ export const tables = {
 
 export const Constants = {
     free: 'free',
-    premium: 'premium'
+    premium: 'premium',
+    standard: 'standard'
 }
 
 export const Month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

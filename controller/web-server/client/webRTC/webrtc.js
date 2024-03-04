@@ -99,7 +99,8 @@ export function WebRTC(connection) {
     }
 
     this.send = (message) => {
-        if (this.dataChannel) {
+        console.log(this.dataChannel)
+        if (this.dataChannel && this.dataChannel.readyState === 'open') {
             this.dataChannel.send(message)
         } else {
             console.log('WebRTC: Data channel is not open. Cannot send message.')

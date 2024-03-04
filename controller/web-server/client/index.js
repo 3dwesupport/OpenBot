@@ -38,7 +38,7 @@ const connection = new Connection();
     const sendToBot = (key) => {
         const msg = JSON.parse(key)
         let commands = {}
-        if (msg.driveCmd !== undefined) {
+        if (signedInUser && signedInUser.email) {
             commands = {
                 driveCmd: msg.driveCmd,
                 roomId: signedInUser.email
@@ -51,6 +51,7 @@ const connection = new Connection();
         }
         // connection.send(JSON.stringify(commands)) //This is for sending via socket)
         botMessageHandler.handle(commands, connection) // This is for sending via webRtc
+
     }
     const onKeyPress = (key) => {
         const command = new Commands(sendToBot)
@@ -329,6 +330,10 @@ export function checkPlanExpiration () {
                         isExpired = true
                         showExpirationWrapper()
                     } else if (items?.planType === Constants.free && res >= 60) { // If free 60 minutes are over
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (items?.planType === Constants.standard && res >= 60 * 50) { // If standard and 3000 minutes are over
                         clearInterval(endTimeCheckInterval)
                         isExpired = true
                         showExpirationWrapper()
