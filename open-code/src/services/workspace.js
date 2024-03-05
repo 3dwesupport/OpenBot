@@ -9,7 +9,7 @@ import {
 } from "./googleDrive";
 import configData from "../config.json"
 import {renameAllProjects, sumUploadCode} from "../apis/projects";
-import {getModelsCount} from "../apis/models";
+
 
 /**
  * get project from drive when user signedIn
@@ -415,12 +415,11 @@ export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
         return sumUploadCode().then((res) => {
             if (new Date() >= new Date(res?.planEndDate)) return false;
-            // if (res.planType === Constants.free) return res.count < 4;
-            // return true;
 
-            switch(res.planType){
+
+            switch(res.planType){  // restrict the user to click number of times
                 case Constants.free :
-                    console.log(res.count);
+                        console.log(res.count);
                         return res.count<10;
                 case Constants.standard :
                     return res.count<200;
@@ -431,21 +430,9 @@ export async function handleUserRestriction(type) {
                 default :
                     return true;
             }
-
-            // else if(Constants.subscribeButton === true){
-            //     // if standard plan then $10
-            //     if(res.planType === Constants.standard) return res.count<200;
-            //     // else premium plan then $50 .
-            //     else if(res.planType === Constants.premium) return res.count<1500;
-            // }
-
         })
     } else {
-        return getModelsCount().then((res) => {
-            if (new Date() >= new Date(res?.planEndDate)) return false;
-            if (res.planType === Constants.free) return res.count < 5;
-            return true;
-        })
+        return true;
     }
 }
 
