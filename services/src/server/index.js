@@ -20,6 +20,7 @@ app.use(cors());
 async function generateToken(UID) {
     return admin.auth().createCustomToken(UID)
         .then((customToken) => {
+            console.log(customToken);
             return customToken;
         })
         .catch((error) => {
@@ -37,6 +38,7 @@ app.get('/getToken', async (req, res) => {
         await generateToken(UID).then(
             (token) => {
                 if (token != null) {
+                    console.log(token);
                     res.json({token});
                     res.status(200).json();
                 } else {

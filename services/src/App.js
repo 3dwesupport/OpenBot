@@ -46,11 +46,16 @@ function App() {
                         email: result.user?.email,
                         uid: result.user?.uid
                     });
+
+                    let currentDate=new Date();
+                    let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60 * 1000));
+
                     const cookieOptions = {
                         // domain: '.openbot.org',
                         domain: 'localhost',
                         // domain: ".itinker.io",
                         secure: true,
+                        expires:expirationDate,
                     };
                     let customToken = await getCustomToken(auth?.currentUser?.uid);
                     Cookies.set(localStorageKeys.accessToken, result.credential?.accessToken, cookieOptions);
@@ -62,6 +67,7 @@ function App() {
 
     useEffect(() => {
         document.body.classList.toggle("dark-mode", theme === Themes.dark);
+        // console.log(new Date("2024-03-05T16:40:00.000Z"));
     }, [theme]);
 
 

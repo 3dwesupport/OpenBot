@@ -21,7 +21,6 @@ const firebaseConfig = {
     measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 };
 
-
 const app = firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
@@ -44,20 +43,26 @@ export async function googleSigIn() {
     } else {
         const signIn = await auth.signInWithPopup(provider)
         localStorage.setItem(localStorageKeys.isSignIn, "true");
+
+        let currentDate = new Date();
+        let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60*  1000));   // 1 hours in milisecond
+
         const cookieOptions = {
             // domain: '.openbot.org',
             domain: 'localhost',
             // domain: ".itinker.io",
             secure: true,
+            expires: expirationDate,
         };
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
             Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
         });
         localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
         let customToken = await getCustomToken(auth?.currentUser?.uid);
+        console.log("custom token:::::", customToken);
         Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
         Cookies.set(localStorageKeys.user, customToken, cookieOptions);
-        return signIn
+        return signIn;
     }
 }
 
