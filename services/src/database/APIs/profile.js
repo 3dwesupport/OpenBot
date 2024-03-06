@@ -29,7 +29,6 @@ export async function getCustomToken(UID) {
     try {
         const response = await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/getToken?uid=${UID}`);
         const data = await response.json();
-        console.log("data:::",data);
         return data.token
     } catch (error) {
         console.error('Error fetching token:', error);

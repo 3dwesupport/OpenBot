@@ -20,6 +20,7 @@ export function DashboardComponent() {
         console.log(tokenValue);
         if(localStorage.getItem(localStorageKeys.isSignIn) === "true"){ // if user logged in
             if(tokenValue===undefined){
+                // to find expiration time 
                 let currentDate=new Date();
                 let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60* 1000));
 
@@ -48,9 +49,10 @@ export function DashboardComponent() {
             case CardData[0].text:
                 CustomTokenGenerate(auth?.currentUser?.uid).then(()=>{
                     window.open("https://www.openbot.itinker.io/", '_blank');
+                    // window.open("http://localhost:3001/", '_blank');
                     }
                 )
-                // window.open("http://localhost:3001/", '_blank');
+
                 break;
             case CardData[1].text:
                 console.log(CardData[1].text);

@@ -47,6 +47,7 @@ function App() {
                         uid: result.user?.uid
                     });
 
+                    // to find expiration time
                     let currentDate=new Date();
                     let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60 * 1000));
 

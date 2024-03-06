@@ -59,7 +59,6 @@ export async function googleSigIn() {
         });
         localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
         let customToken = await getCustomToken(auth?.currentUser?.uid);
-        console.log("custom token:::::", customToken);
         Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
         Cookies.set(localStorageKeys.user, customToken, cookieOptions);
         return signIn;
