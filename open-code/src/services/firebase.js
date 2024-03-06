@@ -13,8 +13,10 @@ import {getAuth, signOut} from "firebase/auth";
 import {Constants, localStorageKeys, tables} from "../utils/constants";
 import {setConfigData} from "./workspace";
 import configData from "../config.json";
-import {Cookies} from "react-cookie-consent";
+import CookieConsent , {Cookies} from "react-cookie-consent";
 import {addSubscription} from "../apis/subscription";
+// import cookieConsent from "react-cookie-consent/src/CookieConsent";
+// import {Cookies} from "react-cookie-consent";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -93,6 +95,12 @@ export async function googleSignOut() {
         localStorage.setItem(localStorageKeys.accessToken, " ");
         localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
         // delete_cookie("user");
+
+        Cookies.remove(localStorageKeys.accessToken," ");
+        Cookies.remove(localStorageKeys.planDetails);
+        localStorage.setItem(localStorageKeys.UID, "");
+        Cookies.remove('CookieConsent');
+
     }).catch((error) => {
         console.log("Sign-out error ", error)
     });
