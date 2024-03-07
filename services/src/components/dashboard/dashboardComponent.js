@@ -21,7 +21,6 @@ export function DashboardComponent() {
 
     async function CustomTokenGenerate() {
         const tokenValue = Cookies.get("user");
-        console.log(tokenValue);
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") { // if user logged in
             if (tokenValue === undefined) {
                 // to find expiration time 
@@ -35,9 +34,8 @@ export function DashboardComponent() {
                     secure: true,
                     expires: expirationDate,
                 };
-                localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid)
+                localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
                 let customToken = await getCustomToken(auth?.currentUser?.uid);
-                // Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
                 Cookies.set(localStorageKeys.user, customToken, cookieOptions);
             }
         }

@@ -68,7 +68,6 @@ function App() {
 
     useEffect(() => {
         document.body.classList.toggle("dark-mode", theme === Themes.dark);
-        // console.log(new Date("2024-03-05T16:40:00.000Z"));
     }, [theme]);
 
 

@@ -7,7 +7,6 @@ import {BillingHistory} from "../../pages/billingHistory";
 import {UserProfile} from "../../pages/userProfile";
 import {Billing} from "../../pages/billing";
 import React from "react";
-import {TestCheckout} from "../payments/checkout";
 
 /**
  * Router to maintain different paths of the application
@@ -26,10 +25,6 @@ export const RouterComponent = () => {
                 <Route
                     path={PathName.editProfile}
                     element={<Layout><UserProfile/></Layout>}
-                />
-                <Route
-                    path={PathName.checkout}
-                    element={<Layout><TestCheckout/></Layout>}
                 />
                 <Route
                     path={PathName.usageAnalysis}
