@@ -15,67 +15,64 @@ import Cookies from "js-cookie";
  * @constructor
  */
 export function DashboardComponent() {
-    async function CustomTokenGenerate(UID){
-        const tokenValue=Cookies.get("user");
+    const {user} = useContext(StoreContext);
+    const navigate = useNavigate();
+    const {theme} = useContext(ThemeContext);
+
+    async function CustomTokenGenerate(UID) {
+        const tokenValue = Cookies.get("user");
         console.log(tokenValue);
-        if(localStorage.getItem(localStorageKeys.isSignIn) === "true"){ // if user logged in
-            if(tokenValue===undefined){
+        if (localStorage.getItem(localStorageKeys.isSignIn) === "true") { // if user logged in
+            if (tokenValue === undefined) {
                 // to find expiration time 
-                let currentDate=new Date();
-                let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60* 1000));
+                let currentDate = new Date();
+                let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60 * 1000));
 
                 const cookieOptions = {
                     // domain: '.openbot.org',
                     domain: 'localhost',
                     // domain: ".itinker.io",
                     secure: true,
-                    expires:expirationDate,
+                    expires: expirationDate,
                 };
-                localStorage.setItem(localStorageKeys.UID,auth?.currentUser?.uid)
-                let customToken=await getCustomToken(auth?.currentUser?.uid);
+                localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid)
+                let customToken = await getCustomToken(auth?.currentUser?.uid);
                 // Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
                 Cookies.set(localStorageKeys.user, customToken, cookieOptions);
             }
         }
     }
 
-    const {user} = useContext(StoreContext);
-    const navigate = useNavigate();
-    const {theme} = useContext(ThemeContext);
-
     //function to handle click event on cards
     const handleCardClick = (clickedCard) => {
         switch (clickedCard.text) {
             case CardData[0].text:
-                CustomTokenGenerate(auth?.currentUser?.uid).then(()=>{
-                    window.open("https://www.openbot.itinker.io/", '_blank');
-                    // window.open("http://localhost:3001/", '_blank');
+                CustomTokenGenerate(auth?.currentUser?.uid).then(() => {
+                        window.open("https://www.openbot.itinker.io/", '_blank');
+                        // window.open("http://localhost:3001/", '_blank');
                     }
                 )
-
                 break;
             case CardData[1].text:
                 console.log(CardData[1].text);
-                CustomTokenGenerate(auth?.currentUser?.uid).then(()=>{
+                CustomTokenGenerate(auth?.currentUser?.uid).then(() => {
                     window.open("http://localhost:8080/", '_blank');
                 })
-
                 break;
             case CardData[2].text:
-                CustomTokenGenerate(auth?.currentUser?.uid).then(()=>{
-                    const training_file = "github/isl-org/OpenBot/blob/master/policy/policy_learning.ipynb";
-                    const colabUrl = `https://colab.research.google.com/${training_file}`;
+                CustomTokenGenerate(auth?.currentUser?.uid).then(() => {
+                    const notebookPath = 'services/src/modelTraining/training-service.ipynb';
+                    const colabUrl = `https://colab.research.google.com/github/3dwesupport/OpenBot/blob/openbot-services/${notebookPath}`;
                     window.open(colabUrl, '_blank');
                     console.log(CardData[2].text);
                 })
-
                 break;
             case CardData[5].text:
-                    if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
-                        navigate(PathName.usageAnalysis);
-                    } else {
-                        errorToast(Constants.signInMessage);
-                    }
+                if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
+                    navigate(PathName.usageAnalysis);
+                } else {
+                    errorToast(Constants.signInMessage);
+                }
                 break;
             default :
                 break;
