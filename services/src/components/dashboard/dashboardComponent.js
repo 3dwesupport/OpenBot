@@ -19,7 +19,7 @@ export function DashboardComponent() {
     const navigate = useNavigate();
     const {theme} = useContext(ThemeContext);
 
-    async function CustomTokenGenerate(UID) {
+    async function CustomTokenGenerate() {
         const tokenValue = Cookies.get("user");
         console.log(tokenValue);
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") { // if user logged in
@@ -47,7 +47,7 @@ export function DashboardComponent() {
     const handleCardClick = (clickedCard) => {
         switch (clickedCard.text) {
             case CardData[0].text:
-                CustomTokenGenerate(auth?.currentUser?.uid).then(() => {
+                CustomTokenGenerate().then(() => {
                         window.open("https://www.openbot.itinker.io/", '_blank');
                         // window.open("http://localhost:3001/", '_blank');
                     }
@@ -55,12 +55,12 @@ export function DashboardComponent() {
                 break;
             case CardData[1].text:
                 console.log(CardData[1].text);
-                CustomTokenGenerate(auth?.currentUser?.uid).then(() => {
+                CustomTokenGenerate().then(() => {
                     window.open("http://localhost:8080/", '_blank');
                 })
                 break;
             case CardData[2].text:
-                CustomTokenGenerate(auth?.currentUser?.uid).then(() => {
+                CustomTokenGenerate().then(() => {
                     const notebookPath = 'services/src/modelTraining/training-service.ipynb';
                     const colabUrl = `https://colab.research.google.com/github/3dwesupport/OpenBot/blob/openbot-services/${notebookPath}`;
                     window.open(colabUrl, '_blank');
