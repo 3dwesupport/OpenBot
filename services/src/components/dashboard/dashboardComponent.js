@@ -71,13 +71,11 @@ export function DashboardComponent() {
 
                 break;
             case CardData[5].text:
-                CustomTokenGenerate(auth?.currentUser?.uid).then(()=>{
                     if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
                         navigate(PathName.usageAnalysis);
                     } else {
                         errorToast(Constants.signInMessage);
                     }
-                })
                 break;
             default :
                 break;

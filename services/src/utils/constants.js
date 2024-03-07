@@ -7,7 +7,8 @@ export const PathName = {
     "editProfile": "/editProfile",
     "usageAnalysis": "/usageAnalysis",
     "billingHistory": "/billingHistory",
-    "billing": "/billing"
+    "billing": "/billing",
+    "checkout": "/checkout"
 }
 
 export const localStorageKeys = {
@@ -33,6 +34,15 @@ export const UserAnalysisCardData = [
     {text: "Number of projects run", emptyMessage: "No projects run yet", value: 0},
     {text: "Web server", emptyMessage: "No duration yet", value: 0},
 ]
+
+export const timeUnits= {
+    hours : "hrs",
+    minutes : "min",
+    seconds : "sec",
+    years:"yr",
+    days:"days",
+    month:"mos"
+}
 
 export const Constants = {
     online: "online",
@@ -75,6 +85,7 @@ export const successToast = (message) => {
         borderRadius: '8px',
     })
 }
+
 
 export const userPlan = [
     {
