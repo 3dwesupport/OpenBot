@@ -244,7 +244,8 @@ JavaScript and Python.
   <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_codeEditor.jpg" alt="Playground code editor" width="50%" height="50%" />
   </p>
 
-- #### Add Model
+- ### Add Model
+
   The OpenBot playground provides a feature to externally add AI model (.tflite) to robot application. The model popup
   allows user to edit the configuration of our model, including its name, type, class, and input size. Note that the
   model will
@@ -254,6 +255,7 @@ JavaScript and Python.
   <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_workspace_model_popup.jpg" alt="Playground code editor" width="40%" height="50%" />
   </p>
 
+    <p style="color:yellow ">Note : - For IOS you can use Autopilot and for Android you can use CMDNAV.</p>
 
 - #### WorkSpace Controller
   The undo and redo button helps to do undo redo functionalities in the playground. The plus icon is for zoom-in and the
