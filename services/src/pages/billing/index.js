@@ -3,6 +3,7 @@ import style from "./billing.module.css";
 import {Constants, Themes, userPlan} from "../../utils/constants";
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
+import {handleCheckout} from "../../stripeAPI";
 
 /**
  * function to display plans and subscriptions
@@ -11,6 +12,14 @@ import {ThemeContext} from "../../App";
  */
 export function Billing() {
     const {theme} = useContext(ThemeContext);
+
+    const checkout = (e) => {
+        console.log(e);
+        switch (e) {
+            case "STANDARD PLAN" :
+                handleCheckout();
+        }
+    }
 
     return (
         <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? "#202020" : "#FFFFFF"}}>
@@ -21,7 +30,7 @@ export function Billing() {
                          style={{color: theme === Themes.dark ? "#FFFFFF" : "black"}}>{Constants.billingTitle}</div>
                     <div className={style.billingPlanDiv}>
                         {userPlan.map((item, key) =>
-                            <BillingCard cardDetails={item} key={key} theme={theme}/>
+                            <BillingCard cardDetails={item} key={key} theme={theme} paymentCheckout={checkout}/>
                         )}
                     </div>
                 </div>

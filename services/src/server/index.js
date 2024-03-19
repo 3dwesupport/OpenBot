@@ -4,6 +4,9 @@ const serviceAccount = require("../../opencode-openbot-firebase-adminsdk-ros9l-b
 const cors = require('cors');
 const app = express();
 const port = process.env.SERVER_PORT || 9000;
+const payment = require("./stripe/payment");
+const customer = require("./stripe/customer");
+var bodyParser = require("body-parser");
 
 admin.initializeApp({
     //TODO add in readme to download account file
@@ -11,6 +14,10 @@ admin.initializeApp({
     databaseURL: "https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 app.use(cors());
+app.use(bodyParser.json());
+
+app.use("/payment", payment);
+app.use("/customer", customer);
 
 /**
  * function to generate token from admin service account

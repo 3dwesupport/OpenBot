@@ -1,26 +1,21 @@
 import React from "react";
 import style from "./card.module.css";
-import {PathName, Themes} from "../../../utils/constants";
+import {Themes} from "../../../utils/constants";
 import {Images} from "../../../utils/images";
 import {useMediaQuery, useTheme} from "@mui/material";
-import {sendClick} from "../../../utils/constants";
-import {useNavigate} from "react-router-dom";
 
 
 export function BillingCard(props) {
-    const {cardDetails, theme} = props;
+    const {cardDetails, theme, paymentCheckout} = props;
     const themes = useTheme();
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
-    const navigate = useNavigate()
 
-    function sendClick() {
-        console.log("Upgrade plan clicked ");
-        navigate(PathName.checkout)
+    function sendClick(e) {
+        paymentCheckout(e);
     }
 
 
     return (
-
         <div className={style.choosePlanDiv}
              style={{
                  backgroundColor: theme === Themes.dark ? cardDetails.darkBackgroundColor : cardDetails.lightBackgroundColor,
@@ -45,7 +40,7 @@ export function BillingCard(props) {
                         </div>
                     )}
                 </div>
-                <div className={style.planButton} onClick={sendClick} style={{
+                <div className={style.planButton} onClick={() => sendClick(cardDetails.title)} style={{
                     backgroundColor: cardDetails.buttonBackgroundColor,
                     color: cardDetails.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px"
                 }}>{cardDetails.planType}</div>

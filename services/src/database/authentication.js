@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import {getCustomToken} from "./APIs/profile";
 import {getAuth, signOut} from "firebase/auth";
 import {addSubscription} from "./APIs/subscription";
+import {createCustomer} from "../stripeAPI";
 
 /**
  * Firebase Configuration
@@ -45,7 +46,7 @@ export async function googleSigIn() {
         localStorage.setItem(localStorageKeys.isSignIn, "true");
 
         let currentDate = new Date();
-        let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60*  1000));   // 1 hours in milisecond
+        let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60 * 1000));   // 1 hours in milisecond
 
         const cookieOptions = {
             // domain: '.openbot.org',
@@ -54,6 +55,8 @@ export async function googleSigIn() {
             secure: true,
             expires: expirationDate,
         };
+
+        createCustomer(auth?.currentUser?.displayName, auth?.currentUser?.email);
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
             Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
         });
