@@ -6,7 +6,6 @@ import Cookies from "js-cookie";
 import {getCustomToken} from "./APIs/profile";
 import {getAuth, signOut} from "firebase/auth";
 import {addSubscription} from "./APIs/subscription";
-import {createCustomer} from "../stripeAPI";
 
 /**
  * Firebase Configuration
@@ -56,7 +55,6 @@ export async function googleSigIn() {
             expires: expirationDate,
         };
 
-        createCustomer(auth?.currentUser?.displayName, auth?.currentUser?.email);
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
             Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
         });

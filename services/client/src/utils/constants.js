@@ -35,13 +35,13 @@ export const UserAnalysisCardData = [
     {text: "Web server", emptyMessage: "No duration yet", value: 0},
 ]
 
-export const timeUnits= {
-    hours : "hrs",
-    minutes : "min",
-    seconds : "sec",
-    years:"yr",
-    days:"days",
-    month:"mos"
+export const timeUnits = {
+    hours: "hrs",
+    minutes: "min",
+    seconds: "sec",
+    years: "yr",
+    days: "days",
+    month: "mos"
 }
 
 export const Constants = {
@@ -54,8 +54,9 @@ export const Constants = {
     billingHistory: "Billing History",
     billingTitle: "Choose your plan",
     profileErrorMsg: "There was an error in updating profile",
+    signInText: "Please sign-in to checkout",
     free: "free",
-    premium: "premium"
+    premium: "premium",
 }
 
 export const errorToast = (message) => {

@@ -1,12 +1,12 @@
 const express = require('express');
 const admin = require("firebase-admin");
-const serviceAccount = require("../../opencode-openbot-firebase-adminsdk-ros9l-b06ecc9b78.json");
+const serviceAccount = require("./opencode-openbot-firebase-adminsdk-ros9l-b06ecc9b78.json");
 const cors = require('cors');
 const app = express();
 const port = process.env.SERVER_PORT || 9000;
 const payment = require("./stripe/payment");
 const customer = require("./stripe/customer");
-var bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 
 admin.initializeApp({
     //TODO add in readme to download account file

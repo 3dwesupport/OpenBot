@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import style from "./billing.module.css";
-import {Constants, Themes, userPlan} from "../../utils/constants";
+import {Constants, errorToast, localStorageKeys, Themes, userPlan} from "../../utils/constants";
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
 import {handleCheckout} from "../../stripeAPI";
@@ -14,10 +14,10 @@ export function Billing() {
     const {theme} = useContext(ThemeContext);
 
     const checkout = (e) => {
-        console.log(e);
-        switch (e) {
-            case "STANDARD PLAN" :
-                handleCheckout();
+        if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
+            handleCheckout(e);
+        } else {
+            errorToast(Constants.signInText);
         }
     }
 
