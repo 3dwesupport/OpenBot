@@ -8,7 +8,9 @@ export const PathName = {
     "usageAnalysis": "/usageAnalysis",
     "billingHistory": "/billingHistory",
     "billing": "/billing",
-    "checkout": "/checkout"
+    "checkout": "/checkout",
+    "success": "payment/success",
+    "failure": "payment/failure"
 }
 
 export const localStorageKeys = {

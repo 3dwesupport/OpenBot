@@ -3,13 +3,13 @@ import {auth} from "../database/authentication";
 export const handleCheckout = (planType) => {
     if (planType !== "FREE PLAN") {
         try {
-            fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/payment/create-checkout-session`, {
+            fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/create-checkout-session`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    priceId: planType === "STANDARD PLAN" ? "price_1Ovdf6SFuZKtXoUByPQMIQZa" : "price_1Ovuz4SFuZKtXoUB1wGPVvTL",
+                    planType: planType,
                     email: auth?.currentUser?.email
                 })
             }).then(res => res.json())
@@ -23,7 +23,7 @@ export const handleCheckout = (planType) => {
 }
 
 export const createCustomer = (name, email, planType) => {
-    fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/customer/create-customer`, {
+    fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/create-customer`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

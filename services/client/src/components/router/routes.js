@@ -7,6 +7,8 @@ import {BillingHistory} from "../../pages/billingHistory";
 import {UserProfile} from "../../pages/userProfile";
 import {Billing} from "../../pages/billing";
 import React from "react";
+import {PaymentSuccess} from "../../pages/payment/success";
+import {PaymentFail} from "../../pages/payment/failure";
 
 /**
  * Router to maintain different paths of the application
@@ -39,6 +41,14 @@ export const RouterComponent = () => {
                 <Route
                     path={PathName.billing}
                     element={<Layout><Billing/></Layout>}
+                />
+                <Route
+                    path={PathName.success}
+                    element={<PaymentSuccess/>}
+                />
+                <Route
+                    path={PathName.failure}
+                    element={<PaymentFail/>}
                 />
             </Routes>
         </BrowserRouter>

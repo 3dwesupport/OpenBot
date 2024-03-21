@@ -1,10 +1,9 @@
-const stripe = require('stripe')("sk_test_51OvXtISFuZKtXoUB9PaHYxWYJSGKYZ65whFeCLavo2JSJKcf8AheHKGq0mC0x59egpMKJlxEuVY4Cpf9dHNUhzzK00FP7YkWek");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const express = require("express");
 const router = express.Router();
 
 router.post("/create-customer", async (req, res) => {
     try {
-        console.log("body::", req.body)
         const {name, email} = req.body;
         const customer = await stripe.customers.create({
             name: name,

@@ -1,11 +1,13 @@
 const express = require('express');
 const admin = require("firebase-admin");
 const serviceAccount = require("./opencode-openbot-firebase-adminsdk-ros9l-b06ecc9b78.json");
+require('dotenv').config()
 const cors = require('cors');
 const app = express();
 const port = process.env.SERVER_PORT || 9000;
 const payment = require("./stripe/payment");
 const customer = require("./stripe/customer");
+const webhook = require("./stripe/webhooks");
 const bodyParser = require("body-parser");
 
 admin.initializeApp({
@@ -13,11 +15,13 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
+
 app.use(cors());
+app.use(webhook);
 app.use(bodyParser.json());
 
-app.use("/payment", payment);
-app.use("/customer", customer);
+app.use(payment);
+app.use(customer);
 
 /**
  * function to generate token from admin service account
