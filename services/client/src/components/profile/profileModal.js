@@ -102,7 +102,14 @@ export function ProfileModal(props) {
                         className={styles.textProfileModal}>{user?.displayName ? (user.displayName.length > 7 ? user.displayName.slice(0, 7) + '...' : user.displayName) : ''}</span>
                     <img className={styles.downArrow} src={Images.arrowDown} alt={'arrow icon'}/>
                 </div>
-            ) : <LoaderComponent color="#FFFFFF" height="20" width="20"/>}
+            ) : (
+                <div className={styles.dropdown}>
+                    <LoaderComponent color="#FFFFFF" height="20" width="20"/>
+                    <img className={styles.downArrow} src={Images.arrowDown} alt={'arrow icon'}/>
+                </div>
+            )
+            }
+
             {
                 // display the logout modal if open
                 logoutModalOpen &&

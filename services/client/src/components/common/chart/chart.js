@@ -10,11 +10,15 @@ import {Month} from "../../../utils/constants";
  * @returns {Element}
  * @constructor
  */
+
+
+
 export function Chart(props) {
     const {usageDetails} = props;
     let date = new Date();
     const firstHalfY = usageDetails?.slice(0, 6);
     const secondHalfY = usageDetails?.slice(0, -6);
+
     return (
         <>
             <div className={style.chartYAxisLabel}>
@@ -29,6 +33,9 @@ export function Chart(props) {
                     area: true,
                     showMark: false,
                     color: "#459CDE",
+                    // highlightScope: {
+                    //     backgroundColor: "tomato"
+                    // }
                 }]}
                 xAxis={[{
                     tickLabelStyle: {
@@ -36,7 +43,7 @@ export function Chart(props) {
                     },
                     tickFontSize: 12,
                     scaleType: 'point',
-                    data: date.getMonth() < 6 ? Month.slice(0, 6).map(month => month.slice(0,3)) : Month.slice(-6).map(month => month.slice(0, 3)),
+                    data: date.getMonth() < 6 ? Month.slice(0, 6).map(month => month.slice(0, 3)) : Month.slice(-6).map(month => month.slice(0, 3)),
                 }]}
                 yAxis={[{
                     tickLabelStyle: {
@@ -56,6 +63,7 @@ export function Chart(props) {
                     },
                 }}
             />
+
             <div className={style.chartXAxisLabel}>
                 <img style={{
                     transform: "rotate(90deg)",

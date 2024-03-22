@@ -151,11 +151,35 @@ export function UserProfile() {
      * @returns {Promise<void>}
      */
     const handleDOBChange = (newDOB) => {
+        const currentDate = new Date();
+        const selectedDate = new Date(newDOB);
+
+        if (selectedDate > currentDate) {
+            console.error("Selected date is after the current date");
+            return; // Return without updating userDetails
+        }
+
         setUserDetails({
             ...userDetails,
             dob: newDOB
-        })
-    };
+        });
+    }
+
+
+    /**
+     * handle Date of birth change
+     * @param Date picker is Disabled after current date is pick
+     * @returns {true/false}
+     */
+
+    function isDOBDisabled() {
+        const currentDate = new Date();
+        const selectedDate = new Date(userDetails.dob);
+
+        // Disable if selected date is after the current date
+        return selectedDate > currentDate;
+    }
+
 
     /**
      * Handling save button on edit profile modal
@@ -228,7 +252,7 @@ export function UserProfile() {
                             <FormComponent userDetails={userDetails} handleNameChange={handleNameChange}
                                            handleDOBChange={handleDOBChange}
                                            handleSubmit={handleSubmit} isSaveDisabled={isSaveDisabled} user={user}
-                                           theme={theme}/>
+                                           theme={theme} isDOBDisabled={isDOBDisabled()} />
                         </div>
                     </div>
                 </div>
