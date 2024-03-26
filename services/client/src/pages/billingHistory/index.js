@@ -58,7 +58,7 @@ export function BillingHistory() {
     const rows = [{id: 1, DATE: new Date().getDate(), AMOUNT: 100, STATUS: 'Jon', INVOICE: "link"}];
     return (
         <div style={{height: "100vh"}}>
-            {type?.planType === Constants.free && <SubscriptionCookie/>}
+            {type?.sub_type === Constants.free && <SubscriptionCookie/>}
             <BillingHeaderComponent title={Constants.billingHistory} theme={theme}/>
             <TableComponent theme={theme} tableAttributes={BillingHistoryParams} rowsData={rows}/>
         </div>

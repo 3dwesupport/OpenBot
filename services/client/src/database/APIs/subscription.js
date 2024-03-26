@@ -1,7 +1,6 @@
-import {nanoid} from "nanoid";
 import {addDoc, collection, doc, getDocs, query, updateDoc, where} from "@firebase/firestore";
 import {db} from "../authentication";
-import {Constants, tables} from "../../utils/constants";
+import {Constants, localStorageKeys, tables} from "../../utils/constants";
 
 /**
  * function to add user subscription in firebase firestore
@@ -15,11 +14,13 @@ export async function addSubscription(uid, planType) {
     endDate.setDate(startDate.getDate() + 30);
     const subscriptionDetails = {
         uid: uid,
-        planType: planType,
-        planStartDate: startDate,
-        planEndDate: endDate,
-        planId: nanoid(),
+        sub_plan_id: null,
+        customer_id: null,
+        sub_start_date: startDate,
+        sub_end_date: endDate,
+        sub_type: planType,
     }
+
     try {
         let docDetails = await getDocDetails(uid);
         if (planType === Constants.free) {
@@ -27,35 +28,16 @@ export async function addSubscription(uid, planType) {
                 return await addDoc(collection(db, tables.subscription),
                     subscriptionDetails
                 ).then(() => {
-                    return {planType: planType, planEndDate: endDate, planStartDate: startDate}
+                    return {sub_type: planType, sub_end_date: endDate, sub_start_date: startDate}
                 });
             } else {
-                const dateObject = new Date(docDetails?.data.planEndDate.seconds * 1000 + docDetails?.data.planEndDate.nanoseconds / 1e6);
-                const startDateObject = new Date(docDetails?.data.planStartDate.seconds * 1000 + docDetails?.data.planStartDate.nanoseconds / 1e6);
+                const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);
+                const startDateObject = new Date(docDetails?.data.sub_start_date.seconds * 1000 + docDetails?.data.sub_start_date.nanoseconds / 1e6);
                 return {
-                    planType: docDetails?.data.planType,
-                    planEndDate: dateObject.toISOString(),
-                    planStartDate: startDateObject.toISOString()
+                    sub_type: docDetails?.data.sub_type,
+                    sub_end_date: dateObject.toISOString(),
+                    sub_start_date: startDateObject.toISOString()
                 }
-            }
-        } else {
-            if (docDetails === null) {
-                return await addDoc(collection(db, tables.subscription),
-                    subscriptionDetails
-                ).then(() => {
-                    return {planType: planType, planEndDate: endDate, planStartDate: startDate}
-                });
-            } else {
-                let updatedData = docDetails?.data;
-                updatedData.planType = Constants.premium;
-                updatedData.planStartDate = startDate;
-                updatedData.planEndDate = endDate;
-                const subscriptionRef = doc(db, tables.subscription, docDetails?.id);
-                return await updateDoc(subscriptionRef,
-                    updatedData
-                ).then(() => {
-                    return {planType: planType, planEndDate: endDate, planStartDate: startDate}
-                });
             }
         }
     } catch (e) {
@@ -82,5 +64,14 @@ export const getDocDetails = async (uid) => {
         return response
     } catch (error) {
         console.log("error :", error);
+    }
+}
+
+export async function getCustomerId() {
+    try {
+        let docDetails = await getDocDetails(localStorage.getItem(localStorageKeys.UID));
+        return docDetails?.data.customer_id
+    } catch (e) {
+        console.log(e);
     }
 }

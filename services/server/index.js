@@ -16,6 +16,8 @@ admin.initializeApp({
     databaseURL: "https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
+const db = admin.firestore();
+
 app.use(cors());
 app.use(webhook);
 app.use(bodyParser.json());
@@ -64,3 +66,5 @@ app.get('/getToken', async (req, res) => {
 app.listen(port, () => {
     console.log("listening on port 9000");
 })
+
+module.exports.db = db;

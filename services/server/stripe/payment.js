@@ -4,7 +4,14 @@ const router = express.Router();
 
 router.post('/create-checkout-session', async (req, res) => {
     try {
-        const {planType, email} = req.body;
+        const {planType, email, uid, customerID} = req.body;
+        console.log("custom id:::", customerID);
+        let customerParam = {};
+        if (customerID) {
+            customerParam.customer = customerID;
+        } else {
+            customerParam.customer_email = email;
+        }
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: 'subscription',
@@ -14,7 +21,10 @@ router.post('/create-checkout-session', async (req, res) => {
                     quantity: 1,
                 },
             ],
-            customer_email: email,
+            metadata: {
+                uid: uid
+            },
+            ...customerParam,
             success_url: `${process.env.CLIENT_ADDRESS}/payment/success`,
             cancel_url: `${process.env.CLIENT_ADDRESS}/payment/failure`,
         });

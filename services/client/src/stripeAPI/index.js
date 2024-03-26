@@ -1,8 +1,10 @@
 import {auth} from "../database/authentication";
+import {getCustomerId} from "../database/APIs/subscription";
 
-export const handleCheckout = (planType) => {
+export const handleCheckout = async (planType) => {
     if (planType !== "FREE PLAN") {
         try {
+            let customerID = await getCustomerId();
             fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/create-checkout-session`, {
                 method: "POST",
                 headers: {
@@ -10,7 +12,9 @@ export const handleCheckout = (planType) => {
                 },
                 body: JSON.stringify({
                     planType: planType,
-                    email: auth?.currentUser?.email
+                    email: auth?.currentUser?.email,
+                    uid: auth?.currentUser?.uid,
+                    customerID: customerID
                 })
             }).then(res => res.json())
                 .then(({url}) => {

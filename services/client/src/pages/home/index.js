@@ -15,7 +15,7 @@ export const Home = () => {
 
     return (
         <div style={{height: "100vh"}}>
-            {type?.planType === Constants.free && <SubscriptionCookie/>}
+            {type?.sub_type === Constants.free && <SubscriptionCookie/>}
             <DashboardComponent/>
         </div>
     );

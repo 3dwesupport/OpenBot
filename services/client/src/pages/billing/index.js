@@ -15,7 +15,7 @@ export function Billing() {
 
     const checkout = (e) => {
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
-            handleCheckout(e);
+            handleCheckout(e).then();
         } else {
             errorToast(Constants.signInText);
         }

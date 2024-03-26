@@ -10,7 +10,7 @@ import {useNavigate} from "react-router-dom";
  * @returns {Element}
  * @constructor
  */
-export function SubscriptionCookie(props) {
+export function SubscriptionCookie() {
     const [open, setOpen] = useState(true);
     const {theme} = useContext(ThemeContext);
     const navigate = useNavigate();

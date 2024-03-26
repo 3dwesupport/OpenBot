@@ -65,7 +65,7 @@ export function UsageAnalysis() {
 
     return (
         <>
-            {type?.planType === Constants.free && <SubscriptionCookie/>}
+            {type?.sub_type === Constants.free && <SubscriptionCookie/>}
             {isAnalyticsLoader && <AnalyticsLoader/>}
             <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? '#202020' : ''}}>
                 <BillingHeaderComponent title={Constants.usageAnalysis} onDataChange={onDataChange} theme={theme}/>
