@@ -8,6 +8,7 @@ const port = process.env.SERVER_PORT || 9000;
 const payment = require("./stripe/payment");
 const customer = require("./stripe/customer");
 const webhook = require("./stripe/webhooks");
+const invoice = require("./stripe/invoice");
 const bodyParser = require("body-parser");
 
 admin.initializeApp({
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 
 app.use(payment);
 app.use(customer);
+app.use(invoice);
 
 /**
  * function to generate token from admin service account

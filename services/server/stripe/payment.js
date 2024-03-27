@@ -5,7 +5,6 @@ const router = express.Router();
 router.post('/create-checkout-session', async (req, res) => {
     try {
         const {planType, email, uid, customerID} = req.body;
-        console.log("custom id:::", customerID);
         let customerParam = {};
         if (customerID) {
             customerParam.customer = customerID;
@@ -31,6 +30,7 @@ router.post('/create-checkout-session', async (req, res) => {
         res.send({url: session.url});
         console.log("session ::", session.url);
     } catch (e) {
+        res.sendStatus(500);
         console.log(e);
     }
 });

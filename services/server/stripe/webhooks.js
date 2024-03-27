@@ -1,6 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const express = require("express");
 const {updateSubscriptionDetails} = require("../database/subscription");
+const {addTransactionHistory} = require("../database/transaction");
 const router = express.Router();
 
 
@@ -21,7 +22,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
 
     let data = event.data.object
     let eventType = event.type
-
     switch (eventType) {
         case "checkout.session.completed":
             await stripe.customers.retrieve(data.customer).then(async (customer) => {
@@ -35,10 +35,14 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
             )
             break;
         case "payment_intent.payment_failed":
-            console.log("Payment failed");
+            await addTransactionHistory(data.id, data.invoice, data.created, data.amount, data.status, data.customer);
+            console.log("Payment failed::", data);
             break;
         case "payment_intent.succeeded":
+            await addTransactionHistory(data.id, data.invoice, data.created, data.amount, data.status, data.customer);
             console.log("Payment succeeded");
+            break;
+        case "customer.subscription.created":
             break;
         default:
             break;

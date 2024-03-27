@@ -16,7 +16,6 @@ router.post("/create-customer", async (req, res) => {
                 price: 'price_1OvvYFSFuZKtXoUBwAS2GVUl',  // Replace with the ID of your $0 plan
             }],
         });
-
         console.log("customer::", customer)
         console.log("subscription::", subscription)
 
