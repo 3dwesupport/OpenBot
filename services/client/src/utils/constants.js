@@ -59,6 +59,13 @@ export const Constants = {
     signInText: "Please sign-in to checkout",
     free: "free",
     premium: "premium",
+    success: "Your payment of $ was Successfully Completed",
+    failure:"Your payment of $ was not Successful",
+    successText:"Payment Successful!",
+    failureText:"Payment Unsuccessful!",
+    buttonSuccessText:"Done",
+    buttonFailureText:"Try Again"
+
 }
 
 export const errorToast = (message) => {

@@ -29,6 +29,8 @@ import whiteArrowIcon from "../assets/images/white-arrow-icon.png";
 import whiteTransactionIcon from "../assets/images/white-transaction-icon.png";
 import whiteLogoutIcon from "../assets/images/white-logout-icon.png";
 import whiteUserIcon from "../assets/images/white-user-icon.png";
+import successImgIcon from "../assets/images/SuccessImg.png";
+import failureImgIcon from "../assets/images/failureImg.png";
 
 export const Images = {
     openBotLogo: openBotLogo,
@@ -61,5 +63,7 @@ export const Images = {
     whiteArrowIcon: whiteArrowIcon,
     whiteTransactionIcon: whiteTransactionIcon,
     whiteLogoutIcon: whiteLogoutIcon,
-    whiteUserIcon: whiteUserIcon
+    whiteUserIcon: whiteUserIcon,
+    successImgIcon:successImgIcon,
+    failureImgIcon:failureImgIcon
 }

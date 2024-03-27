@@ -23,6 +23,8 @@ export async function addSubscription(uid, planType) {
 
     try {
         let docDetails = await getDocDetails(uid);
+
+        console.log("docDetails::", docDetails);
         if (planType === Constants.free) {
             if (docDetails === null) {
                 return await addDoc(collection(db, tables.subscription),

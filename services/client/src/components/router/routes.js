@@ -44,11 +44,11 @@ export const RouterComponent = () => {
                 />
                 <Route
                     path={PathName.success}
-                    element={<PaymentSuccess/>}
+                    element={<Layout><PaymentSuccess/></Layout>}
                 />
                 <Route
                     path={PathName.failure}
-                    element={<PaymentFail/>}
+                    element={<Layout><PaymentFail/></Layout>}
                 />
             </Routes>
         </BrowserRouter>
