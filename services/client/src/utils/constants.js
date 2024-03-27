@@ -64,7 +64,8 @@ export const Constants = {
     successText:"Payment Successful!",
     failureText:"Payment Unsuccessful!",
     buttonSuccessText:"Done",
-    buttonFailureText:"Try Again"
+    buttonFailureText:"Try Again",
+
 
 }
 
@@ -113,7 +114,9 @@ export const userPlan = [
         buttonBackgroundColor: "#F0F0F0",
         color: "black",
         buttonColor: "#ACABAB",
-        checkSign: Images.blackCheckMark
+        checkSign: Images.blackCheckMark,
+        type:"free"
+
     }, {
         title: "STANDARD PLAN",
         cost: "$10",
@@ -130,6 +133,7 @@ export const userPlan = [
         color: "#FFFFFF",
         buttonColor: "#0071C5",
         checkSign: Images.whiteCheckMark,
+        type:"standard"
     },
     {
         title: "PREMIUM PLAN",
@@ -147,6 +151,7 @@ export const userPlan = [
         color: "#FFFFFF",
         buttonColor: "#0071C5",
         checkSign: Images.whiteCheckMark,
+        type:"premium"
     }
 ]
 

@@ -1,9 +1,10 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import style from "./billing.module.css";
 import {Constants, errorToast, localStorageKeys, Themes, userPlan} from "../../utils/constants";
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
 import {handleCheckout} from "../../stripeAPI";
+import {getDocDetails} from "../../database/APIs/subscription";
 
 /**
  * function to display plans and subscriptions
@@ -21,6 +22,33 @@ export function Billing() {
         }
     }
 
+    const [isActivePlan, setIsActivePlan] = useState("free");
+    let uid = localStorage.getItem(localStorageKeys.UID);
+
+    let startDate, newStartDate,endDate,newEndDate;
+    useEffect(() => {
+        let userDetails;
+        getDocDetails(uid).then(doc => {
+            userDetails = doc;
+            // console.log(userDetails);
+            setIsActivePlan(userDetails.data.sub_type); // either free/standard/premium fetch from firebase
+            startDate = userDetails.data.sub_start_date * 1000;
+            endDate = userDetails.data.sub_end_date * 1000;
+            newStartDate = new Date(startDate);
+            newEndDate = new Date(endDate);
+
+            // console.log("Plan Type:::", planType);
+            // console.log("Start date:::", startDate);
+            // console.log("end Date::", endDate);
+
+
+        })
+            .catch(error => {
+                console.error("UserDetails not found");
+            })
+    }, [uid]);
+
+
     return (
         <div style={{height: "100vh", backgroundColor: theme === Themes.dark ? "#202020" : "#FFFFFF"}}>
             <div className={style.billingParentDiv}
@@ -30,7 +58,8 @@ export function Billing() {
                          style={{color: theme === Themes.dark ? "#FFFFFF" : "black"}}>{Constants.billingTitle}</div>
                     <div className={style.billingPlanDiv}>
                         {userPlan.map((item, key) =>
-                            <BillingCard cardDetails={item} key={key} theme={theme} paymentCheckout={checkout}/>
+                            <BillingCard cardDetails={item} key={key} theme={theme} paymentCheckout={checkout}
+                                         isActivePlan={item.type === isActivePlan} startDate={newStartDate} endDate={newEndDate}/>
                         )}
                     </div>
                 </div>

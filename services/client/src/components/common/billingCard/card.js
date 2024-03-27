@@ -4,9 +4,8 @@ import {Themes} from "../../../utils/constants";
 import {Images} from "../../../utils/images";
 import {useMediaQuery, useTheme} from "@mui/material";
 
-
 export function BillingCard(props) {
-    const {cardDetails, theme, paymentCheckout} = props;
+    const {cardDetails, theme, paymentCheckout, isActivePlan, startDate, endDate} = props;
     const themes = useTheme();
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
 
@@ -14,6 +13,12 @@ export function BillingCard(props) {
         paymentCheckout(e);
     }
 
+    // function handlePlanExpiration() {
+    //     switch (cardDetails.type) {
+    //         case "standard" :
+    //             return planObject.planType === cardDetails.type && planObject.planStatus === "active"
+    //     }
+    // }
 
     return (
         <div className={style.choosePlanDiv}
@@ -23,6 +28,9 @@ export function BillingCard(props) {
              }}>
             <div className={style.cardChildDiv}>
                 <div className={style.descriptionDiv}>
+                    {isActivePlan &&
+                        <p style={{textAlign: "center", paddingBottom: '5px', justifyContent: 'center'}}>ACTIVE
+                            PLAN</p>}
                     <div className={style.planTitle}>{cardDetails.title}</div>
                     <div className={style.planCostDiv}>
                         <span
@@ -40,10 +48,11 @@ export function BillingCard(props) {
                         </div>
                     )}
                 </div>
-                <div className={style.planButton} onClick={() => sendClick(cardDetails.title)} style={{
+                {cardDetails.type!='free' && <div className={`${style.planButton}`} onClick={() => sendClick(cardDetails.title)} style={{
+                    // background: handlePlanExpiration() && "red",
                     backgroundColor: cardDetails.buttonBackgroundColor,
                     color: cardDetails.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px"
-                }}>{cardDetails.planType}</div>
+                }}>{cardDetails.planType}</div>}
             </div>
         </div>
     )

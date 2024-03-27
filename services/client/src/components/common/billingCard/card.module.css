@@ -58,3 +58,6 @@
         font-size: 14px;
     }
 }
+.buttonFilter{
+    filter: blur(0.5px); /* Adjust the blur radius as needed */
+}
