@@ -2,7 +2,6 @@ import React, {useContext} from "react";
 import {Themes} from "../../../utils/constants";
 import {ThemeContext} from "../../../App";
 import "./payment.css";
-import Box from '@mui/material/Box';
 
 /**
  * function to take info from props and display
@@ -13,7 +12,6 @@ import Box from '@mui/material/Box';
 export function PaymentInfo(props) {
     const {images, text, color, click, infoText, buttonText} = props;
     const {theme} = useContext(ThemeContext);
-
     return (
         <>
             <div className={"headSuccessContainer"}

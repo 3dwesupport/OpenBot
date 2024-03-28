@@ -1,7 +1,7 @@
 import Card from "@mui/material/Card";
 import React, {useContext} from "react";
 import './usageAnalysisCard.css'
-import {Constants, Themes, timeUnits, UserAnalysisCardData} from "../../utils/constants";
+import {Themes, timeUnits} from "../../utils/constants";
 import {ThemeContext} from "../../App";
 
 /**

@@ -9,6 +9,7 @@ import {Billing} from "../../pages/billing";
 import React from "react";
 import {PaymentSuccess} from "../../pages/payment/success";
 import {PaymentFail} from "../../pages/payment/failure";
+import {ProtectiveRoute} from "../protectiveRoute/router";
 
 /**
  * Router to maintain different paths of the application
@@ -42,14 +43,16 @@ export const RouterComponent = () => {
                     path={PathName.billing}
                     element={<Layout><Billing/></Layout>}
                 />
-                <Route
-                    path={PathName.success}
-                    element={<Layout><PaymentSuccess/></Layout>}
-                />
-                <Route
-                    path={PathName.failure}
-                    element={<Layout><PaymentFail/></Layout>}
-                />
+                <Route element={<ProtectiveRoute/>}>
+                    <Route
+                        path={PathName.success}
+                        element={<Layout><PaymentSuccess/></Layout>}
+                    />
+                    <Route
+                        path={PathName.failure}
+                        element={<Layout><PaymentFail/></Layout>}
+                    />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

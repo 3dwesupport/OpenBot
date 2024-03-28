@@ -30,18 +30,11 @@ export function Billing() {
         let userDetails;
         getDocDetails(uid).then(doc => {
             userDetails = doc;
-            // console.log(userDetails);
             setIsActivePlan(userDetails.data.sub_type); // either free/standard/premium fetch from firebase
             startDate = userDetails.data.sub_start_date * 1000;
             endDate = userDetails.data.sub_end_date * 1000;
             newStartDate = new Date(startDate);
             newEndDate = new Date(endDate);
-
-            // console.log("Plan Type:::", planType);
-            // console.log("Start date:::", startDate);
-            // console.log("end Date::", endDate);
-
-
         })
             .catch(error => {
                 console.error("UserDetails not found");

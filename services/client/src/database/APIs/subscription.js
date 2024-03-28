@@ -1,4 +1,4 @@
-import {addDoc, collection, doc, getDocs, query, updateDoc, where} from "@firebase/firestore";
+import {addDoc, collection, getDocs, query, where} from "@firebase/firestore";
 import {db} from "../authentication";
 import {Constants, localStorageKeys, tables} from "../../utils/constants";
 

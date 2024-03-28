@@ -24,8 +24,8 @@ router.post('/create-checkout-session', async (req, res) => {
                 uid: uid
             },
             ...customerParam,
-            success_url: `${process.env.CLIENT_ADDRESS}/payment/success`,
-            cancel_url: `${process.env.CLIENT_ADDRESS}/payment/failure`,
+            success_url: `${process.env.CLIENT_ADDRESS}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.CLIENT_ADDRESS}/payment/failure?session_id={CHECKOUT_SESSION_ID}`,
         });
         res.send({url: session.url});
         console.log("session ::", session.url);
@@ -34,5 +34,22 @@ router.post('/create-checkout-session', async (req, res) => {
         console.log(e);
     }
 });
+
+router.get("/get-session", async (req, res) => {
+    try {
+        const {sessionID} = req.query;
+        const session = await stripe.checkout.sessions.retrieve(sessionID);
+        if (session.id) {
+            res.send(true);
+        } else {
+            res.send(false);
+        }
+    } catch (e) {
+        res.send(false);
+        res.sendStatus(404);
+        console.log(e);
+    }
+
+})
 
 module.exports = router;

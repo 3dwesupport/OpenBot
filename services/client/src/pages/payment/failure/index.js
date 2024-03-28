@@ -1,7 +1,5 @@
-import React, {useCallback, useContext} from "react";
+import React from "react";
 import {PaymentInfo} from "../../../components/common/paymentInfo/payment";
-import {ThemeContext} from "../../../App";
-// import './failureIndex.css';
 import {Images} from "../../../utils/images";
 import {Constants, PathName} from "../../../utils/constants";
 import {useNavigate} from "react-router-dom";
@@ -12,7 +10,6 @@ import {useNavigate} from "react-router-dom";
  * @constructor
  */
 export function PaymentFail() {
-    const {theme} = useContext(ThemeContext);
     const navigate = useNavigate();
 
     function sendDashboard() {

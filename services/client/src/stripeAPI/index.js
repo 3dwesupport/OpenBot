@@ -70,3 +70,23 @@ export const createCustomer = (name, email, planType) => {
             console.log("res::", res);
         })
 }
+
+/**
+ * function to get session verify
+ * @param sessionID
+ */
+export const verifySession = (sessionID) => {
+    try {
+        return fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/get-session?sessionID=${sessionID}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(res => res.json())
+            .then((res) => {
+                return res;
+            })
+    } catch (e) {
+        console.log(e);
+    }
+}

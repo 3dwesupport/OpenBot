@@ -3,11 +3,10 @@ import {RouterComponent} from "./components/router/routes";
 import {createContext, useEffect, useState} from "react";
 import {auth} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
-import {Constants, localStorageKeys, Themes} from "./utils/constants";
+import {Constants, localStorageKeys, PathName, Themes} from "./utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
-
 
 export const ThemeContext = createContext(null);
 
@@ -48,7 +47,7 @@ function App() {
                     });
 
                     // to find expiration time
-                    let currentDate=new Date();
+                    let currentDate = new Date();
                     let expirationDate = new Date(currentDate.getTime() + (1 * 60 * 60 * 1000));
 
                     const cookieOptions = {
@@ -56,7 +55,7 @@ function App() {
                         domain: 'localhost',
                         // domain: ".itinker.io",
                         secure: true,
-                        expires:expirationDate,
+                        expires: expirationDate,
                     };
                     let customToken = await getCustomToken(auth?.currentUser?.uid);
                     Cookies.set(localStorageKeys.accessToken, result.credential?.accessToken, cookieOptions);
@@ -81,11 +80,11 @@ function App() {
     const toggleTheme = () => {
         if (theme === "light") {
             setTheme("dark");
-            localStorage.setItem("theme", Themes.dark)
+            localStorage.setItem("theme", Themes.dark);
             document.body.classList.replace("light", "dark"); // for background theme
         } else {
             setTheme("light");
-            localStorage.setItem("theme", Themes.light)
+            localStorage.setItem("theme", Themes.light);
             document.body.classList.replace("dark", "light"); //for background theme
         }
     };
