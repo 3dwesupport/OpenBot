@@ -5,7 +5,7 @@ require('dotenv').config()
 const cors = require('cors');
 const app = express();
 const port = process.env.SERVER_PORT || 9000;
-const payment = require("./stripe/checkoutSession");
+const session = require("./stripe/checkoutSession");
 const customer = require("./stripe/customer");
 const webhook = require("./stripe/webhooks");
 const transaction = require("./stripe/transactionInfo");
@@ -23,9 +23,9 @@ app.use(cors());
 app.use(webhook);
 app.use(bodyParser.json());
 
-app.use(payment);
-app.use(customer);
-app.use(transaction);
+app.use("/session", session);
+app.use("/customer", customer);
+app.use("/transaction", transaction);
 
 /**
  * function to generate token from admin service account

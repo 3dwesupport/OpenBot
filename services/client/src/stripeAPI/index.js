@@ -10,7 +10,7 @@ export const handleCheckout = async (planType) => {
     if (planType !== "FREE PLAN") {
         try {
             let customerID = await getCustomerId();
-            fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/create-checkout-session`, {
+            fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/session/create-checkout-session`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -37,7 +37,7 @@ export const handleCheckout = async (planType) => {
  */
 export const downloadInvoice = (invoiceID) => {
     try {
-        fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/download-invoice?invoiceId=${invoiceID}`, {
+        fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/transaction/download-invoice?invoiceId=${invoiceID}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -59,7 +59,7 @@ export const downloadInvoice = (invoiceID) => {
  * @param planType
  */
 export const createCustomer = (name, email, planType) => {
-    fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/create-customer`, {
+    fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/customer/create-customer`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -77,7 +77,7 @@ export const createCustomer = (name, email, planType) => {
  */
 export const verifySession = (sessionID) => {
     try {
-        return fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/get-session?sessionID=${sessionID}`, {
+        return fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/session/get-session?sessionID=${sessionID}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
