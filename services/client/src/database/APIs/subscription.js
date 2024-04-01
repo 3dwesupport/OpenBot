@@ -72,8 +72,26 @@ export const getDocDetails = async (uid) => {
 export async function getCustomerId() {
     try {
         let docDetails = await getDocDetails(localStorage.getItem(localStorageKeys.UID));
+        console.log("Customer ID:::",docDetails?.data.customer_id)
         return docDetails?.data.customer_id
     } catch (e) {
         console.log(e);
+    }
+}
+
+export const getTransactionByCustomerId = async (cid)=>{
+    try{
+        // fetch one by one transaction.
+        const transactionRef=collection('transaction');
+        const querySnapshot = await transactionRef.where('customer_id', '==', cid).get();
+
+        const transactions = [];
+        querySnapshot.forEach((doc) => {
+            transactions.push({ id: doc.id, ...doc.data() });
+        });
+        return transactions;
+    } catch(e){
+        console.log(e);
+        return [];
     }
 }

@@ -19,4 +19,11 @@ async function addTransactionHistory(transactionID, invoiceID, createdTime, amou
     }
 }
 
+async function fetchData(){
+    const uid=localStorage.getItem(localStorageKeys.UID);
+    let custId;
+    getDocDetails(doc=>{
+        custId=doc.customer_id;
+    })
+}
 module.exports = {addTransactionHistory};

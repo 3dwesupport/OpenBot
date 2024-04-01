@@ -72,7 +72,7 @@ export function BillingHeaderComponent(props) {
             if (res?.length === 0) return;
             dispatch({type: actionTypes.SET_YEARS, payload: res});
         });
-    }, []);
+    }, );
 
 
     return (

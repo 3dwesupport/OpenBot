@@ -57,7 +57,7 @@ export function ProfileModal(props) {
             case "Edit Profile" :
                 navigate(PathName.editProfile);
                 break;
-            case "Transaction History":
+            case "Billing History":
                 navigate(PathName.billingHistory);
                 break;
             case "Logout":
@@ -82,10 +82,10 @@ export function ProfileModal(props) {
                                            darkThemeIcon={Images.whiteUserIcon}
                                            label="Edit Profile" className={"dropdownIconDiv"}
                                            onClick={() => handleProfileOptionsClick("Edit Profile")}/>
-                        <DropdownComponent label="Transaction History" hoverIcon={Images.hoverTransactionHistoryIcon}
+                        <DropdownComponent label="Billing History" hoverIcon={Images.hoverTransactionHistoryIcon}
                                            icon={Images.transactionHistoryIcon}
                                            darkThemeIcon={Images.whiteTransactionIcon}
-                                           onClick={() => handleProfileOptionsClick("Transaction History")}
+                                           onClick={() => handleProfileOptionsClick("Billing History")}
                                            className={"dropdownIconDiv"}/>
                         <DropdownComponent label="Logout" icon={Images.logOutIcon} hoverIcon={Images.hoverLogoutIcon}
                                            onClick={() => handleProfileOptionsClick("Logout")}

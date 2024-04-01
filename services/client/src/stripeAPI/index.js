@@ -37,14 +37,15 @@ export const handleCheckout = async (planType) => {
  */
 export const downloadInvoice = (invoiceID) => {
     try {
-        fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/transaction/download-invoice?invoiceId=${invoiceID}`, {
-            method: "POST",
+        return fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/transaction/download-invoice?invoiceId=${invoiceID}`, {
+            method: "GET",
             headers: {
                 "Content-Type": "application/json"
             },
-        }).then(res => res.json())
+        }).then(res => res.text())
             .then((res) => {
                 console.log("res::", res);
+                return res;
             })
     } catch (e) {
         console.log(e);

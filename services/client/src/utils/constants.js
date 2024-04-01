@@ -165,6 +165,8 @@ export const tables = {
     server: "server",
     subscription: "subscription",
     projectsActivity: "projectActivity",
+    transaction:"transaction"
+
 }
 
 // month array

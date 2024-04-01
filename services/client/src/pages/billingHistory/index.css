@@ -1,0 +1,9 @@
+.success-cell{
+    background-color: rgba(46, 125, 50, 0.3);
+}
+.failure-cell{
+    background-color: tomato;
+}
+.onHold-cell{
+    background-color: yellow;
+}

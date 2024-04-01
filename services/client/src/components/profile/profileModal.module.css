@@ -28,6 +28,7 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
+
 }
 
 .textProfileModal {
@@ -37,6 +38,8 @@
 }
 
 @media only screen and (max-width: 768px) {
+
+
     .profileModalIcon {
         height: 26px !important;
         width: 26px !important;
