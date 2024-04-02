@@ -22,7 +22,7 @@ export function Billing() {
         }
     }
 
-    const [isActivePlan, setIsActivePlan] = useState("free");
+    const [isActivePlan, setIsActivePlan] = useState("standard");
     let uid = localStorage.getItem(localStorageKeys.UID);
 
     let startDate, newStartDate,endDate,newEndDate;

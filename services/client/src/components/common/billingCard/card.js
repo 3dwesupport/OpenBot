@@ -29,7 +29,7 @@ export function BillingCard(props) {
             <div className={style.cardChildDiv}>
                 <div className={style.descriptionDiv}>
                     {isActivePlan &&
-                        <p style={{textAlign: "center", paddingBottom: '5px', justifyContent: 'center'}}>ACTIVE
+                        <p style={{paddingBottom: '5px', justifyContent: 'center', color:'#959595'}}>ACTIVE
                             PLAN</p>}
                     <div className={style.planTitle}>{cardDetails.title}</div>
                     <div className={style.planCostDiv}>

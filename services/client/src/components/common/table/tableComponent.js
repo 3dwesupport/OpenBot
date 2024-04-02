@@ -3,31 +3,57 @@ import {DataGrid} from '@mui/x-data-grid';
 import {Themes} from "../../../utils/constants";
 import {useState} from "react";
 import './table.css'
+import {useTheme} from "@mui/system/useTheme";
+import useMediaQuery from '@mui/material/useMediaQuery';
+import {downloadInvoice} from "../../../stripeAPI";
+import {computeFlexColumnsWidth} from "@mui/x-data-grid/hooks/features/columns/gridColumnsUtils";
+
+/**
+ * function to get Transaction Data and displayed yet and focus on Invoice cell
+ * @param props
+ * @returns {Element}
+ * @constructor
+ */
 export function TableComponent(props) {
     const {tableAttributes, rowsData, theme} = props;
     const [selectedCell, setSelectedCell] = useState(null);
 
+    // After Cell clicked color is Changed and also download Invoice file
+
     const handleCellClick = (params, event, details) => {
-        if(params.field === 'INVOICE'){
-        setSelectedCell(params.hasFocus);
-        setTimeout(() => {
-            setSelectedCell(null);
-        }, 150);}
+        if (params.field === 'INVOICE') {
+            setSelectedCell(params.hasFocus);
+            setTimeout(() => {
+                setSelectedCell(null);
+            }, 150);
+        }
+
+        if (params.field === 'INVOICE') {
+            downloadInvoice(params.value).then((res) => {
+                let link = document.createElement('a');
+                link.href = res;
+                link.click();
+            }).catch((error) => {
+                console.error("Error during Downloading ...");
+            })
+        }
     };
     return (
         <div style={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "center",
+            // alignItems: "center",
             marginTop: "15px",
+            height: "80%"
         }}>
 
-            <div style={{width: "90%"}}>
+            <div style={{width: "90%",maxWidth:"100%"}}>
                 <DataGrid
-                    rowHeight={75}
+                    rowHeight={80}
                     disableColumnFilter
                     disableColumnSelector
                     disableDensitySelector
+                    disableColumnMenu
                     disableExportSelector
                     rows={rowsData}
                     columns={tableAttributes}
@@ -39,7 +65,7 @@ export function TableComponent(props) {
                     initialState={{
                         pagination: {
                             paginationModel: {
-                                pageSize: 6,
+                                pageSize: 8,
                             },
                         },
                     }}
@@ -48,31 +74,29 @@ export function TableComponent(props) {
                         borderColor: theme === Themes.dark ? '#323232' : '#F1F1F1',
                         '& .MuiDataGrid-columnHeaders': {
                             backgroundColor: theme === Themes.dark ? '#323232' : "#F1F1F1",
-                            borderColor:theme === Themes.dark ? '#323232' : '#F1F1F1',
-                            color:theme === Themes.dark ? '#F1F1F1' : "inherit",
-                            fontSize: '14px',
+                            borderColor: theme === Themes.dark ? '#323232' : '#F1F1F1',
+                            color: theme === Themes.dark ? '#F1F1F1' : "inherit",
                             fontWeight: 'bold',
                         },
 
                         '& .MuiDataGrid-cell': {
                             color: theme === Themes.dark ? '#FFFFFF' : '#303030',
-                            borderColor:theme === Themes.dark ? '#323232' : '#F1F1F1'
+                            borderColor: theme === Themes.dark ? '#323232' : ''
                         },
                         "& .MuiDataGrid-row:hover": {
                             backgroundColor: theme === Themes.dark ? '#303030' : '#EEF8FF'
                         },
-                        '& .MuiDataGrid-footerContainer':{
-                            borderColor:theme === Themes.dark ? '#323232' : '#F1F1F1',
+                        '& .MuiDataGrid-footerContainer': {
+                            borderColor: theme === Themes.dark ? '#323232' : '#F1F1F1',
                         },
-                        '& .MuiTablePagination-displayedRows':{
-                            color:theme === Themes.dark ? '#F1F1F1' : 'inherit',
+                        '& .MuiTablePagination-displayedRows': {
+                            color: theme === Themes.dark ? '#F1F1F1' : 'inherit',
                         },
-                        '& .MuiTablePagination-actions':{
-                            color:theme === Themes.dark ? '#F1F1F1' : 'inherit',
+                        '& .MuiTablePagination-actions': {
+                            color: theme === Themes.dark ? '#F1F1F1' : 'inherit',
                         }
                     }}
-
-                    pageSizeOptions={[6]}
+                    pageSizeOptions={[8]}
                     disableRowSelectionOnClick
                 />
             </div>

@@ -66,7 +66,6 @@ export function BillingHeaderComponent(props) {
         border: theme === Themes.dark ? '1px solid #555555' : '1px solid #F1F1F1',
     };
 
-
     useEffect(() => {
         getYears().then((res) => {
             if (res?.length === 0) return;
