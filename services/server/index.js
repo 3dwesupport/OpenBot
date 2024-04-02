@@ -1,15 +1,17 @@
+require('dotenv').config()
 const express = require('express');
+const cors = require('cors');
+const bodyParser = require("body-parser");
 const admin = require("firebase-admin");
 const serviceAccount = require("./opencode-openbot-firebase-adminsdk-ros9l-b06ecc9b78.json");
-require('dotenv').config()
-const cors = require('cors');
 const app = express();
-const port = process.env.SERVER_PORT || 9000;
 const session = require("./stripe/checkoutSession");
 const customer = require("./stripe/customer");
 const webhook = require("./stripe/webhooks");
 const transaction = require("./stripe/transactionInfo");
-const bodyParser = require("body-parser");
+const subscription = require("./stripe/handleSubscription");
+
+const port = process.env.SERVER_PORT || 9000;
 
 admin.initializeApp({
     //TODO add in readme to download account file
@@ -26,6 +28,7 @@ app.use(bodyParser.json());
 app.use("/session", session);
 app.use("/customer", customer);
 app.use("/transaction", transaction);
+app.use("/subscription", subscription);
 
 /**
  * function to generate token from admin service account

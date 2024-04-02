@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 import {Outlet, Navigate} from 'react-router-dom'
 import {verifySession} from "../../stripeAPI";
+import {PathName} from "../../utils/constants";
 
 /**
  * function to add a protective route for payment routes
@@ -43,7 +44,7 @@ export const ProtectiveRoute = () => {
             ) : isPaymentVerify ? (
                 <Outlet/>
             ) : (
-                <Navigate to="/"/>
+                <Navigate to={PathName.home}/>
             )}
         </>
     );
