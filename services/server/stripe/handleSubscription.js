@@ -2,23 +2,30 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const express = require("express");
 const router = express.Router();
 
-router.post("/renew-subscription", async (req, res) => {
+router.get("/renew-subscription", async (req, res) => {
         try {
-            const {subscriptionId, customerId} = req.query;
-            const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-
-            console.log("subscriptions::::", subscription);
-
-            if (subscription.status === 'active') {
-                // Update the subscription (renew it for another billing cycle)
-                let update = await stripe.subscriptions.update(subscriptionId, {
-                    billing_cycle_anchor: 'now', // Renew the subscription immediately
-                });
-                res.send(update);
-                console.log("update:::", update);
-            }
-            res.send(subscription);
-            res.sendStatus(20);
+            const {subscriptionId} = req.query;
+            await stripe.invoices.list({
+                subscription: subscriptionId,
+                status: 'draft',
+                limit: 1,
+            }, async function (err, invoices) {
+                if (err) {
+                    console.error(err);
+                    // Handle error
+                } else {
+                    // Extract the upcoming invoice ID
+                    if (invoices.data.length > 0) {
+                        console.log("hello");
+                        const upcomingInvoiceId = invoices.data[0];
+                        const invoice = await stripe.invoices.retrieve(upcomingInvoiceId);
+                        console.log("hosted url:::", invoice.hosted_invoice_url);
+                        res.send(invoice.hosted_invoice_url);
+                    } else {
+                        res.send("No renewal invoices");
+                    }
+                }
+            });
         } catch (e) {
             res.send(e);
             console.log(e);
@@ -46,7 +53,8 @@ router.post("/upgrade-subscription", async (req, res) => {
                         }, {
                             product: process.env.SUBSCRIPTION_PREMIUM_PRODUCT_ID,
                             prices: [process.env.SUBSCRIPTION_PREMIUM_ID]
-                        }],
+                        }
+                        ],
                         proration_behavior: "always_invoice"
                     }
                 },

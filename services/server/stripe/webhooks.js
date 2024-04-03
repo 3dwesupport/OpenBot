@@ -26,6 +26,14 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
     console.log("event type::", eventType);
     switch (eventType) {
         case "checkout.session.completed":
+            let sub = await stripe.subscriptions.update(data.subscription, {
+                collection_method: "send_invoice",
+                days_until_due: 7,
+                payment_settings: {
+                    payment_method_types: ["card"],
+                    save_default_payment_method: "on_subscription",
+                }
+            })
             await stripe.customers.retrieve(data.customer).then(async (customer) => {
                     console.log("hello in checkout.session");
                     if (data.payment_status === "paid") {
@@ -46,6 +54,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
             console.log("Payment succeeded");
             break;
         case "customer.subscription.created":
+            console.log("data:::", data);
             break;
         case "customer.subscription.updated":
             console.log("data::", data);

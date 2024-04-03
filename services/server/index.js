@@ -23,6 +23,7 @@ const db = admin.firestore();
 
 app.use(cors());
 app.use(webhook);
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use("/session", session);
