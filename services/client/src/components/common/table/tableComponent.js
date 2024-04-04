@@ -4,9 +4,7 @@ import {Themes} from "../../../utils/constants";
 import {useState} from "react";
 import './table.css'
 import {useTheme} from "@mui/system/useTheme";
-import useMediaQuery from '@mui/material/useMediaQuery';
 import {downloadInvoice} from "../../../stripeAPI";
-import {computeFlexColumnsWidth} from "@mui/x-data-grid/hooks/features/columns/gridColumnsUtils";
 
 /**
  * function to get Transaction Data and displayed yet and focus on Invoice cell
@@ -19,7 +17,6 @@ export function TableComponent(props) {
     const [selectedCell, setSelectedCell] = useState(null);
 
     // After Cell clicked color is Changed and also download Invoice file
-
     const handleCellClick = (params, event, details) => {
         if (params.field === 'INVOICE') {
             setSelectedCell(params.hasFocus);

@@ -11,7 +11,6 @@ export const getTransactionByCustomerId = async (cid) => {
         transactionSnapshot.forEach((doc) => {
             transactions.push({id: doc.id, ...doc.data()});
         });
-        console.log("transactions::", transactions);
         return transactions;
     } catch (e) {
         console.log(e);
@@ -22,10 +21,8 @@ export const getTransactionByCustomerId = async (cid) => {
 export async function allTransaction() {
     try{
         const CID=await getCustomerId();
-        console.log("CustomerID::::",CID);
         if (CID) {
             const transactions = await getTransactionByCustomerId(CID);
-            console.log("TransactionFinal ::::",transactions);
             return transactions;
         }
         return [];

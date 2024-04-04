@@ -7,6 +7,7 @@ import {SubscriptionCookie} from "../../components/common/cookie/subscriptionCoo
 import Cookies from "js-cookie";
 import {allTransaction} from "../../database/APIs/transaction";
 import {downloadInvoice} from "../../stripeAPI";
+import {AnalyticsLoader} from "../../components/common/loader/loader";
 
 import './bilingHistory.css';
 import Box from "@mui/material/Box";
@@ -19,6 +20,7 @@ import Box from "@mui/material/Box";
 export function BillingHistory() {
     const [transaction, setTransaction] = useState([]);
     const [downloadStatus, setDownloadStatus] = useState({});
+    const [isAnalysisLoader,setIsAnalysisLoader]=useState(false);
     const {theme} = useContext(ThemeContext);
 
     const BillingHistoryParams = [
@@ -100,33 +102,23 @@ export function BillingHistory() {
         return `${day}-${month}-${year}`;
     }
 
-    const rowData = [
-        {id: 1, DATE: '10-01-2023', AMOUNT: '$10', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 2, DATE: '11-01-2023', AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 3, DATE: '12-01-2023', AMOUNT: '$10', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 4, DATE: '13-01-2023', AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 5, DATE: '10-01-2023', AMOUNT: '$10', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 6, DATE: '13-01-2023', AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 7, DATE: '13-01-2023', AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 8, DATE: '13-01-2023', AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 9, DATE: '13-01-2023', AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-        {id: 10, DATE: '13-01-2023',AMOUNT: '$50', STATUS: 'failure', INVOICE: 'abc'},
-        {id: 11, DATE: '13-01-2023',AMOUNT: '$50', STATUS: 'succeeded', INVOICE: 'abc'},
-    ];
     useEffect(() => {
+        setIsAnalysisLoader(true);
         allTransaction().then((r) => {
             const newTransaction = r.map((tr, index) => ({
-                id: index+1,
+                id: index + 1,
                 DATE: getCurrentDateOfBirth(new Date(tr.transaction_time.seconds * 1000 + tr.transaction_time.nanoseconds / 1e6)),
                 AMOUNT: `$${tr.transaction_amount}`,
                 STATUS: tr.transaction_status,
                 INVOICE: tr.invoice_id
             }))
             setTransaction(newTransaction);
+            setIsAnalysisLoader(false);
         })
     }, []);
 
     return (
+
         <div style={{
             backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF',
             color: theme === Themes.dark ? '#FFFFFF' : '#303030', height: "100vh",
@@ -134,10 +126,12 @@ export function BillingHistory() {
         }}>
             {type?.sub_type === Constants.free && <SubscriptionCookie/>}
             <BillingHeaderComponent title={Constants.billingHistory} theme={theme}/>
+            {isAnalysisLoader && <AnalyticsLoader/>}
             <TableComponent theme={theme} tableAttributes={BillingHistoryParams} rowsData={transaction}/>
         </div>
     );
 }
+
 /**
  * function to Download Invoice
  * @param props
@@ -151,12 +145,11 @@ function DownloadInvoice(props) {
 
 
     return <div>
-        <a className={'anchor'} href="#" style={{
+        <a className={"anchor"} href="#" style={{
             textDecoration: "none",
             color: invoiceDownloadStatus === "Downloaded" ? "grey" : "#0071C5"
         }} onClick={(e) => {
             e.preventDefault();
-            console.log("cell clicked::", params.value);
 
             downloadInvoice(params.value).then((res) => {
                 let link = document.createElement('a');

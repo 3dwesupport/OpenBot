@@ -5,7 +5,7 @@ import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
 import {handleCheckout} from "../../stripeAPI";
 import {getDocDetails} from "../../database/APIs/subscription";
-
+import {AnalyticsLoader} from "../../components/common/loader/loader";
 /**
  * function to display plans and subscriptions
  * @returns {Element}
@@ -13,6 +13,7 @@ import {getDocDetails} from "../../database/APIs/subscription";
  */
 export function Billing() {
     const {theme} = useContext(ThemeContext);
+    const [isAnalysisLoader,setIsAnalysisLoader]=useState(false);
     const [planStatus, setPlanStatus] = useState({
         type: "free",
         status: "ACTIVE"
@@ -20,21 +21,19 @@ export function Billing() {
     let uid = localStorage.getItem(localStorageKeys.UID);
 
     useEffect(() => {
+        setIsAnalysisLoader(true);
         getDocDetails(uid).then(doc => {
-            console.log(doc);
-            console.log("Month:::", doc.data.sub_end_date);
             const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? "ACTIVE" : "EXPIRED";
             setPlanStatus({
                 type: doc.data.sub_type,
                 status: updatedStatus
             })
+            setIsAnalysisLoader(false);
         })
             .catch(error => {
-                console.error("UserDetails not found");
+                setIsAnalysisLoader(false);
             })
     }, [uid]);
-
-    console.log("planStatus type:::", planStatus);
 
 
     const checkout = (e) => {
@@ -47,6 +46,7 @@ export function Billing() {
 
     return (
         <div style={{backgroundColor: theme === Themes.dark ? "#202020" : "#FFFFFF", height: "100vh"}}>
+            {isAnalysisLoader && <AnalyticsLoader/>}
             <div className={style.billingParentDiv}
                  style={{backgroundColor: theme === Themes.dark ? "#202020" : "#FFFFFF"}}>
                 <div className={style.billingChildDiv}>

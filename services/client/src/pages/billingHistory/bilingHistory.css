@@ -2,8 +2,8 @@
     background-color: rgba(46, 125, 50, 0.3);
 }
 .failure-cell{
-    background-color: tomato;
+    background-color: red;
 }
 .onHold-cell{
-    background-color: lightyellow;
+    background-color: red;
 }

@@ -44,7 +44,6 @@ export const downloadInvoice = (invoiceID) => {
             },
         }).then(res => res.text())
             .then((res) => {
-                console.log("res::", res);
                 return res;
             })
     } catch (e) {
