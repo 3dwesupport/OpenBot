@@ -1,11 +1,11 @@
 import React from "react";
 import style from "./card.module.css";
-import {Themes} from "../../../utils/constants";
+import {Themes, userPlan} from "../../../utils/constants";
 import {Images} from "../../../utils/images";
 import {useMediaQuery, useTheme} from "@mui/material";
 
 export function BillingCard(props) {
-    const {cardDetails, theme, paymentCheckout, isActivePlan, startDate, endDate} = props;
+    const {cardDetails, theme, paymentCheckout, isActivePlan, plantype} = props;
     const themes = useTheme();
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
 
@@ -13,25 +13,70 @@ export function BillingCard(props) {
         paymentCheckout(e);
     }
 
-    // function handlePlanExpiration() {
-    //     switch (cardDetails.type) {
-    //         case "standard" :
-    //             return planObject.planType === cardDetails.type && planObject.planStatus === "active"
-    //     }
-    // }
+
+    function handlePlanActivity() {
+
+        switch (cardDetails.type) {
+            case "free" :
+                return {
+                    status: isActivePlan.status === "ACTIVE" && cardDetails.type === isActivePlan.type,
+                    color: {
+                        active: theme === Themes.dark ? "#303030" : "#FFFFFF",
+                        expired: theme === Themes.dark ? "#303030" : "#FFFFFF"
+                    }
+                };
+            case "standard":
+                if (isActivePlan.type === "premium") {
+                    return {
+                        status: isActivePlan.status === "ACTIVE",
+                        color: {
+                            active: theme === Themes.dark ? "#303030" : "#303030",
+                            expired: theme === Themes.dark ? "#0071C5" : "#0071C5"
+                        }
+                    };
+                }
+                return {
+                    status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                    color: {
+                        active: theme === Themes.dark ? "#303030" : "#0071C5",
+                        expired: theme === Themes.dark ? "#0071C5" : "#303030"
+                    }
+                };
+            case "premium" :
+
+                return {
+                    status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                    color: {
+                        active: theme === Themes.dark ? "#303030" : "#303030",
+                        expired: theme === Themes.dark ? "#0071C5" : "#0071C5"
+                    }
+                };
+
+            default:
+                return;
+        }
+    }
 
     return (
         <div className={style.choosePlanDiv}
              style={{
-                 backgroundColor: theme === Themes.dark ? cardDetails.darkBackgroundColor : cardDetails.lightBackgroundColor,
+                 backgroundColor: handlePlanActivity().status ? handlePlanActivity().color.active : handlePlanActivity().color.expired,
                  color: theme === Themes.dark ? "#FFFFFF" : cardDetails.color,
              }}>
             <div className={style.cardChildDiv}>
+                {isActivePlan.type === cardDetails.type && isActivePlan.status}
+                {/*{isActivePlan.status === 'premium'}*/}
+                {/*{handlePlanActivity() ? isActivePlan.status:''}*/}
+                {/*{isActivePlan &&*/}
+                {/*}*/}
+                {/*{(isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type) ?*/}
+                {/*    (<p style={{justifyContent: 'center', color: '#959595'}}>{isActivePlan.status}</p>) :*/}
+                {/*    (isActivePlan.status === "EXPIRED" && isActivePlan.type === cardDetails.type) && (*/}
+                {/*        <p>{isActivePlan.status}</p>)}*/}
+
                 <div className={style.descriptionDiv}>
-                    {isActivePlan &&
-                        <p style={{paddingBottom: '5px', justifyContent: 'center', color:'#959595'}}>ACTIVE
-                            PLAN</p>}
                     <div className={style.planTitle}>{cardDetails.title}</div>
+
                     <div className={style.planCostDiv}>
                         <span
                             style={{fontSize: isMobile ? "30px" : "40px", fontWeight: "bold"}}>{cardDetails.cost}</span>
@@ -48,11 +93,17 @@ export function BillingCard(props) {
                         </div>
                     )}
                 </div>
-                {cardDetails.type!='free' && <div className={`${style.planButton}`} onClick={() => sendClick(cardDetails.title)} style={{
-                    // background: handlePlanExpiration() && "red",
-                    backgroundColor: cardDetails.buttonBackgroundColor,
-                    color: cardDetails.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px"
-                }}>{cardDetails.planType}</div>}
+
+
+                {cardDetails.type !== "free" &&
+                    <div className={`${style.planButton}`}
+                         onClick={() => sendClick(cardDetails.title)} style={{
+                        // background: handlePlanExpiration() && "red",
+                        backgroundColor: handlePlanActivity() ? "#f0f0f0" : cardDetails.buttonBackgroundColor,
+                        color: cardDetails.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px",
+                        disabled: handlePlanActivity()
+                    }}>{cardDetails.planType}</div>}
+
             </div>
         </div>
     )

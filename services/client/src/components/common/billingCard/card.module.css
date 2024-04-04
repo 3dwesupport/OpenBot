@@ -1,7 +1,7 @@
 .choosePlanDiv {
     width: 31%;
     border-radius: 10px;
-    height: 470px;
+    height: 540px;
     overflow: scroll;
     box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
 }
@@ -13,6 +13,11 @@
     gap: 40px;
     font-family: Gilroy-Medium, sans-serif;
     flex: 1;
+}
+
+.activePlan {
+    background-color: rgb(48, 48, 48);
+    /*height:420px;*/
 }
 
 .descriptionDiv {
@@ -58,6 +63,7 @@
         font-size: 14px;
     }
 }
-.buttonFilter{
+
+.buttonFilter {
     filter: blur(0.5px); /* Adjust the blur radius as needed */
 }

@@ -111,6 +111,7 @@ export const userPlan = [
         planType: "CURRENT PLAN",
         lightBackgroundColor: "#FFFFFF",
         darkBackgroundColor: "#303030",
+
         buttonBackgroundColor: "#F0F0F0",
         color: "black",
         buttonColor: "#ACABAB",

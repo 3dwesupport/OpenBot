@@ -2,7 +2,7 @@ import {Modal} from "@mui/material";
 import {Images} from "../../../utils/images";
 import React, {useEffect, useReducer} from "react";
 import './billingHeaderModule.css'
-import {Month, Themes} from "../../../utils/constants";
+import {Constants, Month, Themes} from "../../../utils/constants";
 import {getYears} from "../../../database/APIs/projects";
 
 export function BillingHeaderComponent(props) {
@@ -67,11 +67,11 @@ export function BillingHeaderComponent(props) {
     };
 
     useEffect(() => {
-        getYears().then((res) => {
-            if (res?.length === 0) return;
-            dispatch({type: actionTypes.SET_YEARS, payload: res});
-        });
-    }, );
+        // getYears().then((res) => {
+        //     if (res?.length === 0) return;
+        //     dispatch({type: actionTypes.SET_YEARS, payload: res});
+        // });
+    },);
 
 
     return (
@@ -111,24 +111,25 @@ export function BillingHeaderComponent(props) {
             }}>
                 <div className={"billingHeaderTextDiv"}>
                     <span className={"billingHeaderText"}>{title}</span>
-                    <div className={"calenderDiv"}>
-                        <div className={"yearDiv"} style={commonDivStyle}
-                             onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'year')}>
-                            {selectedYear ? selectedYear : (
-                                <span className={"yearText"}>{new Date().getFullYear()}</span>)}
-                            <img className={"billingHeaderImage"}
-                                 src={theme === Themes.dark ? Images.lightThemeArrowDownIcon : Images.billingHeader_icon}
-                                 alt={"icon"}/>
-                        </div>
-                        <div className={"modalDiv"} style={commonDivStyle}
-                             onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'month')}>
-                            {selectedMonth ? (<span>{selectedMonth}</span>) : (
-                                <span className={"monthText"}>{Month[new Date().getMonth()]}</span>)}
-                            <img className={"billingHeaderImage"}
-                                 src={theme === Themes.dark ? Images.lightThemeArrowDownIcon : Images.billingHeader_icon}
-                                 alt={"icon"}/>
-                        </div>
-                    </div>
+                    {title === Constants.usageAnalysis &&
+                        <div className={"calenderDiv"}>
+                            <div className={"yearDiv"} style={commonDivStyle}
+                                 onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'year')}>
+                                {selectedYear ? selectedYear : (
+                                    <span className={"yearText"}>{new Date().getFullYear()}</span>)}
+                                <img className={"billingHeaderImage"}
+                                     src={theme === Themes.dark ? Images.lightThemeArrowDownIcon : Images.billingHeader_icon}
+                                     alt={"icon"}/>
+                            </div>
+                            <div className={"modalDiv"} style={commonDivStyle}
+                                 onClick={() => handleModalAction(actionTypes.OPEN_MODAL, 'month')}>
+                                {selectedMonth ? (<span>{selectedMonth}</span>) : (
+                                    <span className={"monthText"}>{Month[new Date().getMonth()]}</span>)}
+                                <img className={"billingHeaderImage"}
+                                     src={theme === Themes.dark ? Images.lightThemeArrowDownIcon : Images.billingHeader_icon}
+                                     alt={"icon"}/>
+                            </div>
+                        </div>}
                 </div>
             </div>
         </>
