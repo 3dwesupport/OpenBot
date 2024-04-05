@@ -6,6 +6,7 @@ import {ThemeContext} from "../../App";
 import {handleCheckout} from "../../stripeAPI";
 import {getDocDetails} from "../../database/APIs/subscription";
 import {AnalyticsLoader} from "../../components/common/loader/loader";
+
 /**
  * function to display plans and subscriptions
  * @returns {Element}
@@ -15,15 +16,15 @@ export function Billing() {
     const {theme} = useContext(ThemeContext);
     const [isAnalysisLoader,setIsAnalysisLoader]=useState(false);
     const [planStatus, setPlanStatus] = useState({
-        type: "free",
-        status: "ACTIVE"
+        type: Constants.free,
+        status: Constants.active
     })
     let uid = localStorage.getItem(localStorageKeys.UID);
 
     useEffect(() => {
         setIsAnalysisLoader(true);
         getDocDetails(uid).then(doc => {
-            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? "ACTIVE" : "EXPIRED";
+            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? Constants.active : Constants.expired;
             setPlanStatus({
                 type: doc.data.sub_type,
                 status: updatedStatus
@@ -32,6 +33,7 @@ export function Billing() {
         })
             .catch(error => {
                 setIsAnalysisLoader(false);
+                console.error("Error during fetching data:")
             })
     }, [uid]);
 

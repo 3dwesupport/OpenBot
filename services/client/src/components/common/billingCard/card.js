@@ -1,6 +1,6 @@
 import React from "react";
 import style from "./card.module.css";
-import {Themes, userPlan} from "../../../utils/constants";
+import {Constants, Themes, userPlan} from "../../../utils/constants";
 import {Images} from "../../../utils/images";
 import {useMediaQuery, useTheme} from "@mui/material";
 
@@ -12,82 +12,79 @@ export function BillingCard(props) {
     function sendClick(e) {
         paymentCheckout(e);
     }
-
     function handlePlanActivity() {
         switch (cardDetails.type) {
-            case "free" :
+            case Constants.free :
                 return {
-                    status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                    status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                     color: {
-                        active: theme === Themes.dark ? "#303030" : "#FFFFFF",
-                        expired: theme === Themes.dark ? "#303030" : "#FFFFFF"
+                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].lightBackgroundColor,
+                        expired: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].lightBackgroundColor
                     },
-                    activeButton: "false",
+                    activeButton: Constants.false,
                 };
 
-            case "standard":
-                if (isActivePlan.type === "premium") {
+            case Constants.standard:
+                if (isActivePlan.type === Constants.premium) {
                     return {
-                        status: isActivePlan.status === "ACTIVE",
+                        status: isActivePlan.status === Constants.active,
                         color: {
-                            active: theme === Themes.dark ? "#303030" : "#303030",
-                            expired: theme === Themes.dark ? "#0071C5" : "#0071C5"
+                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                            expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[1].lightBackgroundColor
                         },
-                        activeButton: "true",
+                        activeButton: Constants.true,
                     };
                 }
 
-                if (isActivePlan.type === 'free') {
+                if (isActivePlan.type === Constants.free) {
                     return {
-                        status: isActivePlan.status === 'ACTIVE',
+                        status: isActivePlan.status === Constants.active,
                         color: {
-                            active: theme === Themes.dark ? "#0071C5" : "#0071C5",
-                            expired: theme === Themes.dark ? "#0071C5" : "#303030",
+                            active: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[1].lightBackgroundColor,
+                            expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[0].darkBackgroundColor,
                         },
-                        activeButton: "false"
+                        activeButton: Constants.false
                     }
                 }
 
                 return {
-                    status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                    status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                     color: {
-                        active: theme === Themes.dark ? "#303030" : "#303030",
-                        expired: theme === Themes.dark ? "#0071C5" : "#303030",
+                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                        expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[0].darkBackgroundColor,
                     },
-                    activeButton: "true",
+                    activeButton: Constants.true,
                 };
-            case "premium" :
+            case Constants.premium :
 
-                if (isActivePlan.type === 'standard') {
+                if (isActivePlan.type === Constants.standard) {
                     return {
-                        status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                        status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                         color: {
-                            active: theme === Themes.dark ? "#303030" : "#303030",
-                            expired: theme === Themes.dark ? "#0071C5" : "#0071C5"
+                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                            expired: theme === Themes.dark ? userPlan[2].lightBackgroundColor : userPlan[2].lightBackgroundColor
                         },
-                        activeButton: "false",
+                        activeButton: Constants.false,
                     }
                 }
-                if (isActivePlan.type === 'free') {
+                if (isActivePlan.type === Constants.free) {
                     return {
-                        status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                        status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                         color: {
-                            active: theme === Themes.dark ? "#303030" : "#303030",
-                            expired: theme === Themes.dark ? "#0071C5" : "#0071C5"
+                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                            expired: theme === Themes.dark ? userPlan[2].lightBackgroundColor : userPlan[2].lightBackgroundColor
                         },
-                        activeButton: "false",
+                        activeButton: Constants.false,
                     }
                 }
                 return {
-                    status: isActivePlan.status === "ACTIVE" && isActivePlan.type === cardDetails.type,
+                    status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                     color: {
-                        active: theme === Themes.dark ? "#303030" : "#303030",
-                        expired: theme === Themes.dark ? "#0071C5" : "#0071C5"
+                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                        expired: theme === Themes.dark ? userPlan[2].lightBackgroundColor : userPlan[2].lightBackgroundColor
                     },
-                    activeButton: "true",
-
+                    activeButton: Constants.true,
                 };
-
             default:
                 return;
         }
@@ -97,7 +94,7 @@ export function BillingCard(props) {
         <div className={style.choosePlanDiv}
              style={{
                  backgroundColor: handlePlanActivity().status ? handlePlanActivity().color.active : handlePlanActivity().color.expired,
-                 color: theme === Themes.dark ? "#FFFFFF" : cardDetails.color,
+                 color: theme === Themes.dark ? userPlan[0].lightBackgroundColor : cardDetails.color,
              }}>
 
             <div className={style.cardChildDiv}>
@@ -105,8 +102,7 @@ export function BillingCard(props) {
 
                     <div className={style.planTitle}>{cardDetails.title}
                         <div className={style.innerDiv}></div>
-                        <div
-                            className={isActivePlan.type === cardDetails.type && (isActivePlan.status ==='ACTIVE' ? style.activeDot : style.inActiveDot)}></div>
+                        <div className={isActivePlan.type === cardDetails.type ? (isActivePlan.status === Constants.active ? style.activeDot : style.inActiveDot):''}></div>
                         <p>{isActivePlan.type === cardDetails.type && isActivePlan.status}</p>
                     </div>
 
@@ -128,12 +124,11 @@ export function BillingCard(props) {
                 </div>
 
 
-                {(cardDetails.type !== "free" && (handlePlanActivity().activeButton === "false" || isActivePlan.status ==='EXPIRED')) &&
+                {(cardDetails.type !== Constants.free && (handlePlanActivity().activeButton === Constants.false || isActivePlan.status === Constants.expired)) &&
                     <div className={`${style.planButton}`}
-                         onClick={handlePlanActivity().status ? null : () => {
-                             if (!handlePlanActivity().status) {
-                                 sendClick(cardDetails.title)
-                             }
+                         onClick={() => {
+                             console.log("button clicked::::");
+                             sendClick(cardDetails.title)
                          }}
                          style={{
                              backgroundColor: cardDetails.buttonBackgroundColor,

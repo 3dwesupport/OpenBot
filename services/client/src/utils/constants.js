@@ -59,12 +59,18 @@ export const Constants = {
     signInText: "Please sign-in to checkout",
     free: "free",
     premium: "premium",
+    standard:"standard",
+    active:"ACTIVE",
+    expired:"EXPIRED",
+    false:"false",
+    true:"true",
     success: "Your payment of $ was Successfully Completed",
     failure:"Your payment of $ was not Successful",
     successText:"Payment Successful!",
     failureText:"Payment Unsuccessful!",
     buttonSuccessText:"Done",
     buttonFailureText:"Try Again",
+
 
 
 }
