@@ -20,7 +20,7 @@ import Box from "@mui/material/Box";
 export function BillingHistory() {
     const [transaction, setTransaction] = useState([]);
     const [downloadStatus, setDownloadStatus] = useState({});
-    const [isAnalysisLoader,setIsAnalysisLoader]=useState(false);
+    const [isAnalysisLoader, setIsAnalysisLoader] = useState(true);
     const {theme} = useContext(ThemeContext);
 
     const BillingHistoryParams = [
@@ -114,11 +114,13 @@ export function BillingHistory() {
             }))
             setTransaction(newTransaction);
             setIsAnalysisLoader(false);
+        }).catch((error) => {
+            console.error("Error fetching transaction data:::");
+            setIsAnalysisLoader(false);
         })
     }, []);
 
     return (
-
         <div style={{
             backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF',
             color: theme === Themes.dark ? '#FFFFFF' : '#303030', height: "100vh",
@@ -126,8 +128,18 @@ export function BillingHistory() {
         }}>
             {type?.sub_type === Constants.free && <SubscriptionCookie/>}
             <BillingHeaderComponent title={Constants.billingHistory} theme={theme}/>
-            {isAnalysisLoader && <AnalyticsLoader/>}
-            <TableComponent theme={theme} tableAttributes={BillingHistoryParams} rowsData={transaction}/>
+            {isAnalysisLoader ? (
+                <React.Fragment>
+                    <p className={"dataLoading"}>Loading data...</p>
+                    <AnalyticsLoader/>
+                </React.Fragment>
+            ) : (
+                transaction.length > 0 ? (
+                    <TableComponent theme={theme} tableAttributes={BillingHistoryParams} rowsData={transaction}/>
+                ) : (
+                    <p className={"dataLoading"}>No more transaction records found</p>
+                )
+            )}
         </div>
     );
 }
@@ -147,7 +159,7 @@ function DownloadInvoice(props) {
     return <div>
         <a className={"anchor"} href="#" style={{
             textDecoration: "none",
-            color: invoiceDownloadStatus === "Downloaded" ? "grey" : "#0071C5"
+            color: "#0071C5"
         }} onClick={(e) => {
             e.preventDefault();
 

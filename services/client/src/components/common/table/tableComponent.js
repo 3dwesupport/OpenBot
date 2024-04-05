@@ -35,6 +35,8 @@ export function TableComponent(props) {
             })
         }
     };
+
+
     return (
         <div style={{
             display: "flex",
@@ -55,6 +57,7 @@ export function TableComponent(props) {
                     rows={rowsData}
                     columns={tableAttributes}
                     onCellClick={handleCellClick}
+
                     getCellClassName={(params) => {
                         return selectedCell === params.hasFocus ? 'selected-cell' : '';
                     }}

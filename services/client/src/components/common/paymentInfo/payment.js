@@ -15,7 +15,8 @@ export function PaymentInfo(props) {
     return (
         <>
             <div className={"headSuccessContainer"}
-                 style={{backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
+                 style={{backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF',
+                        color: theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
                 <div className={'childDiv'}>
                     <img className="SuccessImg" src={images} alt={'icon'}/>
                     <div className={"paraDiv"}>

@@ -43,7 +43,7 @@ export const RouterComponent = () => {
                     path={PathName.billing}
                     element={<Layout><Billing/></Layout>}
                 />
-                <Route element={<ProtectiveRoute/>}>
+                {/*<Route element={<ProtectiveRoute/>}>*/}
                     <Route
                         path={PathName.success}
                         element={<Layout><PaymentSuccess/></Layout>}
@@ -52,7 +52,7 @@ export const RouterComponent = () => {
                         path={PathName.failure}
                         element={<Layout><PaymentFail/></Layout>}
                     />
-                </Route>
+                {/*</Route>*/}
             </Routes>
         </BrowserRouter>
     );

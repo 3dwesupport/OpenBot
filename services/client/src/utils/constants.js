@@ -71,8 +71,6 @@ export const Constants = {
     buttonSuccessText:"Done",
     buttonFailureText:"Try Again",
 
-
-
 }
 
 export const errorToast = (message) => {
