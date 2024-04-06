@@ -41,6 +41,9 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
         case "payment_intent.succeeded":
             console.log("Payment succeeded");
             break;
+        case "payment_intent.payment_failed":
+            await addTransactionHistory(data.payment_intent, data.id, data.created, data.amount_paid, data.status, data.customer);
+            break;
         case "customer.subscription.created":
             console.log("data:::", data);
             break;
