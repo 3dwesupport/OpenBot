@@ -83,7 +83,7 @@ export function BillingHistory() {
             headerAlign: 'center',
             align: 'center',
             flex: 1,
-            minWidth: 100,
+            minWidth: 140,
             renderCell: (params) => {
                 return (<DownloadInvoice params={params} downloadStatus={downloadStatus}
                                          setDownloadStatus={setDownloadStatus}/>);
