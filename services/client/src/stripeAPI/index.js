@@ -1,5 +1,6 @@
 import {auth} from "../database/authentication";
-import {getCustomerId} from "../database/APIs/subscription";
+import {getCustomerId, getSubscriptionId} from "../database/APIs/subscription";
+import {localStorageKeys} from "../utils/constants";
 
 /**
  * function to handle checkout on clicking subscription plans
@@ -88,5 +89,54 @@ export const verifySession = (sessionID) => {
             })
     } catch (e) {
         console.log(e);
+    }
+}
+
+/**
+ * function to switch Subscriptions plans
+ * @param planType
+ * @returns {Promise<void>}
+ */
+export const switchSubscriptionPlans = async (planType) => {
+    try {
+        let uid = localStorage.getItem(localStorageKeys.UID);
+        let customerID = await getCustomerId();
+        let subscriptionId = await getSubscriptionId();
+        console.log("UID::", uid, "Customer ID::", customerID, "Subscription ID::", subscriptionId);
+        return fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/subscription/upgrade-subscription?uid=${uid}&customerId=${customerID}&subscriptionId=${subscriptionId}`, {
+            method: "POST",
+            headers: {
+                "content-type": "application/JSON",
+            }
+        }).then(res => res.json())
+            .then(({url}) => {
+                console.log(url);
+                window.location = url
+            })
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+/**
+ * function to renew Plans
+ * @param planType
+ * @returns {Promise<void>}
+ */
+export const renewSubscriptionPlans = async (planType) => {
+    try {
+        let subscriptionId = await getSubscriptionId();
+        console.log("Subscription ID::", subscriptionId);
+        const response = await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/subscription/renew-subscription?subscriptionId=${subscriptionId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        console.log("Response ::",response.url);
+        window.location.href = response.url;
+    } catch (e) {
+        console.error(e);
     }
 }

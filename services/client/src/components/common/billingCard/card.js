@@ -12,6 +12,7 @@ export function BillingCard(props) {
     function sendClick(e) {
         paymentCheckout(e);
     }
+
     function handlePlanActivity() {
         switch (cardDetails.type) {
             case Constants.free :
@@ -102,7 +103,8 @@ export function BillingCard(props) {
 
                     <div className={style.planTitle}>{cardDetails.title}
                         <div className={style.innerDiv}></div>
-                        <div className={isActivePlan.type === cardDetails.type ? (isActivePlan.status === Constants.active ? style.activeDot : style.inActiveDot):''}></div>
+                        <div
+                            className={isActivePlan.type === cardDetails.type ? (isActivePlan.status === Constants.active ? style.activeDot : style.inActiveDot) : ''}></div>
                         <p>{isActivePlan.type === cardDetails.type && isActivePlan.status}</p>
                     </div>
 

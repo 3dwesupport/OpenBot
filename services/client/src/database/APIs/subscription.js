@@ -94,3 +94,13 @@ export const getTransactionByCustomerId = async (cid)=>{
         return [];
     }
 }
+
+export async function getSubscriptionId() {
+    try {
+        let docDetails = await getDocDetails(localStorage.getItem(localStorageKeys.UID));
+        console.log("Subscription ID is ::::",docDetails.data.sub_plan_id);
+        return docDetails?.data.sub_plan_id
+    } catch (e) {
+        console.log(e);
+    }
+}

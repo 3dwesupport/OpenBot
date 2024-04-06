@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {Themes} from "../../../utils/constants";
+import {Themes, userPlan} from "../../../utils/constants";
 import {ThemeContext} from "../../../App";
 import "./payment.css";
 
@@ -15,8 +15,9 @@ export function PaymentInfo(props) {
     return (
         <>
             <div className={"headSuccessContainer"}
-                 style={{backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF',
-                        color: theme === Themes.dark ? '#202020' : '#FFFFFF'}}>
+                 style={{
+                     backgroundColor: theme === Themes.dark ? '#202020' : '#FFFFFF',
+                     color: theme === Themes.dark ? "white" : "black"}}>
                 <div className={'childDiv'}>
                     <img className="SuccessImg" src={images} alt={'icon'}/>
                     <div className={"paraDiv"}>

@@ -3,7 +3,7 @@ import style from "./billing.module.css";
 import {Constants, errorToast, localStorageKeys, Themes, userPlan} from "../../utils/constants";
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
-import {handleCheckout} from "../../stripeAPI";
+import {handleCheckout, renewSubscriptionPlans, switchSubscriptionPlans} from "../../stripeAPI";
 import {getDocDetails} from "../../database/APIs/subscription";
 import {AnalyticsLoader} from "../../components/common/loader/loader";
 
@@ -14,7 +14,7 @@ import {AnalyticsLoader} from "../../components/common/loader/loader";
  */
 export function Billing() {
     const {theme} = useContext(ThemeContext);
-    const [isAnalysisLoader,setIsAnalysisLoader]=useState(false);
+    const [isAnalysisLoader, setIsAnalysisLoader] = useState(false);
     const [planStatus, setPlanStatus] = useState({
         type: Constants.free,
         status: Constants.active
@@ -24,7 +24,7 @@ export function Billing() {
     useEffect(() => {
         setIsAnalysisLoader(true);
         getDocDetails(uid).then(doc => {
-            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? Constants.active : Constants.expired;
+            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) <= new Date()) ? Constants.active : Constants.expired;
             setPlanStatus({
                 type: doc.data.sub_type,
                 status: updatedStatus
@@ -37,10 +37,40 @@ export function Billing() {
             })
     }, [uid]);
 
+    /**
+     * function to handle Checkout, Switch and Renew Plans
+     * @param e
+     */
+    function handlePaymentButton(e) {
+        switch (e) {
+            case 'STANDARD PLAN' :
+                if (planStatus.type === "free") {   // first time checkout to standard
+                    handleCheckout(e).then();
+                } else if (planStatus.type === "standard" && planStatus.status === Constants.expired) { // renew Standard Plans
+                    renewSubscriptionPlans(e).then();
+                } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // switch Standard plans
+                    switchSubscriptionPlans(e).then();
+                }
+                return;
+
+            case 'PREMIUM PLAN':
+                if (planStatus.type === "free") { // first time checkout to premium
+                    handleCheckout(e).then();
+                } else if (planStatus.type === "standard") { // if first time standard plan checkout either Active or expired then switch to premium
+                    switchSubscriptionPlans(e).then();
+                } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // renew Premium plans API
+                    renewSubscriptionPlans(e).then();
+                }
+                return;
+
+            default:
+                return;
+        }
+    }
 
     const checkout = (e) => {
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
-            handleCheckout(e).then();
+            handlePaymentButton(e);
         } else {
             errorToast(Constants.signInText);
         }
