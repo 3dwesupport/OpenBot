@@ -58,9 +58,8 @@ export function BillingHistory() {
             minWidth: 100,
 
             cellClassName: (params) => {
-                if (params.value === 'succeeded') return 'success-cell';
-                else if (params.value === 'failure') return 'failure-cell';
-                else return 'onHold-cell';
+                if (params.value === 'paid') return 'success-cell';
+                else if (params.value === 'payment_failed' || 'payment_action_required') return 'failure-cell';
             },
             renderCell: (params) => {
                 return (

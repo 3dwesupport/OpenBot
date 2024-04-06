@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {Themes, userPlan} from "../../../utils/constants";
+import {Themes} from "../../../utils/constants";
 import {ThemeContext} from "../../../App";
 import "./payment.css";
 

@@ -4,9 +4,6 @@
 .failure-cell{
     background-color:rgb(233, 151, 151);
 }
-.onHold-cell{
-    background-color:  rgb(249, 210, 179);
-}
 
 .dataLoading{
     position: absolute;

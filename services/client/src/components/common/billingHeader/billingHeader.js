@@ -67,10 +67,10 @@ export function BillingHeaderComponent(props) {
     };
 
     useEffect(() => {
-        // getYears().then((res) => {
-        //     if (res?.length === 0) return;
-        //     dispatch({type: actionTypes.SET_YEARS, payload: res});
-        // });
+        getYears().then((res) => {
+            if (res?.length === 0) return;
+            dispatch({type: actionTypes.SET_YEARS, payload: res});
+        });
     },);
 
 
