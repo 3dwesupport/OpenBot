@@ -1,6 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const express = require("express");
-const {updateSubscriptionDetails} = require("../database/subscription");
+const {updateSubscriptionDetails, addSubscriptionHistory} = require("../database/subscription");
 const {addTransactionHistory} = require("../database/transaction");
 const router = express.Router();
 
@@ -26,14 +26,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
     console.log("event type::", eventType);
     switch (eventType) {
         case "checkout.session.completed":
-            let sub = await stripe.subscriptions.update(data.subscription, {
-                collection_method: "send_invoice",
-                days_until_due: 7,
-                payment_settings: {
-                    payment_method_types: ["card"],
-                    save_default_payment_method: "on_subscription",
-                }
-            })
             await stripe.customers.retrieve(data.customer).then(async (customer) => {
                     console.log("hello in checkout.session");
                     if (data.payment_status === "paid") {
@@ -45,18 +37,17 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
                 }
             )
             break;
-        case "payment_intent.payment_failed":
-            await addTransactionHistory(data.id, data.invoice, data.created, data.amount, data.status, data.customer);
-            console.log("Payment failed::", data);
-            break;
         case "payment_intent.succeeded":
-            await addTransactionHistory(data.id, data.invoice, data.created, data.amount, data.status, data.customer);
             console.log("Payment succeeded");
             break;
         case "customer.subscription.created":
             console.log("data:::", data);
             break;
         case "customer.subscription.updated":
+            console.log("data::", data);
+            updateSubscriptionDetails(data.metadata.uid, data, data.customer);
+            break;
+        case "customer.subscription.deleted":
             console.log("data::", data);
             break;
         case "payment_method.attached":
@@ -66,6 +57,21 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
             console.log("data::", data);
             break;
         case "invoice.paid":
+            await addTransactionHistory(data.payment_intent, data.id, data.created, data.amount_paid, data.status, data.customer);
+            console.log("invoice data:::",data);
+            if (data.status === "paid") {
+                const subscription = await stripe.subscriptions.retrieve(
+                    data.subscription
+                );
+                await addSubscriptionHistory(subscription, data.amount_paid, data.customer_address, data.customer_email, data.customer_name);
+            }
+            break;
+        case "invoice.payment_action_required":
+            await addTransactionHistory(data.payment_intent, data.id, data.created, data.amount_paid, data.status, data.customer);
+            console.log("data::", data);
+            break;
+        case "invoice.payment_failed":
+            await addTransactionHistory(data.payment_intent, data.id, data.created, data.amount_paid, data.status, data.customer);
             console.log("data::", data);
             break;
         case "charge.succeeded":

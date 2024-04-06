@@ -39,4 +39,32 @@ function updateSubscriptionDetails(userId, subscriptionDetails, customerId) {
         });
 }
 
-module.exports = {updateSubscriptionDetails};
+async function addSubscriptionHistory(subscriptionDetails, amountPaid, customerAddress, customerEmail, customerName) {
+    const subHistory = {
+        sub_id: subscriptionDetails.id,
+        uid: subscriptionDetails.metadata.uid,
+        invoice_id: subscriptionDetails.latest_invoice,
+        plan_details: {
+            plan_id: subscriptionDetails.plan.id,
+            plan_amount_paid: amountPaid,
+            plan_start_date: new Date(subscriptionDetails.current_period_start * 1000),
+            plan_end_date: new Date(subscriptionDetails.current_period_end * 1000),
+        },
+        customer_details: {
+            customer_id: subscriptionDetails.customer,
+            customer_name: customerName,
+            customer_email: customerEmail,
+            customer_address: customerAddress,
+        }
+    }
+
+    try {
+        const subscriptionRef = firestore.db.collection("subscriptionHistory");
+        const docRef = await subscriptionRef.add(subHistory);
+        console.log('Transaction document added with ID:', docRef.id);
+    } catch (e) {
+        console.log("error in add subscription history--->", e);
+    }
+}
+
+module.exports = {updateSubscriptionDetails, addSubscriptionHistory};

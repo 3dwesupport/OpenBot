@@ -6,10 +6,9 @@ async function addTransactionHistory(transactionID, invoiceID, createdTime, amou
         customer_id: customerID,
         invoice_id: invoiceID,
         transaction_time: new Date(createdTime * 1000),
-        transaction_amount: amount / 100,
+        transaction_amount: amount,
         transaction_status: status
     }
-
     try {
         const transactionRef = firestore.db.collection('transaction');
         const docRef = await transactionRef.add(transactionDetails);
@@ -19,11 +18,4 @@ async function addTransactionHistory(transactionID, invoiceID, createdTime, amou
     }
 }
 
-async function fetchData(){
-    const uid=localStorage.getItem(localStorageKeys.UID);
-    let custId;
-    getDocDetails(doc=>{
-        custId=doc.customer_id;
-    })
-}
 module.exports = {addTransactionHistory};

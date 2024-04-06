@@ -7,8 +7,7 @@ router.get("/renew-subscription", async (req, res) => {
             const {subscriptionId} = req.query;
             await stripe.invoices.list({
                 subscription: subscriptionId,
-                status: 'draft',
-                limit: 1,
+                status: "draft",
             }, async function (err, invoices) {
                 if (err) {
                     console.error(err);
@@ -55,7 +54,7 @@ router.post("/upgrade-subscription", async (req, res) => {
                             prices: [process.env.SUBSCRIPTION_PREMIUM_ID]
                         }
                         ],
-                        proration_behavior: "always_invoice"
+                        proration_behavior: "always_invoice",
                     }
                 },
                 metadata: {uid: uid}

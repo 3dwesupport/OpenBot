@@ -5,7 +5,6 @@ const router = express.Router();
 router.post('/create-checkout-session', async (req, res) => {
     try {
         const {planType, email, uid, customerID} = req.body;
-
         console.log("req body::", req.body);
         let customerParam = {};
         if (customerID) {
@@ -24,6 +23,11 @@ router.post('/create-checkout-session', async (req, res) => {
             ],
             metadata: {
                 uid: uid,
+            },
+            subscription_data: {
+                metadata: {
+                    uid: uid,
+                }
             },
             ...customerParam,
             success_url: `${process.env.CLIENT_ADDRESS}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -51,7 +55,6 @@ router.get("/get-session", async (req, res) => {
         res.sendStatus(404);
         console.log(e);
     }
-
 })
 
 module.exports = router;
