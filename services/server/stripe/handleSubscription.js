@@ -7,7 +7,6 @@ router.get("/renew-subscription", async (req, res) => {
             const {subscriptionId} = req.query;
             await stripe.invoices.list({
                 subscription: subscriptionId,
-                status: "draft",
             }, async function (err, invoices) {
                 if (err) {
                     console.error(err);
@@ -43,6 +42,10 @@ router.post("/upgrade-subscription", async (req, res) => {
                 features: {
                     payment_method_update: {enabled: true},
                     invoice_history: {enabled: true},
+                    subscription_cancel: {
+                        enabled: true,
+                        mode: "immediately"
+                    },
                     subscription_update: {
                         default_allowed_updates: ["price"],
                         enabled: true,

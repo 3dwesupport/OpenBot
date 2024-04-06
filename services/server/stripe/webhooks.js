@@ -4,8 +4,9 @@ const {updateSubscriptionDetails, addSubscriptionHistory} = require("../database
 const {addTransactionHistory} = require("../database/transaction");
 const router = express.Router();
 
-
-//stripe webhook
+/**
+ * stripe webhooks
+ */
 router.post('/webhook', express.raw({type: 'application/json'}), async function (req, res) {
     const sig = req.headers['stripe-signature'];
     const body = req.body;
@@ -45,7 +46,6 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
             break;
         case "customer.subscription.updated":
             console.log("data::", data);
-            updateSubscriptionDetails(data.metadata.uid, data, data.customer);
             break;
         case "customer.subscription.deleted":
             console.log("data::", data);
@@ -58,12 +58,15 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
             break;
         case "invoice.paid":
             await addTransactionHistory(data.payment_intent, data.id, data.created, data.amount_paid, data.status, data.customer);
-            console.log("invoice data:::",data);
+            console.log("invoice data:::", data);
             if (data.status === "paid") {
                 const subscription = await stripe.subscriptions.retrieve(
                     data.subscription
                 );
-                await addSubscriptionHistory(subscription, data.amount_paid, data.customer_address, data.customer_email, data.customer_name);
+                updateSubscriptionDetails(subscription.metadata.uid, subscription, subscription.customer);
+                if (data.billing_reason === "subscription_cycle" || "subscription_create") {
+                    await addSubscriptionHistory(subscription, data.amount_paid, data.customer_address, data.customer_email, data.customer_name);
+                }
             }
             break;
         case "invoice.payment_action_required":

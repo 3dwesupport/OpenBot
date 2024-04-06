@@ -1,5 +1,11 @@
 var firestore = require("../index")
 
+/**
+ * function to add current subscription details in firebase
+ * @param userId
+ * @param subscriptionDetails
+ * @param customerId
+ */
 function updateSubscriptionDetails(userId, subscriptionDetails, customerId) {
     const subscriptionRef = firestore.db.collection("subscription");
     let subscriptionType;
@@ -39,6 +45,15 @@ function updateSubscriptionDetails(userId, subscriptionDetails, customerId) {
         });
 }
 
+/**
+ * function to add subscription history into firebase firestore
+ * @param subscriptionDetails
+ * @param amountPaid
+ * @param customerAddress
+ * @param customerEmail
+ * @param customerName
+ * @returns {Promise<void>}
+ */
 async function addSubscriptionHistory(subscriptionDetails, amountPaid, customerAddress, customerEmail, customerName) {
     const subHistory = {
         sub_id: subscriptionDetails.id,
