@@ -19,6 +19,7 @@ export async function addSubscription(uid, planType) {
         sub_start_date: startDate,
         sub_end_date: endDate,
         sub_type: planType,
+        sub_status: null
     }
 
     try {
@@ -78,18 +79,18 @@ export async function getCustomerId() {
     }
 }
 
-export const getTransactionByCustomerId = async (cid)=>{
-    try{
+export const getTransactionByCustomerId = async (cid) => {
+    try {
         // fetch one by one transaction.
-        const transactionRef=collection('transaction');
+        const transactionRef = collection('transaction');
         const querySnapshot = await transactionRef.where('customer_id', '==', cid).get();
 
         const transactions = [];
         querySnapshot.forEach((doc) => {
-            transactions.push({ id: doc.id, ...doc.data() });
+            transactions.push({id: doc.id, ...doc.data()});
         });
         return transactions;
-    } catch(e){
+    } catch (e) {
         console.log(e);
         return [];
     }
@@ -98,7 +99,7 @@ export const getTransactionByCustomerId = async (cid)=>{
 export async function getSubscriptionId() {
     try {
         let docDetails = await getDocDetails(localStorage.getItem(localStorageKeys.UID));
-        console.log("Subscription ID is ::::",docDetails.data.sub_plan_id);
+        console.log("Subscription ID is ::::", docDetails.data.sub_plan_id);
         return docDetails?.data.sub_plan_id
     } catch (e) {
         console.log(e);

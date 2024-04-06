@@ -29,7 +29,7 @@ export function UsageAnalysis() {
         chartData: Array(12).fill(0)
     })
     const plan = Cookies.get(localStorageKeys.planDetails);
-    const type = plan ? JSON.parse(plan) : ""
+    const type = plan ? JSON.parse(plan) : "";
 
     function onDataChange(e) {
         Month.includes(e) ? setIsChangedMonth(e) : setIsChangedYear(e);

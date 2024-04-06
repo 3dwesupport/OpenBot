@@ -52,6 +52,7 @@ router.post('/webhook', express.raw({type: 'application/json'}), async function 
             console.log("data::", data);
             break;
         case "customer.subscription.deleted":
+            updateSubscriptionDetails(data.metadata.uid, data, data.customer);
             console.log("data::", data);
             break;
         case "payment_method.attached":

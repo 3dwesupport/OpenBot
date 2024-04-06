@@ -20,6 +20,7 @@ function updateSubscriptionDetails(userId, subscriptionDetails, customerId) {
         sub_start_date: new Date(subscriptionDetails.current_period_start * 1000),
         sub_end_date: new Date(subscriptionDetails.current_period_end * 1000),
         sub_type: subscriptionType,
+        sub_status: subscriptionDetails.status
     }
 
     subscriptionRef.where('uid', '==', userId).get()

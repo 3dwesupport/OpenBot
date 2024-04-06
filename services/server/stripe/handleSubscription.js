@@ -33,7 +33,7 @@ router.get("/renew-subscription", async (req, res) => {
 
 router.post("/upgrade-subscription", async (req, res) => {
     try {
-        const {subscriptionId, customerId, uid} = req.query;
+        const {subscriptionId, customerId, uid, type} = req.query;
         const configuration = await stripe.billingPortal.configurations.create({
                 business_profile: {
                     privacy_policy_url: 'https://example.com/privacy',
@@ -42,9 +42,13 @@ router.post("/upgrade-subscription", async (req, res) => {
                 features: {
                     payment_method_update: {enabled: true},
                     invoice_history: {enabled: true},
+                    customer_update: {
+                        enabled: true,
+                        allowed_updates: ["address", "email", "name", "phone", "shipping"]
+                    },
                     subscription_cancel: {
                         enabled: true,
-                        mode: "immediately"
+                        mode: "at_period_end"
                     },
                     subscription_update: {
                         default_allowed_updates: ["price"],
@@ -58,7 +62,7 @@ router.post("/upgrade-subscription", async (req, res) => {
                         }
                         ],
                         proration_behavior: "always_invoice",
-                    }
+                    },
                 },
                 metadata: {uid: uid}
             }
@@ -73,6 +77,11 @@ router.post("/upgrade-subscription", async (req, res) => {
                 subscription_update: {
                     subscription: subscriptionId,
                 },
+                // type: "subscription_cancel",
+                // subscription_cancel: {
+                //     subscription: subscriptionId
+                // },
+                // type: "payment_method_update",
                 after_completion: {
                     type: "redirect",
                     redirect: {
