@@ -13,7 +13,7 @@ import {getAuth, signOut} from "firebase/auth";
 import {Constants, localStorageKeys, tables} from "../utils/constants";
 import {setConfigData} from "./workspace";
 import configData from "../config.json";
-import CookieConsent , {Cookies} from "react-cookie-consent";
+import {Cookies} from "react-cookie-consent";
 import {addSubscription} from "../apis/subscription";
 // import cookieConsent from "react-cookie-consent/src/CookieConsent";
 // import {Cookies} from "react-cookie-consent";

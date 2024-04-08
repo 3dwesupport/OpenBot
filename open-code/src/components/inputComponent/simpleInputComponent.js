@@ -108,7 +108,6 @@ export default function SimpleInputComponent(props) {
                                onChange={handleDOBValueChange}
                                className={styles.inputSection + " " + extraInputStyle}
                                style={{color: theme.theme === "dark" ? colors.whiteFont : colors.blackFont}}
-
                         />
                     </div>
                     :

@@ -1,6 +1,5 @@
-import {nanoid} from "nanoid";
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore";
-import {Constants, tables} from "../utils/constants";
+import {tables} from "../utils/constants";
 import {db} from "../services/firebase";
 
 /**
@@ -14,27 +13,35 @@ export async function addSubscription(uid, planType) {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 30);
     const subscriptionDetails = {
-        uid: uid,
-        planType: planType,
-        planStartDate: startDate,
-        planEndDate: endDate,
-        planId: nanoid(),
+        // uid: uid,
+        // planType: planType,
+        // planStartDate: startDate,
+        // planEndDate: endDate,
+        // planId: nanoid(),
+        uid:uid,
+        sub_plan_id: null,
+        customer_id: null,
+        sub_start_date: startDate,
+        sub_end_date: endDate,
+        sub_type: planType,
+        sub_status: null
     }
+
     try {
         let docDetails = await getDocDetails(uid);
         if (docDetails === null) {
             return await addDoc(collection(db, tables.subscription),
                 subscriptionDetails
             ).then(() => {
-                return {planType: planType, planEndDate: endDate, planStartDate: startDate}
+                return {sub_type: planType, sub_end_date: endDate, sub_start_date: startDate}
             });
         } else {
-            const dateObject = new Date(docDetails?.data.planEndDate.seconds * 1000 + docDetails?.data.planEndDate.nanoseconds / 1e6);
-            const startDateObject = new Date(docDetails?.data.planStartDate.seconds * 1000 + docDetails?.data.planStartDate.nanoseconds / 1e6);
+            const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);
+            const startDateObject = new Date(docDetails?.data.sub_start_date.seconds * 1000 + docDetails?.data.sub_start_date.nanoseconds / 1e6);
             return {
-                planType: docDetails?.data.planType,
-                planEndDate: dateObject.toISOString(),
-                planStartDate: startDateObject.toISOString()
+                sub_type: docDetails?.data.sub_type,
+                sub_end_date: dateObject.toISOString(),
+                sub_start_date: startDateObject.toISOString()
             }
         }
     } catch (e) {

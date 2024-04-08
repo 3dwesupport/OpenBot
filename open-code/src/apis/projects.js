@@ -104,12 +104,12 @@ export const sumUploadCode = async () => {
     const details = getCookie(localStorageKeys.planDetails)
     if (details) {
         const items = JSON.parse(details);
-        const startDate = new Date(items?.planStartDate);
-        const endDate = new Date(items.planEndDate);
+        const startDate = new Date(items?.sub_start_date);
+        const endDate = new Date(items.sub_end_date);
         try {
             const ordersQuery = query(collection(db, tables.projectsActivity), and(where("uid", '==', auth?.currentUser.uid), where("updated_at", '>=', startDate), where("updated_at", '<=', endDate)));
             const snapshot = await getCountFromServer(ordersQuery);
-            return {count: snapshot.data().count, planType: items.planType, planEndDate: endDate};
+            return {count: snapshot.data().count, planType: items.sub_type, planEndDate: endDate};
         } catch (e) {
             console.log(e);
         }
