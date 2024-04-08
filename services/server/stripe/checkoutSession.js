@@ -46,9 +46,9 @@ router.get("/get-session", async (req, res) => {
         const {sessionID} = req.query;
         const session = await stripe.checkout.sessions.retrieve(sessionID);
         if (session.id) {
-            res.send(true);
+            res.send({status: true, amount: session.amount_total / 100});
         } else {
-            res.send(false);
+            res.send({status: false, amount: session.amount_total / 100});
         }
     } catch (e) {
         res.send(false);

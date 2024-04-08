@@ -24,7 +24,6 @@ export async function addSubscription(uid, planType) {
 
     try {
         let docDetails = await getDocDetails(uid);
-
         console.log("docDetails::", docDetails);
         if (planType === Constants.free) {
             if (docDetails === null) {
@@ -33,15 +32,14 @@ export async function addSubscription(uid, planType) {
                 ).then(() => {
                     return {sub_type: planType, sub_end_date: endDate, sub_start_date: startDate}
                 });
-            } else {
-                const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);
-                const startDateObject = new Date(docDetails?.data.sub_start_date.seconds * 1000 + docDetails?.data.sub_start_date.nanoseconds / 1e6);
-                return {
-                    sub_type: docDetails?.data.sub_type,
-                    sub_end_date: dateObject.toISOString(),
-                    sub_start_date: startDateObject.toISOString()
-                }
             }
+        }
+        const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);
+        const startDateObject = new Date(docDetails?.data.sub_start_date.seconds * 1000 + docDetails?.data.sub_start_date.nanoseconds / 1e6);
+        return {
+            sub_type: docDetails?.data.sub_type,
+            sub_end_date: dateObject.toISOString(),
+            sub_start_date: startDateObject.toISOString()
         }
     } catch (e) {
         console.log(e);

@@ -23,11 +23,12 @@ export const ProtectiveRoute = () => {
             setIsLoader(true);
             verifySession(sessionId)
                 .then((res) => {
-                    setIsPaymentVerify(res);
-                    setIsLoader(false);
                     const newSearchParams = new URLSearchParams(location.search);
                     newSearchParams.delete('session_id');
-                    window.history.replaceState({}, '', `${location.pathname}${newSearchParams.toString()}`);
+                    newSearchParams.set('amount', res.amount);
+                    window.history.replaceState({}, '', `${location.pathname}?${newSearchParams.toString()}`);
+                    setIsPaymentVerify(res.status);
+                    setIsLoader(false);
                 })
                 .catch((e) => {
                     setIsLoader(false);
@@ -35,7 +36,7 @@ export const ProtectiveRoute = () => {
                     console.log(e);
                 });
         }
-    }, [location.search]);
+    }, []);
 
     return (
         <>

@@ -59,17 +59,17 @@ export const Constants = {
     signInText: "Please sign-in to checkout",
     free: "free",
     premium: "premium",
-    standard:"standard",
-    active:"ACTIVE",
-    expired:"EXPIRED",
-    false:"false",
-    true:"true",
+    standard: "standard",
+    active: "ACTIVE",
+    expired: "EXPIRED",
+    false: "false",
+    true: "true",
     success: "Your payment of $ was Successfully Completed",
-    failure:"Your payment of $ was not Successful",
-    successText:"Payment Successful!",
-    failureText:"Payment Unsuccessful!",
-    buttonSuccessText:"Done",
-    buttonFailureText:"Try Again",
+    failure: "Your payment of $ was not Successful",
+    successText: "Payment Successful!",
+    failureText: "Payment Unsuccessful!",
+    buttonSuccessText: "Done",
+    buttonFailureText: "Try Again",
 
 }
 
@@ -120,7 +120,7 @@ export const userPlan = [
         color: "black",
         buttonColor: "#ACABAB",
         checkSign: Images.blackCheckMark,
-        type:"free"
+        type: "free"
 
     }, {
         title: "STANDARD PLAN",
@@ -138,7 +138,7 @@ export const userPlan = [
         color: "#FFFFFF",
         buttonColor: "#0071C5",
         checkSign: Images.whiteCheckMark,
-        type:"standard"
+        type: "standard"
     },
     {
         title: "PREMIUM PLAN",
@@ -156,7 +156,7 @@ export const userPlan = [
         color: "#FFFFFF",
         buttonColor: "#0071C5",
         checkSign: Images.whiteCheckMark,
-        type:"premium"
+        type: "premium"
     }
 ]
 
@@ -170,7 +170,7 @@ export const tables = {
     server: "server",
     subscription: "subscription",
     projectsActivity: "projectActivity",
-    transaction:"transaction"
+    transaction: "transaction"
 
 }
 
