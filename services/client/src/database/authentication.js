@@ -45,7 +45,7 @@ export async function googleSigIn() {
         localStorage.setItem(localStorageKeys.isSignIn, "true");
 
         let currentDate = new Date();
-        let expirationDate = new Date(currentDate.getTime() + (60 * 60 * 1000));   // 1 hours in milisecond
+        let expirationDate = new Date(currentDate.getTime() + (60 * 60 * 1000));   // 1 hour in millisecond
 
         const cookieOptions = {
             // domain: '.openbot.org',

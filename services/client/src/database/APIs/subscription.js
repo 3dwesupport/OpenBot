@@ -71,6 +71,7 @@ export const getDocDetails = async (uid) => {
 export async function getCustomerId() {
     try {
         let docDetails = await getDocDetails(localStorage.getItem(localStorageKeys.UID));
+        console.log(docDetails?.data.customer_id);
         return docDetails?.data.customer_id
     } catch (e) {
         console.log(e);

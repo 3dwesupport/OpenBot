@@ -15,6 +15,7 @@ import {AnalyticsLoader} from "../../components/common/loader/loader";
 export function Billing() {
     const {theme} = useContext(ThemeContext);
     const [isAnalysisLoader, setIsAnalysisLoader] = useState(false);
+    const [fetching, setFetching] = useState(false);
     const [planStatus, setPlanStatus] = useState({
         type: Constants.free,
         status: Constants.active
@@ -24,7 +25,7 @@ export function Billing() {
     useEffect(() => {
         setIsAnalysisLoader(true);
         getDocDetails(uid).then(doc => {
-            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? Constants.active : Constants.expired;
+            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) <= new Date()) ? Constants.active : Constants.expired;
             setPlanStatus({
                 type: doc.data.sub_type,
                 status: updatedStatus
@@ -44,33 +45,44 @@ export function Billing() {
     function handlePaymentButton(e) {
         switch (e) {
             case 'STANDARD PLAN' :
+                if(planStatus.sub_status ==='canceled' && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) >= new Date())){
+                    return handleCheckout(e);  // if the plan is canceled then goto checkout
+                }
                 if (planStatus.type === "free") {   // first time checkout to standard
-                    handleCheckout(e).then();
+                    return handleCheckout(e);
                 } else if (planStatus.type === "standard" && planStatus.status === Constants.expired) { // renew Standard Plans
-                    renewSubscriptionPlans(e).then();
-                } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // switch Standard plans
-                    switchSubscriptionPlans(e).then();
+                    return renewSubscriptionPlans(e);
+                } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // switch Premium plans
+                    return switchSubscriptionPlans(e);
                 }
                 return;
 
             case 'PREMIUM PLAN':
-                if (planStatus.type === "free") { // first time checkout to premium
-                    handleCheckout(e).then();
-                } else if (planStatus.type === "standard") { // if first time standard plan checkout either Active or expired then switch to premium
-                    switchSubscriptionPlans(e).then();
-                } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // renew Premium plans API
-                    renewSubscriptionPlans(e).then();
+                if((planStatus.sub_status ==='canceled') && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) <= new Date())){
+                    return handleCheckout(e); // if the plan is canceled then goto checkout
                 }
-                return;
+                if (planStatus.type === "free") { // first time checkout to premium
+                    return handleCheckout(e);
+                } else if (planStatus.type === "standard") { // if first time standard plan checkout either Active or expired then switch to premium
+                    return switchSubscriptionPlans(e);
+                } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // renew Premium plans API
+                    return renewSubscriptionPlans(e);
+                }
 
             default:
-                return;
+                return Promise.resolve();
         }
     }
 
     const checkout = (e) => {
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
-            handlePaymentButton(e);
+            if(!fetching){
+                setFetching(true);
+                handlePaymentButton(e).finally(()=>{
+                    setFetching(false);
+                })
+            }
+
         } else {
             errorToast(Constants.signInText);
         }

@@ -11,6 +11,7 @@ export const handleCheckout = async (planType) => {
     if (planType !== "FREE PLAN") {
         try {
             let customerID = await getCustomerId();
+            console.log("handle Checkout plan is select and his customer id is :::",customerID);
             fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/session/create-checkout-session`, {
                 method: "POST",
                 headers: {

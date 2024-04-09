@@ -135,9 +135,11 @@ export function BillingCard(props) {
                          style={{
                              backgroundColor: cardDetails.buttonBackgroundColor,
                              color: cardDetails.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px",
+                             marginTop:cardDetails.type===Constants.premium&&"-15px"
                          }}>{cardDetails.planType}</div>}
-
+                {(cardDetails.type === Constants.free && isActivePlan.status === Constants.expired) && ("Note: Your free trial has ended. Please upgrade to continue.")}
             </div>
+
         </div>
     )
 }

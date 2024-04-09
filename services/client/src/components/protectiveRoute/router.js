@@ -3,7 +3,7 @@ import {useLocation} from 'react-router-dom';
 import {Outlet, Navigate} from 'react-router-dom'
 import {verifySession} from "../../stripeAPI";
 import {PathName} from "../../utils/constants";
-
+import {AnalyticsLoader} from "../common/loader/loader";
 /**
  * function to add a protective route for payment routes
  * @returns {Element}
@@ -40,10 +40,11 @@ export const ProtectiveRoute = () => {
 
     return (
         <>
+            {isLoader && <AnalyticsLoader/>}
             {isLoader ? (
-                <div>Loading...</div>
+                <div></div>
             ) : isPaymentVerify ? (
-                <Outlet/>
+                <Outlet isLoader={"true"}/>
             ) : (
                 <Navigate to={PathName.home}/>
             )}
