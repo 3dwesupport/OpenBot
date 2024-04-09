@@ -81,11 +81,10 @@ okButton.addEventListener('click', handleOkButtonClick)
 const subscribeButton = document.getElementById('subscribe-button')
 subscribeButton.addEventListener('click', handleSubscription)
 
-
 /**
  * function to handle signIn on home page
  */
-function handleSignInButtonClick() {
+function handleSignInButtonClick () {
     if (localStorage.getItem(localStorageKeys.isSignIn) === 'false') {
         googleSigIn()
             .then((user) => {
@@ -109,7 +108,7 @@ function handleSignInButtonClick() {
 /**
  * function to sendId to remote server
  */
-function sendId() {
+function sendId () {
     const response = {
         roomId: signedInUser.email
     }
@@ -119,7 +118,7 @@ function sendId() {
 /**
  * function to handle signOut from google account
  */
-function signOut() {
+function signOut () {
     signedInUser = null
     const signInBtn = document.getElementsByClassName('google-sign-in-button')[0]
     signInBtn.innerText = 'Sign in with Google'
@@ -138,14 +137,14 @@ function signOut() {
 /**
  * function to handle cancel button on logout popup
  */
-function handleCancelButtonClick() {
+function handleCancelButtonClick () {
     hideLogoutWrapper()
 }
 
 /**
  * function to hide logout popup
  */
-function hideLogoutWrapper() {
+function hideLogoutWrapper () {
     const logout = document.getElementsByClassName('logout-wrapper')[0]
     logout.style.display = 'none'
 }
@@ -153,7 +152,7 @@ function hideLogoutWrapper() {
 /**
  * function to display logout popup
  */
-function showLogoutWrapper() {
+function showLogoutWrapper () {
     const logout = document.getElementsByClassName('logout-wrapper')[0]
     logout.style.display = 'block'
 }
@@ -161,7 +160,7 @@ function showLogoutWrapper() {
 /**
  * function to display expiration popup
  */
-function showExpirationWrapper() {
+function showExpirationWrapper () {
     const expire = document.getElementsByClassName('plan-expiration-model')[0]
     expire.style.display = 'block'
 }
@@ -169,7 +168,7 @@ function showExpirationWrapper() {
 /**
  * function to hide logout popup
  */
-function hideExpirationWrapper() {
+function hideExpirationWrapper () {
     const expire = document.getElementsByClassName('plan-expiration-model')[0]
     expire.style.display = 'none'
 }
@@ -177,7 +176,7 @@ function hideExpirationWrapper() {
 /**
  * function to handle "ok" button for logout popup
  */
-function handleOkButtonClick() {
+function handleOkButtonClick () {
     hideLogoutWrapper()
     signOut()
 }
@@ -185,7 +184,8 @@ function handleOkButtonClick() {
 /**
  * function to handle subscribe now button
  */
-function handleSubscription() {
+function handleSubscription () {
+    window.open('','_blank')
     console.log('Navigate to subscription page')
 }
 
@@ -194,7 +194,7 @@ function handleSubscription() {
  * @param cname
  * @returns {string}
  */
-export function getCookie(cname) {
+export function getCookie (cname) {
     const name = cname + '='
     const decodedCookie = decodeURIComponent(document.cookie)
     const ca = decodedCookie.split(';')
@@ -218,7 +218,6 @@ export const deleteCookie = (name) => {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'
 }
 
-
 handleAccessToken()
 handleServerDetailsOnSSO()
 handleAuthChangedOnRefresh()
@@ -226,7 +225,7 @@ handleAuthChangedOnRefresh()
 /**
  * function to handle single sign on from openbot dashboard
  */
-function handleSingleSignOn() {
+function handleSingleSignOn () {
     const cookie = getCookie(localStorageKeys.user)
     if (cookie) {
         const result = cookie
@@ -250,8 +249,7 @@ function handleSingleSignOn() {
     }
 }
 
-
-function handleServerDetailsOnSSO() {
+function handleServerDetailsOnSSO () {
     const cookie = getCookie(localStorageKeys.user)
     if (cookie) {
         if (getCookie(localStorageKeys.serverStartTime)) {
@@ -270,7 +268,7 @@ function handleServerDetailsOnSSO() {
 /**
  * function to handle access token
  */
-function handleAccessToken() {
+function handleAccessToken () {
     const tokenCookie = getCookie('accessToken')
     if (tokenCookie) {
         deleteCookie('accessToken')
@@ -280,7 +278,7 @@ function handleAccessToken() {
 /**
  * function to handle auth status on refreshing page
  */
-function handleAuthChangedOnRefresh() {
+function handleAuthChangedOnRefresh () {
     if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
         setTimeout(() => {
             auth.onAuthStateChanged((res) => {
@@ -321,6 +319,7 @@ export function checkPlanExpiration () {
         const details = getCookie(localStorageKeys.planDetails)
         if (details) {
             const items = JSON.parse(details)
+            console.log(items);
             let isExpired = false
             let isIdSend = false
             getServerDetails().then((res) => {
@@ -334,6 +333,10 @@ export function checkPlanExpiration () {
                         isExpired = true
                         showExpirationWrapper()
                     } else if (items?.planType === Constants.standard && res >= 60 * 50) { // If standard and 3000 minutes are over
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (items?.planType === Constants.premium && res >= 60 * 480) { // If premium and 28800 minutes are over
                         clearInterval(endTimeCheckInterval)
                         isExpired = true
                         showExpirationWrapper()

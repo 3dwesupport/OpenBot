@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "web server with ios and android app connection",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "prestart": "cd server && npm install",
     "start": "run-p dev:server dev:start-server",
@@ -12,7 +13,8 @@
     "dev:start-server": "npx snowpack dev --port 8081",
     "build": "snowpack build"
   },
-  "keywords": [
+
+"keywords": [
     "webrtc",
     "websocket"
   ],

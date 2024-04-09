@@ -6,7 +6,7 @@ import {localStorageKeys} from '../utils/constants'
  * @param connection
  * @constructor
  */
-export function WebRTC(connection) {
+export function WebRTC (connection) {
     const {RTCPeerConnection} = window
 
     let peerConnection = null

@@ -10,7 +10,7 @@ import {getCookie} from '../index'
  * @param serverStartTime
  * @param serverEndTime
  */
-export async function uploadServerUsage(serverStartTime, serverEndTime) {
+export async function uploadServerUsage (serverStartTime, serverEndTime) {
     const user = JSON.parse(localStorage.getItem(localStorageKeys.user))
     const details = {
         startTime: serverStartTime,
@@ -32,16 +32,17 @@ export async function uploadServerUsage(serverStartTime, serverEndTime) {
  * function to get user current plan
  * @returns {Promise<undefined|*>}
  */
-export async function getUserPlan() {
+export async function getUserPlan () {
     const startDate = new Date()
     const endDate = new Date(startDate)
     endDate.setDate(startDate.getDate() + 30)
     const subscriptionDetails = {
         uid: auth.currentUser?.uid,
-        planType: Constants.free,
-        planStartDate: startDate,
-        planEndDate: endDate,
-        planId: nanoid()
+        sub_type: Constants.free,
+        sub_start_date: startDate,
+        sub_end_date: endDate,
+        sub_plan_id: nanoid(),
+        customer_id: null
     }
     try {
         const docDetails = await getDocDetails(subscriptionDetails?.uid)
@@ -55,7 +56,7 @@ export async function getUserPlan() {
             const dateObject = new Date(docDetails?.data.planEndDate.seconds * 1000 + docDetails?.data.planEndDate.nanoseconds / 1e6)
             const startDateObject = new Date(docDetails?.data.planStartDate.seconds * 1000 + docDetails?.data.planStartDate.nanoseconds / 1e6)
             return {
-                planType: docDetails?.data.planType,
+                planType: docDetails?.data.sub_type,
                 planEndDate: dateObject.toISOString(),
                 planStartDate: startDateObject.toISOString()
             }
@@ -72,9 +73,9 @@ export async function getUserPlan() {
  */
 export const getDocDetails = async (uid) => {
     try {
-        const ordersQuery = query(collection(db, tables.subscription), where("uid", '==', uid));
-        const querySnapshot = await getDocs(ordersQuery);
-        let response = null;
+        const ordersQuery = query(collection(db, tables.subscription), where('uid', '==', uid))
+        const querySnapshot = await getDocs(ordersQuery)
+        let response = null
         querySnapshot.forEach((doc) => {
             return response = {
                 data: doc.data(),
@@ -83,12 +84,12 @@ export const getDocDetails = async (uid) => {
         })
         return response
     } catch (error) {
-        console.log("error :", error);
+        // console.log("error:", error)
+        console.log('error:', error)
     }
 }
 
-
-export async function getServerDetails() {
+export async function getServerDetails () {
     const details = getCookie(localStorageKeys.planDetails)
     if (details) {
         const items = JSON.parse(details)
@@ -96,16 +97,16 @@ export async function getServerDetails() {
         const endDate = new Date(items.planEndDate)
         try {
             const ordersQuery = query(collection(db, tables.server), and(where("startTime", '>=', startDate), where("startTime", '<', endDate), where("uid", '==', auth?.currentUser.uid)));
-            const querySnapshot = await getDocs(ordersQuery);
-            let duration = 0;
+            const querySnapshot = await getDocs(ordersQuery)
+            let duration = 0
             querySnapshot.forEach((doc) => {
-                const startTime = new Date(doc.data()?.startTime.seconds * 1000 + doc.data()?.startTime.nanoseconds / 1e6);
-                const endTime = new Date(doc.data()?.endTime.seconds * 1000 + doc.data()?.endTime.nanoseconds / 1e6);
+                const startTime = new Date(doc.data()?.startTime.seconds * 1000 + doc.data()?.startTime.nanoseconds / 1e6)
+                const endTime = new Date(doc.data()?.endTime.seconds * 1000 + doc.data()?.endTime.nanoseconds / 1e6)
                 duration += (new Date(endTime) - new Date(startTime)) / (1000 * 60) // in minutes
-            });
+            })
             return duration
         } catch (error) {
-            console.log("error :", error);
+            console.log('error :', error)
         }
     }
 }
