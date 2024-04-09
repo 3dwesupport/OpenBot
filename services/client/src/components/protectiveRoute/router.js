@@ -36,7 +36,7 @@ export const ProtectiveRoute = () => {
                     console.log(e);
                 });
         }
-    }, []);
+    }, [location.pathname, location.search, sessionId]);
 
     return (
         <>

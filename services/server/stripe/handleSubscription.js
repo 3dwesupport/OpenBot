@@ -33,7 +33,7 @@ router.get("/renew-subscription", async (req, res) => {
 
 router.post("/upgrade-subscription", async (req, res) => {
     try {
-        const {subscriptionId, customerId, uid, type} = req.query;
+        const {subscriptionId, customerId, uid} = req.query;
         const configuration = await stripe.billingPortal.configurations.create({
                 business_profile: {
                     privacy_policy_url: 'https://example.com/privacy',
@@ -77,15 +77,10 @@ router.post("/upgrade-subscription", async (req, res) => {
                 subscription_update: {
                     subscription: subscriptionId,
                 },
-                // type: "subscription_cancel",
-                // subscription_cancel: {
-                //     subscription: subscriptionId
-                // },
-                // type: "payment_method_update",
                 after_completion: {
                     type: "redirect",
                     redirect: {
-                        return_url: `${process.env.CLIENT_ADDRESS}/`,
+                        return_url: `${process.env.CLIENT_ADDRESS}/billing?subscriptionUpdate=true`,
                     }
                 },
             },
@@ -95,6 +90,20 @@ router.post("/upgrade-subscription", async (req, res) => {
     } catch
         (e) {
         res.send(e);
+        console.log(e);
+    }
+})
+
+router.post("/create-customer-portal", async (req, res) => {
+    try {
+        const {customerId} = req.query;
+        const portal = await stripe.billingPortal.sessions.create({
+            customer: customerId,
+            return_url: `${process.env.CLIENT_ADDRESS}/billing`,
+        });
+        res.send({url: portal.url});
+        console.log("customer portal url::", portal.url);
+    } catch (e) {
         console.log(e);
     }
 })

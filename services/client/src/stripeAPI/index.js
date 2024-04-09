@@ -134,10 +134,30 @@ export const renewSubscriptionPlans = async (planType) => {
                 "Content-Type": "application/json"
             }
         });
-
-        console.log("Response ::",response.url);
+        console.log("Response ::", response.url);
         window.location.href = response.url;
     } catch (e) {
         console.error(e);
+    }
+}
+
+/**
+ * function to create customer portal for customers
+ * @param customerId
+ * @returns {Promise<void>}
+ */
+export const createCustomerPortal = async (customerId) => {
+    try {
+        await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/subscription/create-customer-portal?customerId=${customerId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(res => res.json())
+            .then(({url}) => {
+                window.location = url;
+            })
+    } catch (e) {
+        console.log(e);
     }
 }

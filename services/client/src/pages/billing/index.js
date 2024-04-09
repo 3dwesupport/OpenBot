@@ -4,8 +4,10 @@ import {Constants, errorToast, localStorageKeys, Themes, userPlan} from "../../u
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
 import {handleCheckout, renewSubscriptionPlans, switchSubscriptionPlans} from "../../stripeAPI";
-import {getDocDetails} from "../../database/APIs/subscription";
+import {addSubscription, getDocDetails} from "../../database/APIs/subscription";
 import {AnalyticsLoader} from "../../components/common/loader/loader";
+import {useLocation} from "react-router-dom";
+import Cookies from "js-cookie";
 
 /**
  * function to display plans and subscriptions
@@ -20,6 +22,7 @@ export function Billing() {
         type: Constants.free,
         status: Constants.active
     })
+    const location = useLocation();
     let uid = localStorage.getItem(localStorageKeys.UID);
 
     useEffect(() => {
@@ -34,9 +37,29 @@ export function Billing() {
         })
             .catch(error => {
                 setIsAnalysisLoader(false);
-                console.error("Error during fetching data:")
+                console.error("Error during fetching data:");
             })
     }, [uid]);
+
+    useEffect(() => {
+        const newSearchParams = new URLSearchParams(location.search);
+        const isUpdate = newSearchParams.get('subscriptionUpdate');
+        if (isUpdate && uid) {
+            newSearchParams.delete("subscriptionUpdate");
+            window.history.replaceState({}, '', `${location.pathname}${newSearchParams.toString()}`);
+            const cookieOptions = {
+                // domain: '.openbot.org',
+                domain: 'localhost',
+                // domain: ".itinker.io",
+                secure: true,
+                expires: new Date(new Date().getTime() + (60 * 60 * 1000)),
+            };
+            console.log("updating susbcription");
+            addSubscription(localStorage.getItem(localStorageKeys.UID), Constants.premium).then(async (res) => {
+                Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+            });
+        }
+    })
 
     /**
      * function to handle Checkout, Switch and Renew Plans
@@ -45,7 +68,7 @@ export function Billing() {
     function handlePaymentButton(e) {
         switch (e) {
             case 'STANDARD PLAN' :
-                if(planStatus.sub_status ==='canceled' && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) >= new Date())){
+                if (planStatus.sub_status === 'canceled' && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) >= new Date())) {
                     return handleCheckout(e);  // if the plan is canceled then goto checkout
                 }
                 if (planStatus.type === "free") {   // first time checkout to standard
@@ -58,7 +81,7 @@ export function Billing() {
                 return;
 
             case 'PREMIUM PLAN':
-                if((planStatus.sub_status ==='canceled') && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) <= new Date())){
+                if ((planStatus.sub_status === 'canceled') && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) <= new Date())) {
                     return handleCheckout(e); // if the plan is canceled then goto checkout
                 }
                 if (planStatus.type === "free") { // first time checkout to premium
@@ -76,9 +99,9 @@ export function Billing() {
 
     const checkout = (e) => {
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
-            if(!fetching){
+            if (!fetching) {
                 setFetching(true);
-                handlePaymentButton(e).finally(()=>{
+                handlePaymentButton(e).finally(() => {
                     setFetching(false);
                 })
             }
