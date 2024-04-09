@@ -6,12 +6,14 @@ import "./profileModal.module.css"
 import {Avatar, Popover, styled} from "@mui/material";
 import {LogoutComponent} from "../common/logout/modalComponent";
 import LoaderComponent from "../common/loader/loader";
-import {PathName, Themes} from "../../utils/constants";
+import {errorToast, PathName, Themes} from "../../utils/constants";
 import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";
 import "../common/dropdown/dropdown.css"
 import {ThemeProvider, createTheme} from '@mui/material/styles';
 import {ThemeContext} from "../../App";
+import {getCustomerId} from "../../database/APIs/subscription";
+import {createCustomerPortal} from "../../stripeAPI";
 
 export function ProfileModal(props) {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -52,6 +54,18 @@ export function ProfileModal(props) {
         })
     }
 
+    const handleCustomerPortal=()=>{
+        getCustomerId().then((res)=>{
+            if(res){
+                return createCustomerPortal(res);
+            }else{
+                errorToast("Error during fetching customer Portal ");
+            }
+        }).catch((e)=>{
+            console.error("Error during fetching customer portal :");
+        })
+    }
+
     function handleProfileOptionsClick(option) {
         switch (option) {
             case "Edit Profile" :
@@ -63,11 +77,16 @@ export function ProfileModal(props) {
             case "Logout":
                 handleLogoutClick();
                 break;
+            case "CustomerPortal":
+                handleCustomerPortal();
+                break;
+
             default:
                 break;
         }
         handlePopoverClose();
     }
+
 
     /*StyledPopover for the dropdown menu*/
     return (
@@ -86,6 +105,10 @@ export function ProfileModal(props) {
                                            icon={Images.transactionHistoryIcon}
                                            darkThemeIcon={Images.whiteTransactionIcon}
                                            onClick={() => handleProfileOptionsClick("Billing History")}
+                                           className={"dropdownIconDiv"}/>
+                        <DropdownComponent label="Customer portal" icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverLogoutIcon}
+                                           onClick={() => handleProfileOptionsClick("CustomerPortal")}
+                                           darkThemeIcon={Images.whiteUserIcon}
                                            className={"dropdownIconDiv"}/>
                         <DropdownComponent label="Logout" icon={Images.logOutIcon} hoverIcon={Images.hoverLogoutIcon}
                                            onClick={() => handleProfileOptionsClick("Logout")}

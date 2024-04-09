@@ -71,7 +71,7 @@ export function DashboardComponent() {
                 break;
             case CardData[4].text:
                 console.log(CardData[3].text);
-                navigate(PathName.billingHistory);
+                // navigate(PathName.billingHistory);
                 break;
             case CardData[5].text:
                 if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
