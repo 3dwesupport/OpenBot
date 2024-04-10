@@ -148,6 +148,7 @@ export const renewSubscriptionPlans = async (planType) => {
  */
 export const createCustomerPortal = async (customerId) => {
     try {
+        console.log("Customer ID aa gyi:::",customerId);
         await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/subscription/create-customer-portal?customerId=${customerId}`, {
             method: "POST",
             headers: {

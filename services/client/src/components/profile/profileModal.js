@@ -59,7 +59,7 @@ export function ProfileModal(props) {
         getCustomerId().then((res)=>{
             if(res){
                 console.log("Customer id is :::::",res);
-                return createCustomerPortal(res);
+                createCustomerPortal(res).then();
             }else{
                 errorToast("You need to Subscribe or purchase plan for customer portal");
             }

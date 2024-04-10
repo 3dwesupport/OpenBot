@@ -101,6 +101,15 @@ export const successToast = (message) => {
     })
 }
 
+export const Colors={
+    darkBackgroundColor:"#303030",
+    lightBackgroundColor:"#FFFFFF",
+    activeColor:"#0071C5",
+    whiteColor:"#FFFFFF",
+    blackColor:"#000000",
+    buttonColor:"#0071C5",
+    buttonBackgroundColor:"#F0F0F0"
+}
 
 export const userPlan = [
     {
@@ -113,12 +122,6 @@ export const userPlan = [
             "Train 2 AI models using training service",
         ],
         planType: "CURRENT PLAN",
-        lightBackgroundColor: "#FFFFFF",
-        darkBackgroundColor: "#303030",
-
-        buttonBackgroundColor: "#F0F0F0",
-        color: "black",
-        buttonColor: "#ACABAB",
         checkSign: Images.blackCheckMark,
         type: "free"
 
@@ -132,11 +135,6 @@ export const userPlan = [
             "Train 10 AI models using training service",
         ],
         planType: "UPGRADE PLAN",
-        lightBackgroundColor: "#0071C5",
-        darkBackgroundColor: "#0071C5",
-        buttonBackgroundColor: "#FFFFFF",
-        color: "#FFFFFF",
-        buttonColor: "#0071C5",
         checkSign: Images.whiteCheckMark,
         type: "standard"
     },
@@ -150,11 +148,6 @@ export const userPlan = [
             "Train 30 AI models using training service",
         ],
         planType: "UPGRADE PLAN",
-        lightBackgroundColor: "#0071C5",
-        darkBackgroundColor: "#0071C5",
-        buttonBackgroundColor: "#FFFFFF",
-        color: "#FFFFFF",
-        buttonColor: "#0071C5",
         checkSign: Images.whiteCheckMark,
         type: "premium"
     }
