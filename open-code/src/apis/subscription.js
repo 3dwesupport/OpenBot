@@ -38,6 +38,7 @@ export async function addSubscription(uid, planType) {
         } else {
             const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);
             const startDateObject = new Date(docDetails?.data.sub_start_date.seconds * 1000 + docDetails?.data.sub_start_date.nanoseconds / 1e6);
+            console.log("DateObject :::",dateObject);
             return {
                 sub_type: docDetails?.data.sub_type,
                 sub_end_date: dateObject.toISOString(),
@@ -60,6 +61,7 @@ export const getDocDetails = async (uid) => {
         const querySnapshot = await getDocs(ordersQuery);
         let response = null;
         querySnapshot.forEach((doc) => {
+            console.log("Docs::",doc);
             return response = {
                 data: doc.data(),
                 id: doc.id,

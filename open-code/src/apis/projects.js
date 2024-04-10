@@ -104,8 +104,11 @@ export const sumUploadCode = async () => {
     const details = getCookie(localStorageKeys.planDetails)
     if (details) {
         const items = JSON.parse(details);
+        console.log(items);
         const startDate = new Date(items?.sub_start_date);
         const endDate = new Date(items.sub_end_date);
+        console.log("Start Date ::",startDate);
+        console.log("End Date ::",endDate);
         try {
             const ordersQuery = query(collection(db, tables.projectsActivity), and(where("uid", '==', auth?.currentUser.uid), where("updated_at", '>=', startDate), where("updated_at", '<=', endDate)));
             const snapshot = await getCountFromServer(ordersQuery);

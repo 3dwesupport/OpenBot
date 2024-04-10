@@ -414,12 +414,13 @@ function handleChildBlockInWorkspace(array, child) {
 export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
         return sumUploadCode().then((res) => {
-            if (new Date() >= new Date(res?.sub_end_date)) return false;
+            console.log("Plan end Date :::",res?.planEndDate)
+            if (new Date() >= new Date(res?.planEndDate)) return false;
 
             switch(res.planType){  // restrict the user to click number of times
                 case Constants.free :
                         console.log(res.count);
-                        return res.count<11;
+                        return res.count<10;
                 case Constants.standard :
                     return res.count<200;
 
