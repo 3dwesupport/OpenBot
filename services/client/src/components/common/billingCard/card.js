@@ -30,7 +30,7 @@ export function BillingCard(props) {
                     return {
                         status: isActivePlan.status === Constants.active,
                         color: {
-                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].lightBackgroundColor,
                             expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[1].lightBackgroundColor
                         },
                         activeButton: Constants.true,
@@ -42,7 +42,7 @@ export function BillingCard(props) {
                         status: isActivePlan.status === Constants.active,
                         color: {
                             active: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[1].lightBackgroundColor,
-                            expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[0].darkBackgroundColor,
+                            expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[1].darkBackgroundColor,
                         },
                         activeButton: Constants.false
                     }
@@ -51,8 +51,8 @@ export function BillingCard(props) {
                 return {
                     status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                     color: {
-                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
-                        expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[0].darkBackgroundColor,
+                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].lightBackgroundColor,
+                        expired: theme === Themes.dark ? userPlan[1].lightBackgroundColor : userPlan[1].darkBackgroundColor,
                     },
                     activeButton: Constants.true,
                 };
@@ -62,7 +62,7 @@ export function BillingCard(props) {
                     return {
                         status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                         color: {
-                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                            active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].lightBackgroundColor,
                             expired: theme === Themes.dark ? userPlan[2].lightBackgroundColor : userPlan[2].lightBackgroundColor
                         },
                         activeButton: Constants.false,
@@ -81,7 +81,7 @@ export function BillingCard(props) {
                 return {
                     status: isActivePlan.status === Constants.active && isActivePlan.type === cardDetails.type,
                     color: {
-                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].darkBackgroundColor,
+                        active: theme === Themes.dark ? userPlan[0].darkBackgroundColor : userPlan[0].lightBackgroundColor,
                         expired: theme === Themes.dark ? userPlan[2].lightBackgroundColor : userPlan[2].lightBackgroundColor
                     },
                     activeButton: Constants.true,
@@ -95,7 +95,8 @@ export function BillingCard(props) {
         <div className={style.choosePlanDiv}
              style={{
                  backgroundColor: handlePlanActivity().status ? handlePlanActivity().color.active : handlePlanActivity().color.expired,
-                 color: theme === Themes.dark ? userPlan[0].lightBackgroundColor : cardDetails.color,
+                 color: theme === Themes.dark ? "white" : (cardDetails.type !== Constants.free && (handlePlanActivity().activeButton === Constants.false || isActivePlan.status === Constants.expired)) ?
+                 "white" : "black",
              }}>
 
             <div className={style.cardChildDiv}>
@@ -135,9 +136,9 @@ export function BillingCard(props) {
                          style={{
                              backgroundColor: cardDetails.buttonBackgroundColor,
                              color: cardDetails.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px",
-                             marginTop:cardDetails.type===Constants.premium&&"-15px"
+                             marginTop: cardDetails.type === Constants.premium && "-15px"
                          }}>{cardDetails.planType}</div>}
-                {(cardDetails.type === Constants.free && isActivePlan.status === Constants.expired) && ("Note: Your free trial has ended. Please upgrade to continue.")}
+                {(cardDetails.type === Constants.free && isActivePlan.status === Constants.expired) && (<p style={{fontWeight:"bold",fontSize:"18px"}}>Note: Your free trial has ended. Please upgrade to continue.</p>)}
             </div>
 
         </div>
