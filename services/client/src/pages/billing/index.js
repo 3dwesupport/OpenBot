@@ -28,7 +28,7 @@ export function Billing() {
     useEffect(() => {
         setIsAnalysisLoader(true);
         getDocDetails(uid).then(doc => {
-            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) <= new Date()) ? Constants.active : Constants.expired;
+            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? Constants.active : Constants.expired;
             setPlanStatus({
                 type: doc.data.sub_type,
                 status: updatedStatus

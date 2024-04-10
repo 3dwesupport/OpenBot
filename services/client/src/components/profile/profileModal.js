@@ -55,11 +55,13 @@ export function ProfileModal(props) {
     }
 
     const handleCustomerPortal=()=>{
+        console.log("Click to customer portal :::")
         getCustomerId().then((res)=>{
             if(res){
+                console.log("Customer id is :::::",res);
                 return createCustomerPortal(res);
             }else{
-                errorToast("Error during fetching customer Portal ");
+                errorToast("You need to Subscribe or purchase plan for customer portal");
             }
         }).catch((e)=>{
             console.error("Error during fetching customer portal :");
@@ -106,9 +108,9 @@ export function ProfileModal(props) {
                                            darkThemeIcon={Images.whiteTransactionIcon}
                                            onClick={() => handleProfileOptionsClick("Billing History")}
                                            className={"dropdownIconDiv"}/>
-                        <DropdownComponent label="Customer portal" icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverLogoutIcon}
+                        <DropdownComponent label="Customer portal" icon={Images.customerPortal} hoverIcon={Images.hoverCustomerPortal}
                                            onClick={() => handleProfileOptionsClick("CustomerPortal")}
-                                           darkThemeIcon={Images.whiteUserIcon}
+                                           darkThemeIcon={Images.whiteCustomerPortal}
                                            className={"dropdownIconDiv"}/>
                         <DropdownComponent label="Logout" icon={Images.logOutIcon} hoverIcon={Images.hoverLogoutIcon}
                                            onClick={() => handleProfileOptionsClick("Logout")}

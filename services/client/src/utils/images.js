@@ -31,7 +31,9 @@ import whiteLogoutIcon from "../assets/images/white-logout-icon.png";
 import whiteUserIcon from "../assets/images/white-user-icon.png";
 import successImgIcon from "../assets/images/SuccessImg.png";
 import failureImgIcon from "../assets/images/failureImg.png";
-
+import whiteCustomerPortalIcon from "../assets/images/whiteCustomerPortal.png";
+import customerPortalIcon from "../assets/images/customerPortal.png";
+import hoverCustomerPortalIcon from "../assets/images/hoverCustomerPortal.png"
 export const Images = {
     openBotLogo: openBotLogo,
     lightTheme_icon: lightTheme_icon,
@@ -65,5 +67,8 @@ export const Images = {
     whiteLogoutIcon: whiteLogoutIcon,
     whiteUserIcon: whiteUserIcon,
     successImgIcon:successImgIcon,
-    failureImgIcon:failureImgIcon
+    failureImgIcon:failureImgIcon,
+    whiteCustomerPortal:whiteCustomerPortalIcon,
+    customerPortal:customerPortalIcon,
+    hoverCustomerPortal:hoverCustomerPortalIcon
 }

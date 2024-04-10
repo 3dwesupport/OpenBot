@@ -70,7 +70,9 @@ app.get('/getToken', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log("listening on port 9000");
-})
+    console.log("listening on port 9000",port);
+}).on('error', (err) => {
+    console.error('Server startup error:', err.message);
+});
 
 module.exports.db = db;

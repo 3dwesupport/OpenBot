@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 160px;
+    height: 180px;
     width: 100%;
 }
 
@@ -69,7 +69,7 @@
     }
 
     .dropdownItem {
-        height: 110px;
+        height: 130px;
     }
 
     .arrowLeft {
