@@ -111,6 +111,10 @@ export const Colors={
     buttonBackgroundColor:"#F0F0F0"
 }
 
+export const upgradePlans={
+    planType:"UPGRADE PLAN",
+    upgradePlanType:"RENEW PLAN"
+}
 export const userPlan = [
     {
         title: "FREE PLAN",
@@ -121,7 +125,6 @@ export const userPlan = [
             "1 hour limit for OpenBot Web-controller",
             "Train 2 AI models using training service",
         ],
-        planType: "CURRENT PLAN",
         checkSign: Images.blackCheckMark,
         type: "free"
 
@@ -134,7 +137,6 @@ export const userPlan = [
             "50 hours limit for OpenBot Web-controller",
             "Train 10 AI models using training service",
         ],
-        planType: "UPGRADE PLAN",
         checkSign: Images.whiteCheckMark,
         type: "standard"
     },
@@ -147,7 +149,6 @@ export const userPlan = [
             "20 days usage of OpenBot Web-controller",
             "Train 30 AI models using training service",
         ],
-        planType: "UPGRADE PLAN",
         checkSign: Images.whiteCheckMark,
         type: "premium"
     }
