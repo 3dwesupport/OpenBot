@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {FormComponent} from "../../components/common/form/form";
 import {getDateOfBirth, setDateOfBirth, uploadProfilePic} from "../../database/APIs/profile";
 import firebase from "firebase/compat/app";
-import {errorToast, successToast, Themes} from "../../utils/constants";
+import {errorToast, localStorageKeys, successToast, Themes} from "../../utils/constants";
 import LoaderComponent from "../../components/common/loader/loader";
 import {Avatar} from "@mui/material";
 import {Images} from "../../utils/images";
@@ -13,7 +13,6 @@ import {auth} from "../../database/authentication"
 import heic2any from "heic2any";
 import Compressor from 'compressorjs';
 import {ThemeContext} from "../../App";
-
 /**
  * Edit profile component
  * @returns {Element}
@@ -42,10 +41,12 @@ export function UserProfile() {
         if (user) {
             (async () => {
                 try {
+
                     const [dob, names] = await Promise.all([
                         getDateOfBirth(user?.uid),
                         user?.displayName ? user?.displayName.split(' ') : [],
                     ]);
+                    console.log("user?.photoURL::",user?.photoURL)
                     setUserDetails((prevState) => ({
                         ...prevState,
                         firstName: names[0] || '',

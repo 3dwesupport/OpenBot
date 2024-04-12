@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 180px;
+    height: auto;
     width: 100%;
 }
 
@@ -56,6 +56,7 @@
 
     .dropdownDiv {
         width: 120px;
+        height:10px;
     }
 
     .dropdownText {
@@ -69,7 +70,7 @@
     }
 
     .dropdownItem {
-        height: 130px;
+        height: 120px;
     }
 
     .arrowLeft {

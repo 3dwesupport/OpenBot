@@ -54,7 +54,7 @@ export function DashboardComponent() {
             case CardData[1].text:
                 console.log(CardData[1].text);
                 CustomTokenGenerate().then(() => {
-                    window.open("http://localhost:8080/", '_blank');
+                    window.open("http://localhost:8081/", '_blank');
                 })
                 break;
             case CardData[2].text:

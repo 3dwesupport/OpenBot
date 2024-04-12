@@ -6,7 +6,7 @@ import "./profileModal.module.css"
 import {Avatar, Popover, styled} from "@mui/material";
 import {LogoutComponent} from "../common/logout/modalComponent";
 import LoaderComponent from "../common/loader/loader";
-import {errorToast, PathName, Themes} from "../../utils/constants";
+import {errorToast, localStorageKeys, PathName, Themes} from "../../utils/constants";
 import {googleSignOut} from "../../database/authentication.js";
 import {useNavigate} from "react-router-dom";
 import "../common/dropdown/dropdown.css"
@@ -14,6 +14,7 @@ import {ThemeProvider, createTheme} from '@mui/material/styles';
 import {ThemeContext} from "../../App";
 import {getCustomerId} from "../../database/APIs/subscription";
 import {createCustomerPortal} from "../../stripeAPI";
+import {useLocation} from "react-router-dom";
 
 export function ProfileModal(props) {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -23,6 +24,7 @@ export function ProfileModal(props) {
     const open = Boolean(anchorEl);
     const themes = createTheme();
     const {theme} = useContext(ThemeContext);
+    const location =useLocation();
     const StyledPopover = styled(Popover)(({theme}) => ({
         '& .MuiPopover-paper': {
             width: "270px",
@@ -89,7 +91,6 @@ export function ProfileModal(props) {
         handlePopoverClose();
     }
 
-
     /*StyledPopover for the dropdown menu*/
     return (
         <div>
@@ -99,15 +100,15 @@ export function ProfileModal(props) {
                                 transformOrigin={{vertical: 'top', horizontal: 'right'}}>
                     <div className={"dropdownItem"}
                          style={{backgroundColor: theme === Themes.dark ? "rgb(48, 48, 48)" : "#FFFFFF"}}>
-                        <DropdownComponent icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverEditProfileIcon}
+                        {(location.pathname !=='/editProfile') && ( <DropdownComponent icon={Images.editProfileDropdownIcon} hoverIcon={Images.hoverEditProfileIcon}
                                            darkThemeIcon={Images.whiteUserIcon}
                                            label="Edit Profile" className={"dropdownIconDiv"}
-                                           onClick={() => handleProfileOptionsClick("Edit Profile")}/>
-                        <DropdownComponent label="Billing History" hoverIcon={Images.hoverTransactionHistoryIcon}
+                                           onClick={() => handleProfileOptionsClick("Edit Profile")}/>)}
+                        {(location.pathname!== '/billingHistory') && (<DropdownComponent label="Billing History" hoverIcon={Images.hoverTransactionHistoryIcon}
                                            icon={Images.transactionHistoryIcon}
                                            darkThemeIcon={Images.whiteTransactionIcon}
                                            onClick={() => handleProfileOptionsClick("Billing History")}
-                                           className={"dropdownIconDiv"}/>
+                                           className={"dropdownIconDiv"}/>)}
                         <DropdownComponent label="Customer portal" icon={Images.customerPortal} hoverIcon={Images.hoverCustomerPortal}
                                            onClick={() => handleProfileOptionsClick("CustomerPortal")}
                                            darkThemeIcon={Images.whiteCustomerPortal}

@@ -1,4 +1,4 @@
-import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom'
 import {PathName} from "../../utils/constants";
 import {Home} from "../../pages/home";
 import {UsageAnalysis} from "../../pages/analytics";
@@ -64,5 +64,6 @@ const Layout = ({children}) => (
         {children}
     </>
 );
+
 
 
