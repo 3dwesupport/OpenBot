@@ -413,28 +413,31 @@ function handleChildBlockInWorkspace(array, child) {
  */
 export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
-        return sumUploadCode().then((res) => {
-            console.log("Plan end Date :::",res?.planEndDate)
-            if (new Date() >= new Date(res?.planEndDate)) return false;
+        try {
+            const res = await sumUploadCode();
+            console.log("results:::",res);
+            if (new Date().getTime() >= new Date(res?.planEndDate).getTime()) return false;
+            switch (res?.planType) { // restrict the user to click number of times
+                case Constants.free:
+                    console.log(res.count);
+                    return res.count < 10;
+                case Constants.standard:
+                    return res.count < 200;
+                case Constants.premium:
+                    return res.count < 1500;
 
-            switch(res.planType){  // restrict the user to click number of times
-                case Constants.free :
-                        console.log(res.count);
-                        return res.count<10;
-                case Constants.standard :
-                    return res.count<200;
-
-                case Constants.premium :
-                    return res.count<1500;
-
-                default :
+                default:
                     return true;
             }
-        })
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            return false; // Handle error case appropriately
+        }
     } else {
         return true;
     }
 }
+
 
 /**
  * function to get cookie from storage

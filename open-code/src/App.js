@@ -2,10 +2,12 @@ import './App.css';
 import {RouterComponent} from "./components/router/router";
 import StoreProvider from './context/context';
 import {createContext, useEffect, useState} from "react";
-import {localStorageKeys, Themes} from "./utils/constants";
+import {Constants, localStorageKeys, Themes} from "./utils/constants";
 import {auth, googleSignOut} from "./services/firebase";
 import {ToastContainer} from "react-toastify";
 import {getCookie} from "./services/workspace";
+import {addSubscription} from "./apis/subscription";
+import {Cookies} from "react-cookie-consent";
 
 export const ThemeContext = createContext(null);
 
@@ -54,6 +56,16 @@ function App() {
                         photoURL: result.user?.photoURL,
                         displayName: result.user?.displayName,
                         email: result.user?.email,
+                    });
+                    const cookieOptions = {
+                        // domain: '.openbot.org',
+                        domain: 'localhost',
+                        // domain: ".itinker.io",
+                        secure: true,
+                    };
+                    await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
+                        console.log("res::", res)
+                        Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
                     });
                 }
             });

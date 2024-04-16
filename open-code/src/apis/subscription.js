@@ -38,7 +38,6 @@ export async function addSubscription(uid, planType) {
         } else {
             const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);
             const startDateObject = new Date(docDetails?.data.sub_start_date.seconds * 1000 + docDetails?.data.sub_start_date.nanoseconds / 1e6);
-            console.log("DateObject :::",dateObject);
             return {
                 sub_type: docDetails?.data.sub_type,
                 sub_end_date: dateObject.toISOString(),

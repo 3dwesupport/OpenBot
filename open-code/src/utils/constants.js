@@ -157,7 +157,7 @@ export const Constants = {
     projects: "projects",
     models: "models",
     theme: "theme",
-    subscriptionEnded: "Your trial has just ended!",
+    subscriptionEnded: "Your active plan has ended!",
     subscriptionContinueService: "To continue using OpenBot Playground, you",
     subscriptionContinueInfo: "will need to upgrade your plan.",
     subscribeButton: "Subscribe Now",

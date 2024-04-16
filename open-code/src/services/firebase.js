@@ -81,7 +81,7 @@ export async function googleSigIn() {
         await setConfigData();
         return signIn
     }
-}
+};
 
 /**
  * function to log out user from Goole account
@@ -96,7 +96,7 @@ export async function googleSignOut() {
         localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
         // delete_cookie("user");
 
-        Cookies.remove(localStorageKeys.accessToken," ");
+        Cookies.remove(localStorageKeys.accessToken, " ");
         Cookies.remove(localStorageKeys.planDetails);
         localStorage.setItem(localStorageKeys.UID, "");
         Cookies.remove('CookieConsent');
@@ -114,7 +114,7 @@ export async function getDateOfBirth() {
     const docRef = doc(db, "users", auth.currentUser?.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        if(docSnap.data()?.dob) {
+        if (docSnap.data()?.dob) {
             const date = new Date(docSnap.data().dob.toDate());
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1

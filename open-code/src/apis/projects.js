@@ -6,7 +6,7 @@ import {
     query,
     getDocs, and, writeBatch, getCountFromServer
 } from "firebase/firestore";
-import {auth, db} from "../services/firebase";
+import {auth, db, googleSignOut} from "../services/firebase";
 import {localStorageKeys, tables} from "../utils/constants";
 import {nanoid} from "nanoid";
 import {getCookie} from "../services/workspace";
@@ -102,19 +102,24 @@ export const getDocDetails = async (value, table, fieldName) => {
  */
 export const sumUploadCode = async () => {
     const details = getCookie(localStorageKeys.planDetails)
-    if (details) {
-        const items = JSON.parse(details);
-        console.log(items);
-        const startDate = new Date(items?.sub_start_date);
-        const endDate = new Date(items.sub_end_date);
-        console.log("Start Date ::",startDate);
-        console.log("End Date ::",endDate);
-        try {
-            const ordersQuery = query(collection(db, tables.projectsActivity), and(where("uid", '==', auth?.currentUser.uid), where("updated_at", '>=', startDate), where("updated_at", '<=', endDate)));
-            const snapshot = await getCountFromServer(ordersQuery);
-            return {count: snapshot.data().count, planType: items.sub_type, planEndDate: endDate};
-        } catch (e) {
-            console.log(e);
+    console.log("All plan details :::",details);
+    if(!details){
+        alert("You don't have any planDetails");
+        googleSignOut().then();
+    }
+    else{
+        if (details) {
+            const items = JSON.parse(details);
+            console.log("Items",items);
+            const startDate = new Date(items?.sub_start_date);
+            const endDate = new Date(items.sub_end_date);
+            try {
+                const ordersQuery = query(collection(db, tables.projectsActivity), and(where("uid", '==', auth?.currentUser.uid), where("updated_at", '>=', startDate), where("updated_at", '<=', endDate)));
+                const snapshot = await getCountFromServer(ordersQuery);
+                return {count: snapshot.data().count, planType: items.sub_type, planEndDate: endDate};
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 }
