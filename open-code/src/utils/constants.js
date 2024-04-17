@@ -132,7 +132,8 @@ export const localStorageKeys = {
     accessToken: "accessToken",
     configData: "configData",
     theme: "theme",
-    planDetails: "planDetails"
+    planDetails: "planDetails",
+    uid: "uid"
 }
 
 /**
@@ -162,8 +163,8 @@ export const Constants = {
     subscriptionContinueInfo: "will need to upgrade your plan.",
     subscribeButton: "Subscribe Now",
     free: "free",
-    standard:"standard",
-    premium:"premium"
+    standard: "standard",
+    premium: "premium"
 }
 
 export const Month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

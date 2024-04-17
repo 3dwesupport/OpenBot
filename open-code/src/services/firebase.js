@@ -15,8 +15,6 @@ import {setConfigData} from "./workspace";
 import configData from "../config.json";
 import {Cookies} from "react-cookie-consent";
 import {addSubscription} from "../apis/subscription";
-// import cookieConsent from "react-cookie-consent/src/CookieConsent";
-// import {Cookies} from "react-cookie-consent";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -69,6 +67,7 @@ export async function googleSigIn() {
         const signIn = await auth.signInWithPopup(provider);
         localStorage.setItem("isSigIn", "true");
         localStorage.setItem(localStorageKeys.accessToken, signIn.credential?.accessToken);
+        localStorage.setItem(localStorageKeys.uid, signIn.user.uid);
         const cookieOptions = {
             // domain: '.openbot.org',
             domain: 'localhost',
@@ -76,6 +75,7 @@ export async function googleSigIn() {
             secure: true,
         };
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
+            console.log("res::", res)
             Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
         });
         await setConfigData();
@@ -98,7 +98,7 @@ export async function googleSignOut() {
 
         Cookies.remove(localStorageKeys.accessToken, " ");
         Cookies.remove(localStorageKeys.planDetails);
-        localStorage.setItem(localStorageKeys.UID, "");
+        localStorage.setItem(localStorageKeys.uid, "");
         Cookies.remove('CookieConsent');
 
     }).catch((error) => {

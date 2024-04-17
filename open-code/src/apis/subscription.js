@@ -1,5 +1,5 @@
 import {addDoc, collection, getDocs, query, where} from "firebase/firestore";
-import {tables} from "../utils/constants";
+import {Constants, tables} from "../utils/constants";
 import {db} from "../services/firebase";
 
 /**
@@ -8,22 +8,17 @@ import {db} from "../services/firebase";
  * @param planType
  * @returns {Promise<{type: (string|*), planEndDate: *}>}
  */
-export async function addSubscription(uid, planType) {
+export async function addSubscription(uid) {
     const startDate = new Date();
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 30);
     const subscriptionDetails = {
-        // uid: uid,
-        // planType: planType,
-        // planStartDate: startDate,
-        // planEndDate: endDate,
-        // planId: nanoid(),
         uid:uid,
         sub_plan_id: null,
         customer_id: null,
         sub_start_date: startDate,
         sub_end_date: endDate,
-        sub_type: planType,
+        sub_type: Constants.free,
         sub_status: null
     }
 
@@ -33,7 +28,7 @@ export async function addSubscription(uid, planType) {
             return await addDoc(collection(db, tables.subscription),
                 subscriptionDetails
             ).then(() => {
-                return {sub_type: planType, sub_end_date: endDate, sub_start_date: startDate}
+                return {sub_type: Constants.free, sub_end_date: endDate, sub_start_date: startDate}
             });
         } else {
             const dateObject = new Date(docDetails?.data.sub_end_date.seconds * 1000 + docDetails?.data.sub_end_date.nanoseconds / 1e6);

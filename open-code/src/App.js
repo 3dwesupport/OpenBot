@@ -2,12 +2,14 @@ import './App.css';
 import {RouterComponent} from "./components/router/router";
 import StoreProvider from './context/context';
 import {createContext, useEffect, useState} from "react";
-import {Constants, localStorageKeys, Themes} from "./utils/constants";
-import {auth, googleSignOut} from "./services/firebase";
+import {localStorageKeys, Themes} from "./utils/constants";
+import {auth, db, googleSignOut} from "./services/firebase";
 import {ToastContainer} from "react-toastify";
 import {getCookie} from "./services/workspace";
 import {addSubscription} from "./apis/subscription";
 import {Cookies} from "react-cookie-consent";
+import {collection, onSnapshot} from "@firebase/firestore"
+import {query, where} from "firebase/firestore";
 
 export const ThemeContext = createContext(null);
 
@@ -52,6 +54,7 @@ function App() {
                 if (result.credential) {
                     localStorage.setItem(localStorageKeys.accessToken, result.credential.accessToken);
                     localStorage.setItem("isSigIn", "true");
+                    localStorage.setItem(localStorageKeys.uid, result?.user.uid);
                     setUser({
                         photoURL: result.user?.photoURL,
                         displayName: result.user?.displayName,
@@ -63,7 +66,7 @@ function App() {
                         // domain: ".itinker.io",
                         secure: true,
                     };
-                    await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
+                    await addSubscription(auth?.currentUser?.uid).then(async (res) => {
                         console.log("res::", res)
                         Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
                     });
@@ -88,6 +91,7 @@ function App() {
             let result = cookie
             localStorage.setItem("isSigIn", "true");
             auth.signInWithCustomToken(result).then((res) => {
+
                 delete_cookie("user");
             })
                 .catch((error) => {
@@ -129,12 +133,38 @@ function App() {
                 clearTimeout(timeoutId);
             }
         });
-
         return () => {
             unsubscribe();
             clearTimeout(timeoutId);
+            // unsubscribeSubscription();
         }
     }, [isTimeoutId]);
+
+    useEffect(() => {
+        console.log(localStorage.getItem(localStorageKeys.uid))
+
+        if (localStorage.getItem("isSigIn") === "true") {
+            const q = query(collection(db, "subscription"), where("uid", "==", localStorage.getItem(localStorageKeys.uid)));
+            onSnapshot(q, (snapshot) => {
+                console.log("Data fetched ::::", snapshot);
+                snapshot.docChanges().forEach((change) => {
+                    console.log("change::",change)
+                    if (change.type === "added") {
+                        console.log("New city: ", change.doc.data());
+                        Cookies.set("planDetails",change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        console.log("Modified city: ", change.doc.data());
+                        Cookies.set("planDetails",change.doc.data());
+                    }
+                });
+
+            }, (error) => {
+                console.log("error during fetch data from firebase :");
+            })
+        }
+    }, []);
+
 
     useEffect(() => {
         if (isSessionExpire) {
@@ -166,6 +196,20 @@ function App() {
         }
     };
 
+    /**
+     * Update cookies real time data from firebase
+     * @param subscriptionData
+     */
+    // const updateCookies=(subscriptionData)=>{
+    //     // update Cookies with the subscription data
+    //     const cookieOptions = {
+    //         // domain: '.openbot.org',
+    //         domain: 'localhost',
+    //         // domain: ".itinker.io",
+    //         secure: true,
+    //     };
+    //     Cookies.set("SubscriptionData",JSON.stringify(subscriptionData),cookieOptions);
+    // }
     return (
         <ThemeContext.Provider value={{theme, toggleTheme}}>
             <StoreProvider isOnline={internetOn} isSessionExpireModal={isSessionExpireModal}
