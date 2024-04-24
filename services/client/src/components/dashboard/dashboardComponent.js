@@ -46,8 +46,9 @@ export function DashboardComponent() {
         switch (clickedCard.text) {
             case CardData[0].text:
                 CustomTokenGenerate().then(() => {
-                        window.open("https://www.openbot.itinker.io/", '_blank');
-                        // window.open("http://localhost:3001/", '_blank');
+                        // window.open("https://www.openbot.itinker.io/", '_blank');
+                    console.log("Go to React-Blockly");
+                        window.open("http://localhost:3001/", '_blank');
                     }
                 )
                 break;

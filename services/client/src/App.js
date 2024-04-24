@@ -1,12 +1,13 @@
 import './App.css';
 import {RouterComponent} from "./components/router/routes";
 import {createContext, useEffect, useState} from "react";
-import {auth} from "./database/authentication"
+import {auth, db} from "./database/authentication"
 import StoreProvider from "./context/storeContext"
-import {Constants, localStorageKeys, PathName, Themes} from "./utils/constants";
+import {Constants, localStorageKeys, Themes} from "./utils/constants";
 import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
+import {query, where, onSnapshot, collection} from "@firebase/firestore";
 
 export const ThemeContext = createContext(null);
 
@@ -88,6 +89,23 @@ function App() {
             document.body.classList.replace("dark", "light"); //for background theme
         }
     };
+
+    useEffect(()=>{
+        const q=query(collection(db,"subscription"),where("uid","==",localStorage.getItem(localStorageKeys.UID)));
+        onSnapshot(q,(snapshot)=>{
+            snapshot.docChanges().forEach((change)=>{
+                console.log("Which type changed :::",change);
+                if (change.type === "added") {
+                    console.log("New city: ", change.doc.data());
+                    Cookies.set("subscriptionUpdated",`${JSON.stringify(change.doc.data())}`);
+                }
+                if (change.type === "modified") {
+                    console.log("Modified city: ", change.doc.data());
+                    Cookies.set("subscriptionUpdated",`${JSON.stringify(change.doc.data())}`);
+                }
+            })
+        })
+    })
 
     return (
         <ThemeContext.Provider value={{theme, toggleTheme}}>

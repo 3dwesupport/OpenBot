@@ -70,8 +70,7 @@ export function Billing() {
             case 'STANDARD PLAN' :
                 if (planStatus.sub_status === 'canceled' && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) >= new Date())) {
                     return handleCheckout(e);  // if the plan is canceled then goto checkout
-                }
-                if (planStatus.type === "free") {   // first time checkout to standard
+                } if (planStatus.type === "free") {   // first time checkout to standard
                     return handleCheckout(e);
                 } else if (planStatus.type === "standard" && planStatus.status === Constants.expired) { // renew Standard Plans
                     return renewSubscriptionPlans(e);
@@ -83,8 +82,7 @@ export function Billing() {
             case 'PREMIUM PLAN':
                 if ((planStatus.sub_status === 'canceled') && (new Date(e.data.sub_end_date.seconds * 1000 + e.data.sub_end_date.nanoseconds / 1e6) <= new Date())) {
                     return handleCheckout(e); // if the plan is canceled then goto checkout
-                }
-                if (planStatus.type === "free") { // first time checkout to premium
+                } if (planStatus.type === "free") { // first time checkout to premium
                     return handleCheckout(e);
                 } else if (planStatus.type === "standard") { // if first time standard plan checkout either Active or expired then switch to premium
                     return switchSubscriptionPlans(e);
