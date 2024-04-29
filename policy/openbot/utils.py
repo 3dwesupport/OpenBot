@@ -9,6 +9,7 @@ from IPython.display import Javascript
 from nbconvert import HTMLExporter
 import codecs
 import nbformat
+import boto3
 
 # Select non-interactive backend for compatability
 plt.switch_backend("agg")
@@ -209,8 +210,22 @@ def compare_tf_tflite(
         # np.testing.assert_almost_equal(tf_result, tflite_result, decimal=2)
 
 
+def list_s3_objects(bucket_name, prefix):
+    s3 = boto3.client('s3')
+    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+    objects = [obj['Key'] for obj in response.get('Contents', [])]
+    return objects
+
+
 def list_dirs(path):
-    return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+    # Example usage:
+    print("in list dirs")
+    bucket_name = 'openbotbucketsagemaker'
+    prefix = 'train_data/'
+    objects = list_s3_objects(bucket_name, prefix)
+    print("Objects in S3 bucket:", objects)
+    return objects
+    #     return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
 
 def load_img(file_path, is_crop=False):
