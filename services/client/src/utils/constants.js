@@ -123,7 +123,7 @@ export const userPlan = [
         services: [
             "Compile blockly code 50 times using OpenBot Playground",
             "1 hour limit for OpenBot Web-controller",
-            "Train 2 AI models using training service",
+            "Train Autopilot/Point goal navigation Model on Google Colab."
         ],
         checkSign: Images.blackCheckMark,
         type: "free"
@@ -135,7 +135,7 @@ export const userPlan = [
         services: [
             "Compile blockly code 200 times using OpenBot Playground",
             "50 hours limit for OpenBot Web-controller",
-            "Train 10 AI models using training service",
+            "Train Autopilot/Point goal navigation Model on AWS Sagemaker for 10 hrs.",
         ],
         checkSign: Images.whiteCheckMark,
         type: "standard"
@@ -147,7 +147,7 @@ export const userPlan = [
         services: [
             "Compile blockly code 1500 times of projects using OpenBot Playground",
             "20 days usage of OpenBot Web-controller",
-            "Train 30 AI models using training service",
+            "Train Autopilot/Point goal navigation Model on AWS Sagemaker for 50 hrs.",
         ],
         checkSign: Images.whiteCheckMark,
         type: "premium"
