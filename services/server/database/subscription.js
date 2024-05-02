@@ -27,6 +27,13 @@ function updateSubscriptionDetails(userId, subscriptionDetails, customerId) {
         .then(snapshot => {
             if (snapshot.empty) {
                 console.log('No documents found for uid.');
+                subscriptionRef.add(subInstance)
+                    .then(docRef => {
+                        console.log(`New document created with ID: ${docRef.id}`);
+                    })
+                    .catch(error => {
+                        console.error('Error creating document:', error);
+                    });
                 return;
             }
             snapshot.forEach(doc => {
