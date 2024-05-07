@@ -42,8 +42,11 @@ export default firebase;
 export async function googleSigIn() {
     const signIn = await signInWithPopup(auth, provider);
     localStorage.setItem(localStorageKeys.isSignIn, "true");
-    localStorage.setItem(localStorageKeys.uid, auth?.currentUser?.uid);
-    return signIn;
+    const uid = auth?.currentUser?.uid; // Assuming auth is of type Auth | undefined
+    if (uid !== undefined) {
+        localStorage.setItem(localStorageKeys.uid, uid);
+    }
+    return auth.currentUser;
 }
 
 /**

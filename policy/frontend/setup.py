@@ -4,7 +4,7 @@ setup(
     name="openbot_frontend",
     version="0.7.0",
     description="OpenBot Frontend package",
-    url="https://github.com/sanyatuning/OpenBot",
+    url="https://github.com/3dwesupport/OpenBot/tree/model-training-service",
     author="Balazs Sandor",
     author_email="sanyatuning@gmail.com",
     license="MIT",

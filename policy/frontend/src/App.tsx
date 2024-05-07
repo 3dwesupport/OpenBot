@@ -10,6 +10,7 @@ import {TrainPage} from './pages/TrainPage';
 import {auth, googleSigIn, googleSignOut} from "./database/authentication";
 import {useEffect, useState} from "react";
 import {LogoutModal} from "./modals/LogoutModal";
+import {localStorageKeys} from "./utils/constants";
 
 
 function App() {
@@ -18,7 +19,6 @@ function App() {
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
-            console.log("display name:::", res?.displayName);
             setName(res?.displayName ?? "Google Sign in");
         })
     }, [name])
@@ -40,8 +40,14 @@ function App() {
                                 <Nav.Item href="#/train">Train</Nav.Item>
                             </Nav>
                             <Nav pullRight>
-                                <Nav.Item><Button
-                                    onClick={name === "Google Sign in" ? googleSigIn : () => setOpen(true)}>{name}</Button></Nav.Item>
+                                <Nav.Item>{localStorage.getItem(localStorageKeys.isSignIn) === "true" ?
+                                    <Button onClick={() => setOpen(true)}>{name}</Button> :
+                                    <Button onClick={() => {
+                                        googleSigIn().then((res) => {
+                                            console.log("res after google sign In::", res?.displayName);
+                                            setName(res?.displayName ?? "Google Sign In");
+                                        })
+                                    }}>Google Sign In</Button>}</Nav.Item>
                             </Nav>
                         </Navbar.Body>
                     </Navbar>
