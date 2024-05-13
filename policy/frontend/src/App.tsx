@@ -11,22 +11,40 @@ import {auth, googleSigIn, googleSignOut} from "./database/authentication";
 import {useEffect, useState} from "react";
 import {LogoutModal} from "./modals/LogoutModal";
 import {localStorageKeys} from "./utils/constants";
+import {useToggle} from "./utils/useToggle";
 
 
 function App() {
-    const [name, setName] = useState("Google Sign in");
-    const [open, setOpen] = useState(false);
+    const [user, setUser] = useState({name: "Google Sign In"});
+    const [show, userModal] = useToggle();
+    const [isSignIn, setIsSignIn] = useState(localStorage.getItem(localStorageKeys.isSignIn) ?? "false");
 
     useEffect(() => {
         auth.onAuthStateChanged((res) => {
-            setName(res?.displayName ?? "Google Sign in");
+            if (res != undefined) {
+                setUser({
+                    name: res.displayName ?? "Google Sign In"
+                });
+            }
         })
-    }, [name])
+    }, [setUser])
+
+    function handleSignIn() {
+        console.log("clicked sign in");
+        googleSigIn().then((res) => {
+            if (res != undefined) {
+                console.log("res after google sign In::", res?.displayName);
+                setUser({
+                    name: res.displayName ?? "Google Sign In"
+                });
+                setIsSignIn("true");
+            }
+        })
+    }
 
     return (
         <>
             <Container className="App">
-                {open && <LogoutModal open={open} setOpen={setOpen}/>}
                 <Header>
                     <Navbar appearance="inverse">
                         <Navbar.Header>
@@ -40,14 +58,11 @@ function App() {
                                 <Nav.Item href="#/train">Train</Nav.Item>
                             </Nav>
                             <Nav pullRight>
-                                <Nav.Item>{localStorage.getItem(localStorageKeys.isSignIn) === "true" ?
-                                    <Button onClick={() => setOpen(true)}>{name}</Button> :
+                                <Nav.Item>{isSignIn === "true" ?
                                     <Button onClick={() => {
-                                        googleSigIn().then((res) => {
-                                            console.log("res after google sign In::", res?.displayName);
-                                            setName(res?.displayName ?? "Google Sign In");
-                                        })
-                                    }}>Google Sign In</Button>}</Nav.Item>
+                                        userModal()
+                                    }}>{user.name}</Button> :
+                                    <Button onClick={handleSignIn}>Google Sign In</Button>}</Nav.Item>
                             </Nav>
                         </Navbar.Body>
                     </Navbar>
@@ -76,6 +91,7 @@ function App() {
                 </Content>
                 <ConnectionAlert/>
             </Container>
+            {<LogoutModal show={show} onHide={userModal} setIsSignIn={setIsSignIn}/>}
         </>
     );
 }

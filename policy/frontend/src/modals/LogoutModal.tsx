@@ -1,26 +1,32 @@
-import {Modal, Button} from 'rsuite';
+import {Modal, Button, ModalProps} from 'rsuite';
 import {googleSignOut} from "../database/authentication";
 
-export const LogoutModal = (params: { open: boolean; setOpen: any; }) => {
-    const {open, setOpen} = params;
-    const handleClose = () => setOpen(false);
+type LogoutModelProps = ModalProps & { show: boolean; onHide: () => void; setIsSignIn: (b: string) => void };
 
+export const LogoutModal = ({show, onHide, setIsSignIn}: LogoutModelProps) => {
     return (
-        <Modal backdrop="static" size="xs"  open={open} onClose={handleClose}>
-            <Modal.Header>
-                <Modal.Title>Modal Title</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Are you sure want to logout ?
-            </Modal.Body>
-            <Modal.Footer>
-                <Button onClick={googleSignOut} appearance="primary">
-                    Ok
-                </Button>
-                <Button onClick={handleClose} appearance="subtle">
-                    Cancel
-                </Button>
-            </Modal.Footer>
-        </Modal>
+        <>
+            <Modal backdrop="static" size="sm" show={show} onHide={onHide}>
+                <Modal.Header>
+                    <Modal.Title>Confirm Logout</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure want to logout ?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        googleSignOut().then(() => {
+                            setIsSignIn("false");
+                            onHide()
+                        });
+                    }} appearance="primary">
+                        Yes
+                    </Button>
+                    <Button onClick={onHide} appearance="subtle">
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
     );
 };

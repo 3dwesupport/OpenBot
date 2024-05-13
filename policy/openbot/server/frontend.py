@@ -9,11 +9,13 @@ from openbot import base_dir
 
 
 async def init_frontend(app: web.Application):
+    print("base_dir::",base_dir)
     public_dir = None
 
     async def handle_static(request: web.Request):
         path = request.match_info.get("path") or "index.html"
         if public_dir:
+            print("in public dir::",public_dir)
             return web.FileResponse(os.path.join(public_dir, path))
         return web.HTTPNotFound()
 
@@ -42,7 +44,10 @@ async def init_frontend(app: web.Application):
     importlib.reload(openbot_frontend)
 
     version = get_pkg_version(frontend_pkg)
-    public_dir = openbot_frontend.where()
+#    To run frontend through python server change the public directory path and run release.sh
+    public_dir = "/Users/hardikgarg/Desktop/server/OpenBot/policy/frontend/openbot_frontend"
+#     public_dir = openbot_frontend.where()
+    print("public_dir::",public_dir)
     print("Running frontend:", version)
     print("Frontend path:", public_dir)
 
