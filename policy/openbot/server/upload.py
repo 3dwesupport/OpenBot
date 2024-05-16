@@ -11,6 +11,7 @@ async def handle_file_upload(field: multipart.BodyPartReader) -> web.Response:
     size = 0
     hash = hashlib.sha1()
     path = os.path.join(dataset_dir, field.filename)
+    print("path::;",path)
     with open(path, "wb") as f:
         while True:
             chunk = await field.read_chunk()  # 8192 bytes by default.

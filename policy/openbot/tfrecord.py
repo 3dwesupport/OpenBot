@@ -34,7 +34,7 @@ def get_parser():
     return parser
 
 
-def load_labels(data_dir, datasets, policy="autopilot"):
+def load_labels(id , data_dir, datasets, policy="autopilot"):
     """Returns a dictionary of matched images path[string] and actions tuple, namely (left[int], right[int], cmd[int]) for autopilot policy and (left[int], right[int], dist[float],sinYaw[float],cosYaw[float]) for point_goal_nav policy."""
 
     if policy == "autopilot":
@@ -45,12 +45,15 @@ def load_labels(data_dir, datasets, policy="autopilot"):
         raise Exception("Unknown policy")
 
     corpus = []
+#     print("datasets in load_labels::",datasets)
     for dataset in datasets:
         dataset_folders = [
             f
             for f in os.listdir(os.path.join(data_dir, dataset))
             if not f.startswith(".")
+            if f.endswith(id)
         ]
+        print("real f :::",dataset_folders)
         for folder in dataset_folders:
             sensor_data_dir = os.path.join(data_dir, dataset, folder, "sensor_data")
             with open(
@@ -79,6 +82,7 @@ def load_labels(data_dir, datasets, policy="autopilot"):
 
 
 def convert_dataset(
+    id,
     data_dir,
     tfrecords_dir,
     tfrecords_name,
@@ -97,6 +101,8 @@ def convert_dataset(
         raise Exception("Unknown policy")
 
     # load the datasets avaible.
+    for d in os.listdir(data_dir):
+        print("d:::::",d)
     datasets = [
         d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d))
     ]
@@ -104,7 +110,9 @@ def convert_dataset(
 
     # match frames.
     max_offset = 1e3  # 1ms
+    print("id in convert_dataset::",id)
     frames = associate_frames.match_frame_ctrl_input(
+        id,
         data_dir,
         datasets,
         max_offset,
@@ -114,11 +122,13 @@ def convert_dataset(
     )
 
     # creating TFRecords output folder.
+    tfrecords_dir=tfrecords_dir+f"/{id}"
+    print("tfrecordsDir::",tfrecords_dir)
     if not os.path.exists(tfrecords_dir):
         os.makedirs(tfrecords_dir)
 
     # generate data in the TFRecord format.
-    samples = load_labels(data_dir, datasets, policy)
+    samples = load_labels(id, data_dir, datasets, policy)
     with tf.io.TFRecordWriter(tfrecords_dir + "/" + tfrecords_name) as writer:
         for image_path, ctrl_input in samples.items():
             try:

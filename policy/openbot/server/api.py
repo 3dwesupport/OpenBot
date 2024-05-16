@@ -49,6 +49,7 @@ async def handle_static(request: web.Request) -> web.StreamResponse:
 
 
 async def handle_models(request: web.Request) -> web.StreamResponse:
+    print("request::",request)
     models = getModelFiles()
     return web.json_response(models)
 
@@ -59,6 +60,7 @@ async def handle_upload(request: web.Request) -> web.Response:
         field = await reader.next()
         if field.name == "file":
             res = await handle_file_upload(field)
+            print("res in handle_upload:::",res)
             await rpc.notify("session")
             return res
 
@@ -104,14 +106,15 @@ async def init_api(app: web.Application):
 
 
 def listDir(params):
-    return get_dir_info(params["path"].lstrip("/"))
+    return get_dir_info(params["path"].lstrip("/") , params["id"])
 
 
 async def getSession(path):
     return get_info(path)
 
 
-async def createDataset(params):
+async def createDataset():
+#     print("params in createDataset::",params)
     path = os.path.join(dataset_dir, params["newDir"], params["newName"])
     os.mkdir(path)
     await rpc.notify("dataset")
@@ -158,37 +161,44 @@ def stop():
     return True
 
 
-def getDatasets():
+def getDatasets(params):
     return dict(
-        train=get_dataset_list("train_data"),
-        test=get_dataset_list("test_data"),
+        train=get_dataset_list("train_data",params["id"]),
+        test=get_dataset_list("test_data",params["id"]),
     )
 
 
 def getModelInfo(name):
-    return get_model_info(name)
+    print("name::",name["data"] , name["id"])
+    return get_model_info(name["data"] , name["id"])
 
 
-def getModels():
-    return get_models()
+def getModels(params):
+    return get_models(params["id"])
 
 
-def getHyperparameters():
+def getHyperparameters(params):
+    print("id::",params["id"])
     return Hyperparameters().__dict__
 
 
 async def start(params):
+    print("params with id ::",params)
+    print("params::",params)
     event_cancelled.clear()
+    print("cqscscqsdcqwc")
     loop = asyncio.get_event_loop()
-
+    print("cqscwscw")
     def broadcast(event, payload=None):
         print("broadcast", event, payload)
         if payload:
             payload = encode(payload)
         data = dict(event=event, payload=payload)
+        print("scxqscqswcwqdc")
         asyncio.run_coroutine_threadsafe(rpc.notify("training", data), loop).result()
-
+        print("asyncio.run_coroutine_threadsafe")
     hyper_params = Hyperparameters()
+    print("hyper_params::",hyper_params)
     for p in params:
         setattr(hyper_params, p, params[p])
     setattr(hyper_params, "POLICY", "autopilot")
@@ -199,10 +209,14 @@ async def start(params):
 
 def train(params, broadcast, cancelled):
     try:
+        id = params.__dict__["id"]
+#         del(params.__dict__["id"])
+        print("params in train train::",params.__dict__)
+#         print("id in trin train:",id)
         broadcast("started", params.__dict__)
         my_callback = MyCallback(broadcast, cancelled, True)
-        create_tfrecord(my_callback, params.POLICY)
-        tr = start_train(params, my_callback)
+        create_tfrecord(id,my_callback, params.POLICY)
+        tr = start_train(params,id, my_callback)
         broadcast("done", {"model": tr.model_name})
     except CancelledException:
         broadcast("cancelled")

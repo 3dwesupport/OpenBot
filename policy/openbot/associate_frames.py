@@ -108,6 +108,7 @@ def associate(first_list, second_list, max_offset):
 
 
 def match_frame_ctrl_input(
+    id,
     data_dir,
     datasets,
     max_offset,
@@ -116,14 +117,18 @@ def match_frame_ctrl_input(
     policy="autopilot",
 ):
     frames = []
+    print("id in match_frame_ctrl_input::",id)
     for dataset in datasets:
         for folder in utils.list_dirs(os.path.join(data_dir, dataset)):
-            session_dir = os.path.join(data_dir, dataset, folder)
-            frame_list = match_frame_session(
-                session_dir, max_offset, redo_matching, remove_zeros, policy
-            )
-            for timestamp in list(frame_list):
-                frames.append(frame_list[timestamp][0])
+            print("type::::",type(folder))
+            if(folder.endswith(id)):
+                print("folders:::",folder)
+                session_dir = os.path.join(data_dir, dataset, folder)
+                frame_list = match_frame_session(
+                    session_dir, max_offset, redo_matching, remove_zeros, policy
+                )
+                for timestamp in list(frame_list):
+                    frames.append(frame_list[timestamp][0])
     return frames
 
 

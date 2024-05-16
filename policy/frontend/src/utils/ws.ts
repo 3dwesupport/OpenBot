@@ -1,19 +1,25 @@
+import {localStorageKeys} from "./constants";
+
 export interface JsonRpcRequest {
     jsonrpc: "2.0";
     method: string;
     params: any;
 }
+
 export type JsonRpcResponse = JsonRpcResult | JsonRpcError;
+
 export interface JsonRpcResult {
     jsonrpc: "2.0";
     id: number;
     result: any;
 }
+
 export interface JsonRpcError {
     jsonrpc: "2.0";
     id: number;
     error: any;
 }
+
 type ConnectionState = 'connecting' | 'connected' | 'closed';
 
 type MessageCallback = (msg: JsonRpcRequest | JsonRpcResponse, event: MessageEvent) => void;
@@ -28,12 +34,21 @@ let jsonRpcId = 1;
 export function jsonRpc<T>(method: string, ...params: any[]) {
     return new Promise<T>((resolve, reject) => {
         const id = jsonRpcId++;
+        if (method == "start" || "publishModel" ) {
+            params[0] = {
+                ...params[0],
+                id: localStorage.getItem(localStorageKeys.uid) ?? ""
+            }
+        }
+        console.log("method::",method);
+        console.log("params in ws:::",params);
         const done = onMessage((msg: any) => {
             if (msg.jsonrpc === '2.0' && msg.id === id) {
                 done();
                 if (msg.error) {
                     reject(msg.error);
                 } else {
+                    console.log("msg.result:::",msg.result)
                     resolve(msg.result);
                 }
             }

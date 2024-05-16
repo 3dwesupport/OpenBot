@@ -159,16 +159,17 @@ class MyCallback(tf.keras.callbacks.Callback):
             )
 
 
-def process_data(tr: Training):
+def process_data(tr: Training , id):
     tr.train_datasets = utils.list_dirs(tr.train_data_dir)
     tr.test_datasets = utils.list_dirs(tr.test_data_dir)
-
+    print("id in process_data::",id)
     print("Train Datasets: ", len(tr.train_datasets))
     print("Test Datasets: ", len(tr.test_datasets))
 
     # 1ms
     max_offset = 1e3
     train_frames = associate_frames.match_frame_ctrl_input(
+        id,
         tr.train_data_dir,
         tr.train_datasets,
         max_offset,
@@ -178,6 +179,7 @@ def process_data(tr: Training):
     )
 
     test_frames = associate_frames.match_frame_ctrl_input(
+        id,
         tr.test_data_dir,
         tr.test_datasets,
         max_offset,
@@ -373,15 +375,19 @@ def load_data(tr: Training, verbose=0):
     tr.test_ds = test_ds.prefetch(buffer_size=10 * tr.hyperparameters.TRAIN_BATCH_SIZE)
 
 
-def visualize_train_data(tr: Training):
+def visualize_train_data(tr: Training,id):
     utils.show_batch(dataset=tr.train_ds, policy=tr.hyperparameters.POLICY, model=None)
-    utils.savefig(os.path.join(models_dir, "train_preview.png"))
+    print("train_preview.png path:::",models_dir)
+    utils.savefig(os.path.join(models_dir,id, "train_preview.png"))
 
 
-def do_training(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0):
+def do_training(tr: Training,id, callback: tf.keras.callbacks.Callback, verbose=0):
+    print("tr.dataset_name::",tr.dataset_name)
+    print("tr.hyperparameters:::",str(tr.hyperparameters))
     tr.model_name = tr.dataset_name + "_" + str(tr.hyperparameters)
-    tr.checkpoint_path = os.path.join(models_dir, tr.model_name, "checkpoints")
-    tr.log_path = os.path.join(models_dir, tr.model_name, "logs")
+    print("in do_training")
+    tr.checkpoint_path = os.path.join(models_dir,id, tr.model_name, "checkpoints")
+    tr.log_path = os.path.join(models_dir,id, tr.model_name, "logs")
 
     tr.custom_objects = {
         "direction_metric": metrics.direction_metric,
@@ -426,6 +432,7 @@ def do_training(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0):
             print(err)
             raise
 
+    print("resume_training::",resume_training)
     if not resume_training:
         model = getattr(models, tr.hyperparameters.MODEL)(
             tr.NETWORK_IMG_WIDTH,
@@ -433,7 +440,9 @@ def do_training(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0):
             tr.hyperparameters.BATCH_NORM,
             tr.hyperparameters.POLICY,
         )
-        dot_img_file = os.path.join(models_dir, tr.model_name, "model.png")
+
+        dot_img_file = os.path.join(models_dir,id, tr.model_name, "model.png")
+        print("dot_img_file::",dot_img_file)
         tf.keras.utils.plot_model(model, to_file=dot_img_file, show_shapes=True)
 
     callback.broadcast("model", tr.model_name)
@@ -489,7 +498,7 @@ def do_training(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0):
     callback.broadcast("message", "...Done")
 
 
-def do_evaluation(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0):
+def do_evaluation(tr: Training,id, callback: tf.keras.callbacks.Callback, verbose=0):
     callback.broadcast("message", "Generate plots...")
 
     x = np.arange(tr.INITIAL_EPOCH + 1, tr.history.params["epochs"] + 1, 1)
@@ -500,6 +509,7 @@ def do_evaluation(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend(loc="upper right")
+    print("log path::",tr.log_path)
     utils.savefig(os.path.join(tr.log_path, "loss.png"))
 
     plt.figure().gca().xaxis.get_major_locator().set_params(integer=True)
@@ -598,46 +608,51 @@ def do_evaluation(tr: Training, callback: tf.keras.callbacks.Callback, verbose=0
     utils.show_batch(
         dataset=tr.test_ds, policy=tr.hyperparameters.POLICY, model=last_model
     )
+    print("test_preview.png path::",tr.log_path)
     utils.savefig(os.path.join(tr.log_path, "test_preview.png"))
     utils.compare_tf_tflite(last_model, last_tflite, policy=tr.hyperparameters.POLICY)
 
 
 def start_train(
-    params: Hyperparameters, callback: MyCallback, verbose=0, no_tf_record=False
+    params: Hyperparameters,id, callback: MyCallback, verbose=0, no_tf_record=False
 ):
+    print("params in start_train::",params.__dict__)
+    print("id in start train::::",id)
     tr = Training(params)
     if no_tf_record:
         callback.broadcast("message", "Processing data...")
         tr.train_data_dir = os.path.join(dataset_dir, "train_data")
         tr.test_data_dir = os.path.join(dataset_dir, "test_data")
-        process_data(tr)
+        process_data(tr,id)
         callback.broadcast("message", "Loading data...")
         load_data(tr, verbose)
     else:
         callback.broadcast("message", "Loading data from tfrecord...")
-        tr.train_data_dir = os.path.join(dataset_dir, "tfrecords/train.tfrec")
-        tr.test_data_dir = os.path.join(dataset_dir, "tfrecords/test.tfrec")
+        tr.train_data_dir = os.path.join(dataset_dir, f"tfrecords/{id}/train.tfrec")
+        tr.test_data_dir = os.path.join(dataset_dir, f"tfrecords/{id}/test.tfrec")
         load_tfrecord(tr, verbose)
 
-    visualize_train_data(tr)
+    visualize_train_data(tr,id)
     callback.broadcast("preview")
-    do_training(tr, callback, verbose)
-    do_evaluation(tr, callback, verbose)
+    do_training(tr,id, callback, verbose)
+    do_evaluation(tr,id, callback, verbose)
 
     return tr
 
 
-def create_tfrecord(callback: MyCallback, policy="autopilot"):
+def create_tfrecord(id,callback: MyCallback, policy="autopilot"):
     callback.broadcast(
         "message", "Converting data to tfrecord (this may take some time)..."
     )
     tfrecord.convert_dataset(
+        id,
         os.path.join(dataset_dir, "train_data"),
         os.path.join(dataset_dir, "tfrecords"),
         "train.tfrec",
         policy=policy,
     )
     tfrecord.convert_dataset(
+        id,
         os.path.join(dataset_dir, "test_data"),
         os.path.join(dataset_dir, "tfrecords"),
         "test.tfrec",
