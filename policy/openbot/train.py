@@ -621,8 +621,8 @@ def start_train(
     tr = Training(params)
     if no_tf_record:
         callback.broadcast("message", "Processing data...")
-        tr.train_data_dir = os.path.join(dataset_dir, "train_data")
-        tr.test_data_dir = os.path.join(dataset_dir, "test_data")
+        tr.train_data_dir = os.path.join(dataset_dir,id, "train_data")
+        tr.test_data_dir = os.path.join(dataset_dir,id, "test_data")
         process_data(tr,id)
         callback.broadcast("message", "Loading data...")
         load_data(tr, verbose)
@@ -646,14 +646,14 @@ def create_tfrecord(id,callback: MyCallback, policy="autopilot"):
     )
     tfrecord.convert_dataset(
         id,
-        os.path.join(dataset_dir, "train_data"),
+        os.path.join(dataset_dir,id, "train_data"),
         os.path.join(dataset_dir, "tfrecords"),
         "train.tfrec",
         policy=policy,
     )
     tfrecord.convert_dataset(
         id,
-        os.path.join(dataset_dir, "test_data"),
+        os.path.join(dataset_dir,id, "test_data"),
         os.path.join(dataset_dir, "tfrecords"),
         "test.tfrec",
         policy=policy,

@@ -34,21 +34,24 @@ let jsonRpcId = 1;
 export function jsonRpc<T>(method: string, ...params: any[]) {
     return new Promise<T>((resolve, reject) => {
         const id = jsonRpcId++;
-        if (method == "start" || "publishModel" ) {
+        if (method == "getModelInfo") {
+            params[0] = {
+                data: params[0],
+                id: localStorage.getItem(localStorageKeys.uid) ?? ""
+            }
+        } else if (method == "subscribe" || method == "unsubscribe") {
+        } else {
             params[0] = {
                 ...params[0],
                 id: localStorage.getItem(localStorageKeys.uid) ?? ""
             }
         }
-        console.log("method::",method);
-        console.log("params in ws:::",params);
         const done = onMessage((msg: any) => {
             if (msg.jsonrpc === '2.0' && msg.id === id) {
                 done();
                 if (msg.error) {
                     reject(msg.error);
                 } else {
-                    console.log("msg.result:::",msg.result)
                     resolve(msg.result);
                 }
             }

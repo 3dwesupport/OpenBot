@@ -3,6 +3,7 @@ import {getStorage} from "firebase/storage";
 import {getFirestore} from "firebase/firestore";
 import {getAuth, signOut, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {localStorageKeys} from "../utils/constants";
+import {jsonRpc} from "../utils/ws";
 
 /**
  * Firebase Configuration
@@ -45,6 +46,7 @@ export async function googleSigIn() {
     const uid = auth?.currentUser?.uid; // Assuming auth is of type Auth | undefined
     if (uid !== undefined) {
         localStorage.setItem(localStorageKeys.uid, uid);
+        await jsonRpc('createIdDirectory', {})
     }
     return auth.currentUser;
 }

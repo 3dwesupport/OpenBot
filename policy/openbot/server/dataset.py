@@ -6,13 +6,7 @@ from .. import associate_frames, dataset_dir
 
 
 def get_dataset_list(dir_path , id):
-    print("id in get_dataset_list::",id)
-    print("dir_path, name::",dir_path, dataset_dir)
-    print("get_dataset_info::",get_dataset_info)
-    for name in listdir(dataset_dir, dir_path):
-        print("name::",name)
-    print("get_dataset_list::",[get_dataset_info(dir_path, name, id) for name in listdir(dataset_dir, dir_path)])
-    return [get_dataset_info(dir_path, name, id) for name in listdir(dataset_dir, dir_path)]
+    return [get_dataset_info(dir_path, name, id) for name in listdir(dataset_dir, id,  dir_path)]
 
 
 def get_dataset_info(dir_path, name, id):
@@ -26,15 +20,11 @@ def get_dataset_info(dir_path, name, id):
 
 def get_dir_info(dir_path , id):
     files = []
-    list1 = listdir(dataset_dir, dir_path)
-    print("list1:::",list1)
+    list1 = listdir(dataset_dir,id, dir_path)
     for basename in list1:
-        info = get_info(dir_path, basename)
-        if info and basename.endswith(id):
+        info = get_info(id+"/"+dir_path, basename)
+        if info:
             files.append(info)
-
-#     filtered_items = [files for item in files if item['path'].endswith(id)]
-#     print("files:::",filtered_items)
     return files
 
 
@@ -46,7 +36,6 @@ def listdir(*parts):
 
 def get_info(path, basename=None):
     path = path.lstrip("/")
-    print("get_info path::",path , basename)
     if basename:
         path = os.path.join(path, basename)
     else:

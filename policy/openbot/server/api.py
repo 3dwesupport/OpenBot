@@ -49,8 +49,9 @@ async def handle_static(request: web.Request) -> web.StreamResponse:
 
 
 async def handle_models(request: web.Request) -> web.StreamResponse:
-    print("request::",request)
-    models = getModelFiles()
+    params = request.query
+    uid = params.get("id")
+    models = getModelFiles({'id': uid})
     return web.json_response(models)
 
 
@@ -58,9 +59,10 @@ async def handle_upload(request: web.Request) -> web.Response:
     reader = await request.multipart()
     while not reader.at_eof():
         field = await reader.next()
+        if field.name == "id":
+            uid = await field.text()
         if field.name == "file":
-            res = await handle_file_upload(field)
-            print("res in handle_upload:::",res)
+            res = await handle_file_upload(field,uid)
             await rpc.notify("session")
             return res
 
@@ -96,6 +98,7 @@ async def init_api(app: web.Application):
         ("", redoMatching),
         ("", start),
         ("", stop),
+        ("", createIdDirectory)
     )
     rpc.add_topics(
         "dataset",
@@ -113,24 +116,45 @@ async def getSession(path):
     return get_info(path)
 
 
-async def createDataset():
-#     print("params in createDataset::",params)
-    path = os.path.join(dataset_dir, params["newDir"], params["newName"])
+async def createDataset(params):
+    path = os.path.join(dataset_dir,params["id"], params["newDir"], params["newName"])
     os.mkdir(path)
     await rpc.notify("dataset")
     return True
 
+async def createIdDirectory(params):
+    id_dir = os.path.join(dataset_dir,params["id"])
+    if not os.path.isdir(id_dir):
+        os.mkdir(id_dir)
+
+    upload_dir = os.path.join(dataset_dir,params["id"], "uploaded")
+    train_data_dir = os.path.join(dataset_dir,params["id"], "train_data")
+    test_data_dir = os.path.join(dataset_dir,params["id"], "test_data")
+
+    if not os.path.isdir(upload_dir):
+        os.mkdir(upload_dir)
+    if not os.path.isdir(train_data_dir):
+        os.mkdir(train_data_dir)
+    if not os.path.isdir(test_data_dir):
+        os.mkdir(test_data_dir)
+
+    if len(os.listdir(train_data_dir)) < 1:
+        os.mkdir(os.path.join(train_data_dir, "my_dataset_1"))
+
+    if len(os.listdir(test_data_dir)) < 1:
+        os.mkdir(os.path.join(test_data_dir, "my_dataset_2"))
+    return True
 
 async def deleteDataset(params):
-    real_dir = dataset_dir + params["path"]
+    real_dir = dataset_dir + "/" + params["id"] + params["path"]
     shutil.rmtree(real_dir)
     await rpc.notify("dataset")
     return True
 
 
 async def renameDataset(params):
-    src = os.path.join(dataset_dir, params["oldDir"], params["oldName"])
-    dst = os.path.join(dataset_dir, params["newDir"], params["newName"])
+    src = os.path.join(dataset_dir,params["id"], params["oldDir"], params["oldName"])
+    dst = os.path.join(dataset_dir,params["id"], params["newDir"], params["newName"])
     if src == dst:
         return True
     if os.path.exists(dst):
@@ -143,7 +167,7 @@ async def renameDataset(params):
 async def moveSession(params):
     basename = os.path.basename(params["path"])
     src = os.path.join(dataset_dir + params["path"])
-    dst = os.path.join(dataset_dir + params["new_path"], basename)
+    dst = os.path.join(dataset_dir + "/" + params["id"] + params["new_path"], basename)
     os.rename(src, dst)
     await rpc.notify("session")
     return True
@@ -169,7 +193,6 @@ def getDatasets(params):
 
 
 def getModelInfo(name):
-    print("name::",name["data"] , name["id"])
     return get_model_info(name["data"] , name["id"])
 
 
@@ -178,31 +201,21 @@ def getModels(params):
 
 
 def getHyperparameters(params):
-    print("id::",params["id"])
     return Hyperparameters().__dict__
 
 
 async def start(params):
-    print("params with id ::",params)
-    print("params::",params)
     event_cancelled.clear()
-    print("cqscscqsdcqwc")
     loop = asyncio.get_event_loop()
-    print("cqscwscw")
     def broadcast(event, payload=None):
-        print("broadcast", event, payload)
         if payload:
             payload = encode(payload)
         data = dict(event=event, payload=payload)
-        print("scxqscqswcwqdc")
         asyncio.run_coroutine_threadsafe(rpc.notify("training", data), loop).result()
-        print("asyncio.run_coroutine_threadsafe")
     hyper_params = Hyperparameters()
-    print("hyper_params::",hyper_params)
     for p in params:
         setattr(hyper_params, p, params[p])
     setattr(hyper_params, "POLICY", "autopilot")
-    print(hyper_params.__dict__)
     loop.run_in_executor(None, train, hyper_params, broadcast, event_cancelled)
     return True
 
@@ -210,9 +223,6 @@ async def start(params):
 def train(params, broadcast, cancelled):
     try:
         id = params.__dict__["id"]
-#         del(params.__dict__["id"])
-        print("params in train train::",params.__dict__)
-#         print("id in trin train:",id)
         broadcast("started", params.__dict__)
         my_callback = MyCallback(broadcast, cancelled, True)
         create_tfrecord(id,my_callback, params.POLICY)

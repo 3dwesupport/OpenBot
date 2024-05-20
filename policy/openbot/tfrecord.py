@@ -51,7 +51,6 @@ def load_labels(id , data_dir, datasets, policy="autopilot"):
             f
             for f in os.listdir(os.path.join(data_dir, dataset))
             if not f.startswith(".")
-            if f.endswith(id)
         ]
         print("real f :::",dataset_folders)
         for folder in dataset_folders:

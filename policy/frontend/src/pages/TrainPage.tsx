@@ -8,6 +8,7 @@ import {HyperparametersForm} from 'src/components/HyperparametersForm';
 import {Plot} from 'src/components/Plot';
 import {ProgressState, useProgress} from 'src/utils/useProgress';
 import {jsonRpc} from 'src/utils/ws';
+import {localStorageKeys} from "../utils/constants";
 
 const noSleep = new NoSleep();
 
@@ -21,7 +22,7 @@ export function TrainPage() {
                 <Panel shaded header="Hyperparameters">
                     <HyperparametersForm/>
                 </Panel>
-            ): (
+            ) : (
                 <TrainProgress state={state} clear={clear}/>
             )}
         </div>
@@ -37,6 +38,8 @@ function TrainProgress({state, clear}: { state: ProgressState, clear: () => any 
             noSleep.disable();
         }
     }, [active]);
+
+
     const now = new Date();
     const end = predictEndDate(state, now);
     return <>
@@ -56,7 +59,7 @@ function TrainProgress({state, clear}: { state: ProgressState, clear: () => any 
             <ButtonBar>
                 {active ? (
                     <Button onClick={() => jsonRpc('stop')}>Stop</Button>
-                ): (
+                ) : (
                     <Button onClick={clear}>Clear</Button>
                 )}
             </ButtonBar>
@@ -74,17 +77,18 @@ function TrainProgress({state, clear}: { state: ProgressState, clear: () => any 
         )}
         {!!state.rnd && (
             <Panel bodyFill shaded header="Train preview" collapsible defaultExpanded>
-                <img alt="preview thumbnails" src={`/models/train_preview.png?rnd=${state.rnd}`}/>
+                <img alt="preview thumbnails"
+                     src={`/models/${localStorage.getItem(localStorageKeys.uid)}/train_preview.png?rnd=${state.rnd}`}/>
             </Panel>
         )}
         {!!state.model && (
             <Panel bodyFill shaded header="Model preview" collapsible defaultExpanded>
-                <img alt="preview thumbnails" src={`/models/${state.model}/model.png?rnd=${state.rnd}`}/>
+                <img alt="preview thumbnails" src={`/models/${localStorage.getItem(localStorageKeys.uid)}/${state.model}/model.png?rnd=${state.rnd}`}/>
             </Panel>
         )}
         {state.status === 'success' && (
             <Panel bodyFill shaded header="Test preview" collapsible defaultExpanded>
-                <img alt="preview thumbnails" src={`/models/${state.model}/logs/test_preview.png?rnd=${state.rnd}`}/>
+                <img alt="preview thumbnails" src={`/models/${localStorage.getItem(localStorageKeys.uid)}/${state.model}/logs/test_preview.png?rnd=${state.rnd}`}/>
             </Panel>
         )}
     </>
