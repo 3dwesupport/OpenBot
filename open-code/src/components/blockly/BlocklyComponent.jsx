@@ -13,6 +13,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import {checkFileExistsInFolder, getFolderId, getShareableLink} from "../../services/googleDrive";
 import {RightDrawer} from "../drawer/drawer";
 import {useLocation} from "react-router-dom";
+// import blockly from "./index";
 
 Blockly.setLocale(locale);
 
@@ -25,8 +26,7 @@ Blockly.setLocale(locale);
  * @returns {JSX.Element}
  */
 function BlocklyComponent(props) {
-    const {initialXml, children, onWorkspaceChange, ...rest} = props;
-
+    const {codeValue,initialXml, children, onWorkspaceChange, ...rest} = props;
     // Refs for the workspace, toolbox, and blockly div
     const blocklyDiv = useRef();
     const toolbox = useRef();
@@ -47,6 +47,7 @@ function BlocklyComponent(props) {
         category,
         isAutoSyncEnabled,
         setIsAutoSyncEnabled,
+        setIsBlockEventChange,
     } = useContext(StoreContext);
     const themes = useTheme();
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
@@ -112,6 +113,43 @@ function BlocklyComponent(props) {
         }
     };
 
+    let timer;
+    const handleCodeEditorOnModifyingWorkspace = useCallback((event) => {
+        function createBlock(){
+            console.log("Blocks are created ::");
+            setIsBlockEventChange(true);
+        }
+        function deleteBlock(){
+            console.log("Blocks are deleted:");
+            setIsBlockEventChange(true);
+        }
+        function dragBlock(){
+            console.log("Blocks are drag and drop::");
+            setIsBlockEventChange(true);
+        }
+        function changeCode(){
+            console.log("Code are changes ::");
+            setIsBlockEventChange(true);
+        }
+
+       if (event.type===Blockly.Events.CREATE){
+           clearTimeout(timer);
+           timer=setTimeout(createBlock,5000);
+       }
+       else if(event.type === Blockly.Events.DELETE){
+           clearTimeout(timer);
+           timer=setTimeout(deleteBlock,5000);
+       }
+       else if(event.type === Blockly.Events.BLOCK_DRAG){
+           clearTimeout(timer);
+           timer=setTimeout(dragBlock,5000);
+       }
+       else if(event.type === Blockly.Events.CHANGE){
+           clearTimeout(timer);
+           timer=setTimeout(changeCode,3000);
+       }
+    }, [])
+
     /**
      * function to disable forever block if start block contains AI block
      * @type {(function(): void)|*}
@@ -141,6 +179,7 @@ function BlocklyComponent(props) {
     }, [])
 
     //function to check qr code availability and display drive link
+
     const checkQRCode = async () => {
         if (localStorage.getItem("isSigIn") === "true") {
             if (isOnline) {
@@ -196,6 +235,7 @@ function BlocklyComponent(props) {
             ...rest,
         });
 
+
         // Set the zoom level for mobile devices
         //decreased size of blocks in mobile view
         const zoomLevel = 0.7;
@@ -225,6 +265,8 @@ function BlocklyComponent(props) {
 
         //handle forever block disability if start block contains AI block
         primaryWorkspace.current.addChangeListener(handleForeverBlocks);
+
+        primaryWorkspace.current.addChangeListener(handleCodeEditorOnModifyingWorkspace);
 
         // Load XML code into the workspace if it exists, otherwise load initial XML code
         if (currentProjectXml) {

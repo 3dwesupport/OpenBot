@@ -13,6 +13,7 @@ import {RightSlider} from "../drawer/drawer";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {useTheme} from "@mui/material";
 import {Themes} from "../../utils/constants";
+import {myCode} from "../../services/generativeAI";
 
 /**x
  * Code Editor to display Js code and python code.
@@ -20,11 +21,21 @@ import {Themes} from "../../utils/constants";
  * @returns {JSX.Element}
  * @constructor
  */
+
 function CodeEditor(params) {
+    const [codeValue, setCodeValue] = useState('');
+    const [finalCode,setFinalCode]=useState('');
     const editorRef = useRef(null);
-    const {workspace, currentProjectXml, category, drawer} = useContext(StoreContext);
-    const themes = useTheme();// Get the current theme breakpoints using useTheme hook
-    const isMobile = useMediaQuery(themes.breakpoints.down('sm'));// Determine if the screen is a mobile device using useMediaQuery hook
+    const {
+        workspace,
+        currentProjectXml,
+        category,
+        drawer,
+        isBlockEventChange,
+        setIsBlockEventChange,
+    } = useContext(StoreContext);
+    const themes = useTheme();  // Get the current theme breakpoints using useTheme hook
+    const isMobile = useMediaQuery(themes.breakpoints.down('sm'));  // Determine if the screen is a mobile device using useMediaQuery hook
     const {theme} = useContext(ThemeContext);
     const [isLandscape, setIsLandscape] = useState(window.matchMedia("(max-height: 500px) and (max-width: 1000px) and (orientation: landscape)").matches);
     const [isTabletQuery, setIsTabletQuery] = useState(window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches);
@@ -36,6 +47,7 @@ function CodeEditor(params) {
             );
             setIsTabletQuery(window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches);
         };
+
         window.addEventListener("resize", handleOrientationChange);
     }, []);
 
@@ -45,19 +57,36 @@ function CodeEditor(params) {
         let code;
         let mode;
         if (category === Constants.py) {
+            console.log("in python code")
             code = pythonGenerator.workspaceToCode(workspace);
             mode = "ace/mode/python";
-
         } else if (category === Constants.js) {
+            console.log("in js code")
             code = javascriptGenerator.workspaceToCode(workspace);
             mode = "ace/mode/javascript";
+        }
+
+        setCodeValue(code);
+
+        // When the drawer is open, trigger an API request to fetch the data.
+
+        if (drawer) {
+            // if blocks is move
+            if (isBlockEventChange) {
+                myCode(codeValue).then((res) => {
+                   setFinalCode(res);
+                });
+                setIsBlockEventChange(false);
+            }
+        } else {
+            console.log("Drawer is not open ");
         }
         editor.session.setMode(mode);
         editor.setOption("useWorker", false);
         editor.setReadOnly(true);
         editor.setTheme(theme === Themes.dark ? "ace/theme/one_dark" : "ace/theme/textmate");
         editor.session.setMode(mode);
-        editor.setValue(code);
+        editor.setValue(finalCode);
         const gutterEl = editor.renderer.$gutter;
         editor.renderer.$printMarginEl.style.width = "0px"
         gutterEl.style.color = theme === "dark" ? "white" : "black";
@@ -68,7 +97,7 @@ function CodeEditor(params) {
         return () => {
             editor.destroy();
         };
-    }, [workspace, currentProjectXml, category, drawer, theme]);
+    }, [workspace, currentProjectXml, category, drawer, theme, isBlockEventChange,finalCode]);
 
     return (<div>
         <div style={{zIndex: 2, position: "absolute", top: isLandscape ? "100%" : "30%"}}>
@@ -83,6 +112,5 @@ function CodeEditor(params) {
         }}/>
     </div>)
 }
-
 
 export default CodeEditor;

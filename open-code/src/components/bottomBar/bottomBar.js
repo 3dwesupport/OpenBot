@@ -20,13 +20,14 @@ import navbarStyle from "../navBar/navbar.module.css";
 import BlueText from "../fonts/blueText";
 import {ModelUploadingComponent} from "./modelUploadingComponent";
 import SubscriptionModel from "../subscription/subscriptionModel";
-import {setProjectDetails} from "../../apis/projects";
 
 /**
  * Bottom Bar contains generate code, upload on drive icon , zoom in-out and undo redo functionality.
  * @returns {JSX.Element}
  * @constructor
  */
+
+
 export const BottomBar = () => {
     const [buttonSelected, setButtonSelected] = useState({backgroundColor: colors.openBotBlue});
     const [buttonActive, setButtonActive] = useState(false);
@@ -108,6 +109,7 @@ export const BottomBar = () => {
                 const multipleObjectTracking = workspace.getBlocksByType(PlaygroundConstants.multipleObjectTracking);
                 const variableDetection = workspace.getBlocksByType(PlaygroundConstants.variableDetection);
                 let objNameArray = [];
+
                 if (variableDetection?.length > 0) {
                     for (let i = 0; i < variableDetection.length; i++) {
                         objNameArray.push(variableDetection[i].getFieldValue(PlaygroundConstants.labels));
@@ -368,7 +370,7 @@ export const BottomBar = () => {
 function UploadCodeButton(params) {
     const {clickedButton, buttonSelected, buttonActive, setDrawer, setIsAIModelComponent, setFile} = params
     const themes = useTheme();
-    const {setCategory} = useContext(StoreContext);
+    const {setCategory, setIsBlockEventChange} = useContext(StoreContext);
     const isMobile = useMediaQuery(themes.breakpoints.down('sm'));
     const theme = useContext(ThemeContext);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -380,6 +382,7 @@ function UploadCodeButton(params) {
     const isDesktopSmallerScreen = useMediaQuery(themes.breakpoints.down('lg'));
     const inputRef = useRef();
 
+
     const handleClick = (event) => {
         event.stopPropagation();
         setOpenPopupArrow(!openPopupArrow);
@@ -390,12 +393,19 @@ function UploadCodeButton(params) {
 
     const handleLanguageDropDown = (lang) => {
         setCategory(lang);
+        setIsBlockEventChange(true);
+        if (lang === 'js') {
+            console.log("Javascript code :");
+        } else {
+            console.log("Python code :");
+        }
         setDrawer(true);
         setAnchorEl(null);
         setOpenPopupArrow(!openPopupArrow);
     }
 
     const handleChange = (e) => {
+
         setFile(e.target.files[0])
         setIsAIModelComponent(true)
     }
