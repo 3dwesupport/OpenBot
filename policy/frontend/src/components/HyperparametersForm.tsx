@@ -1,11 +1,23 @@
 import {useEffect, useRef} from 'react';
-import {Button, ControlLabel, Form, FormControl, FormGroup, Message, Panel, Placeholder, SelectPicker} from 'rsuite';
+import {
+    Button,
+    ControlLabel,
+    Form,
+    FormControl,
+    FormGroup,
+    Message,
+    Notification,
+    Panel,
+    Placeholder,
+    SelectPicker
+} from 'rsuite';
 import {BoolParam} from 'src/components/BoolParam';
 import {ButtonBar} from 'src/components/ButtonBar';
 import {NumberParam} from 'src/components/NumberParam';
 import {Hyperparametes} from 'src/utils/useProgress';
 import {useRpc} from 'src/utils/useRpc';
 import {jsonRpc} from 'src/utils/ws';
+import {localStorageKeys} from "../utils/constants";
 
 const models = [
     {label: 'cil', value: 'cil'},
@@ -39,9 +51,21 @@ export function HyperparametersForm() {
         formValue.current = values;
     }
 
+    function handleTrainEvent() {
+        if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
+            jsonRpc('start', formValue.current).then()
+        } else {
+            console.log("in t");
+            Notification.warning({
+                title: `Please sign in to train model`
+            });
+        }
+    }
+
     return (
         <>
-            <Message description="You may have to tune the learning rate and batch size depending on your available compute resources and dataset. As a general rule of thumb, if you increase the batch size by a factor of n, you can increase the learning rate by a factor of sqrt(n)."/>
+            <Message
+                description="You may have to tune the learning rate and batch size depending on your available compute resources and dataset. As a general rule of thumb, if you increase the batch size by a factor of n, you can increase the learning rate by a factor of sqrt(n)."/>
             <Form onChange={onChange} formDefaultValue={value} layout="horizontal">
                 <FormGroup>
                     <ControlLabel>MODEL</ControlLabel>
@@ -61,7 +85,7 @@ export function HyperparametersForm() {
                     help="For debugging and hyperparamter tuning, you can set the number of epochs to a small value like 10. If you want to train a model which will achieve good performance, you should set it to 50 or more. In our paper we used 100."
                 />
                 <Panel bordered header="Advanced parameters" collapsible>
-                    <Message type="warning" description="Don't change these unless you know what you are doing" />
+                    <Message type="warning" description="Don't change these unless you know what you are doing"/>
                     <BoolParam name="BATCH_NORM" defaultChecked={value.BATCH_NORM}/>
                     <BoolParam name="FLIP_AUG" defaultChecked={value.FLIP_AUG}/>
                     <BoolParam name="CMD_AUG" defaultChecked={value.CMD_AUG}/>
@@ -72,7 +96,7 @@ export function HyperparametersForm() {
                 />
             </Form>
             <ButtonBar>
-                <Button onClick={() => jsonRpc('start', formValue.current)} appearance="primary">Start</Button>
+                <Button onClick={handleTrainEvent} appearance="primary">Start</Button>
             </ButtonBar>
         </>
     );

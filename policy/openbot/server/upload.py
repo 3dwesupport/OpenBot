@@ -1,13 +1,13 @@
 import hashlib
 import os
 import zipfile
+from .googleDrive import accessToken,main
 
 from aiohttp import multipart, web
 
 from .. import dataset_dir
 
-
-async def handle_file_upload(field: multipart.BodyPartReader,uid) -> web.Response:
+async def handle_file_upload(field: multipart.BodyPartReader,uid , accessToken) -> web.Response:
     size = 0
     hash = hashlib.sha1()
     path = os.path.join(dataset_dir, field.filename)
@@ -20,7 +20,7 @@ async def handle_file_upload(field: multipart.BodyPartReader,uid) -> web.Respons
             hash.update(chunk)
     with zipfile.ZipFile(path, "r") as zip_ref:
         zip_ref.extractall(dataset_dir +"/" + uid + "/uploaded/" + field.filename[:-4])
-
+    await main(path)
     os.unlink(path)
 
     return web.json_response(

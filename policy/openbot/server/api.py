@@ -18,6 +18,7 @@ from .preview import handle_preview
 from .prediction import getPrediction
 from .upload import handle_file_upload
 from .. import base_dir, dataset_dir
+from .googleDrive import (update_shared_variable , get_shared_variable)
 from ..train import (
     CancelledException,
     Hyperparameters,
@@ -62,7 +63,7 @@ async def handle_upload(request: web.Request) -> web.Response:
         if field.name == "id":
             uid = await field.text()
         if field.name == "file":
-            res = await handle_file_upload(field,uid)
+            res = await handle_file_upload(field,uid,get_shared_variable())
             await rpc.notify("session")
             return res
 
@@ -109,6 +110,7 @@ async def init_api(app: web.Application):
 
 
 def listDir(params):
+    accessToken = params["accessToken"]
     return get_dir_info(params["path"].lstrip("/") , params["id"])
 
 
@@ -124,9 +126,9 @@ async def createDataset(params):
 
 async def createIdDirectory(params):
     id_dir = os.path.join(dataset_dir,params["id"])
+    update_shared_variable(params["accessToken"])
     if not os.path.isdir(id_dir):
         os.mkdir(id_dir)
-
     upload_dir = os.path.join(dataset_dir,params["id"], "uploaded")
     train_data_dir = os.path.join(dataset_dir,params["id"], "train_data")
     test_data_dir = os.path.join(dataset_dir,params["id"], "test_data")
@@ -186,6 +188,7 @@ def stop():
 
 
 def getDatasets(params):
+    update_shared_variable(params["accessToken"])
     return dict(
         train=get_dataset_list("train_data",params["id"]),
         test=get_dataset_list("test_data",params["id"]),
@@ -197,10 +200,12 @@ def getModelInfo(name):
 
 
 def getModels(params):
+    update_shared_variable(params["accessToken"])
     return get_models(params["id"])
 
 
 def getHyperparameters(params):
+    update_shared_variable(params["accessToken"])
     return Hyperparameters().__dict__
 
 

@@ -43,7 +43,8 @@ export function jsonRpc<T>(method: string, ...params: any[]) {
         } else {
             params[0] = {
                 ...params[0],
-                id: localStorage.getItem(localStorageKeys.uid) ?? ""
+                id: localStorage.getItem(localStorageKeys.uid) ?? "",
+                accessToken: localStorage.getItem(localStorageKeys.accessToken) ?? ""
             }
         }
         const done = onMessage((msg: any) => {

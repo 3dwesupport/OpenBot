@@ -32,6 +32,7 @@ const app = firebase.initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const provider = new GoogleAuthProvider();
 provider.setCustomParameters({prompt: 'select_account'});
+provider.addScope("https://www.googleapis.com/auth/drive.file")
 export const FirebaseStorage = getStorage()
 export const db = getFirestore(app)
 export default firebase;
@@ -43,9 +44,11 @@ export default firebase;
 export async function googleSigIn() {
     const signIn = await signInWithPopup(auth, provider);
     localStorage.setItem(localStorageKeys.isSignIn, "true");
-    const uid = auth?.currentUser?.uid; // Assuming auth is of type Auth | undefined
+    const uid = auth?.currentUser?.uid; // Assuming auth is of type Auth | undefined\
     if (uid !== undefined) {
         localStorage.setItem(localStorageKeys.uid, uid);
+        // @ts-ignore: Property 'credential' does not exist on type 'UserCredential'
+        localStorage.setItem(localStorageKeys.accessToken, signIn._tokenResponse.oauthAccessToken);
         await jsonRpc('createIdDirectory', {})
     }
     return auth.currentUser;
@@ -60,6 +63,7 @@ export async function googleSignOut() {
         window.location.reload();
         localStorage.setItem(localStorageKeys.isSignIn, "false");
         localStorage.setItem(localStorageKeys.uid, " ");
+        localStorage.setItem(localStorageKeys.accessToken, " ");
         window.location.reload();
     }).catch((error) => {
         console.log("Sign-out error ", error)

@@ -16,12 +16,26 @@ import {
 } from 'rsuite';
 import {useToggle} from 'src/utils/useToggle';
 import {jsonRpc} from '../utils/ws';
+import {localStorageKeys} from "../utils/constants";
 
 export function DatasetModalWithButton(props: { defaultDir: string }) {
     const [show, toggle] = useToggle()
+
+    function handleCreateDataset() {
+        if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
+            toggle()
+        } else {
+            Notification.warning({
+                title: `Please sign in to create dataset`
+            });
+            console.log("Please login in first")
+        }
+    }
+
     return <>
-        <IconButton appearance="ghost" onClick={toggle} icon={<Icon icon="plus"/>}>Create dataset</IconButton>
-        <DatasetModal {...props} show={show} toggle={toggle}/>
+        <IconButton appearance="ghost" onClick={handleCreateDataset} icon={<Icon icon="plus"/>}>Create
+            dataset</IconButton>
+        <DatasetModal {...props} show={show} toggle={handleCreateDataset}/>
     </>;
 }
 
