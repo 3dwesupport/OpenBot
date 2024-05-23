@@ -7,12 +7,12 @@ import {ConnectionAlert} from './components/ConnectionAlert';
 import {HomePage} from './pages/HomePage';
 import {ModelsPage} from './pages/ModelsPage';
 import {TrainPage} from './pages/TrainPage';
-import {auth, googleSigIn, googleSignOut} from "./database/authentication";
+import {auth, googleSigIn} from "./database/authentication";
 import {useEffect, useState} from "react";
 import {LogoutModal} from "./modals/LogoutModal";
 import {localStorageKeys} from "./utils/constants";
 import {useToggle} from "./utils/useToggle";
-
+import google from "./assets/icons/google-icon.png"
 
 function App() {
     const [user, setUser] = useState({name: "Google Sign In"});
@@ -46,7 +46,7 @@ function App() {
         <>
             <Container className="App">
                 <Header>
-                    <Navbar appearance="inverse">
+                    <Navbar appearance="inverse" className="navbar">
                         <Navbar.Header>
                             <a href="#/" className="navbar-brand logo">OpenBot Driving Policy Trainer</a>
                         </Navbar.Header>
@@ -62,7 +62,17 @@ function App() {
                                     <Button onClick={() => {
                                         userModal()
                                     }}>{user.name}</Button> :
-                                    <Button onClick={handleSignIn}>Google Sign In</Button>}</Nav.Item>
+                                    <Button style={{
+                                        color: "black", display: "flex",
+                                        justifyContent: "space-evenly", width: 170
+                                    }} onClick={handleSignIn}>
+                                        <img src={google}
+                                             style={{
+                                                 height: 25,
+                                             }}
+                                             alt="Google-sign-in"/>
+                                        Google Sign In
+                                    </Button>}</Nav.Item>
                             </Nav>
                         </Navbar.Body>
                     </Navbar>

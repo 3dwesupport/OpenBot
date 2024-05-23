@@ -55,7 +55,6 @@ export function HyperparametersForm() {
         if (localStorage.getItem(localStorageKeys.isSignIn) === "true") {
             jsonRpc('start', formValue.current).then()
         } else {
-            console.log("in t");
             Notification.warning({
                 title: `Please sign in to train model`
             });
