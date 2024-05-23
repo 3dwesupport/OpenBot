@@ -11,20 +11,18 @@ async function myCode(code) {
             })
         }).then((res) => res.json())
             .then((res) => {
-                // console.log("res:::",res.info)
+                console.log("res:::",res.info)
                 return res.info;
+
+                // GPT Responses
+                // console.log("Response fetch from api key :::::",res.choices[0].message.content);
+                // return (res.choices[0].message.content);
             })
-        // if (response !== undefined) {
-        //     console.log("Fetch data from api:", response);
-        // } else {
-        //     console.log("resp", response);
-        // }
-        // const streamResult=await response;
-        // console.log("response get from api",JSON.stringify((streamResult.response)));
 
     } catch (e) {
         console.log("Error during fetch response:", e);
     }
 }
+
 
 export {myCode};

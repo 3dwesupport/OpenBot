@@ -4,6 +4,7 @@ import {Constants, localStorageKeys} from "../utils/constants";
 
 export const StoreContext = createContext(null);
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default ({
                     children,
                     isOnline,

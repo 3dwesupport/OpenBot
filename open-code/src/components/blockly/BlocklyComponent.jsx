@@ -4,7 +4,15 @@ import Blockly from 'blockly/core';
 import locale from 'blockly/msg/en';
 import 'blockly/blocks';
 import {ThemeContext} from "../../App";
-import {aiBlocks, Constants, DarkTheme, errorToast, LightTheme, PathName} from "../../utils/constants";
+import {
+    aiBlocks,
+    Constants,
+    DarkTheme,
+    errorToast,
+    LightTheme,
+    PathName,
+    PlaygroundConstants
+} from "../../utils/constants";
 import {Modal} from "@blockly/plugin-modal";
 import {StoreContext} from "../../context/context";
 import {getCurrentProject, handleChildBlockInWorkspace, updateCurrentProject} from "../../services/workspace";
@@ -13,6 +21,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import {checkFileExistsInFolder, getFolderId, getShareableLink} from "../../services/googleDrive";
 import {RightDrawer} from "../drawer/drawer";
 import {useLocation} from "react-router-dom";
+// import useSlot from "@mui/material/utils/useSlot";
+// import {workspaces} from "blockly/core/serialization";
 // import blockly from "./index";
 
 Blockly.setLocale(locale);
@@ -26,7 +36,7 @@ Blockly.setLocale(locale);
  * @returns {JSX.Element}
  */
 function BlocklyComponent(props) {
-    const {codeValue,initialXml, children, onWorkspaceChange, ...rest} = props;
+    const {codeValue, initialXml, children, onWorkspaceChange, ...rest} = props;
     // Refs for the workspace, toolbox, and blockly div
     const blocklyDiv = useRef();
     const toolbox = useRef();
@@ -115,39 +125,27 @@ function BlocklyComponent(props) {
 
     let timer;
     const handleCodeEditorOnModifyingWorkspace = useCallback((event) => {
-        function createBlock(){
-            console.log("Blocks are created ::");
-            setIsBlockEventChange(true);
+
+        const start = primaryWorkspace.current.getBlocksByType(PlaygroundConstants.start);
+        const forever = primaryWorkspace.current.getBlocksByType(PlaygroundConstants.forever);
+
+        if (start.length === 0 && forever.length === 0) {
+            console.log("workspace is empty and not make an API calls ")
+            setIsBlockEventChange(false);
         }
-        function deleteBlock(){
-            console.log("Blocks are deleted:");
-            setIsBlockEventChange(true);
-        }
-        function dragBlock(){
-            console.log("Blocks are drag and drop::");
-            setIsBlockEventChange(true);
-        }
-        function changeCode(){
-            console.log("Code are changes ::");
+
+        function handleInactivity() {
+            console.log("5 second pause to handle inactivity:::");
             setIsBlockEventChange(true);
         }
 
-       if (event.type===Blockly.Events.CREATE){
-           clearTimeout(timer);
-           timer=setTimeout(createBlock,5000);
-       }
-       else if(event.type === Blockly.Events.DELETE){
-           clearTimeout(timer);
-           timer=setTimeout(deleteBlock,5000);
-       }
-       else if(event.type === Blockly.Events.BLOCK_DRAG){
-           clearTimeout(timer);
-           timer=setTimeout(dragBlock,5000);
-       }
-       else if(event.type === Blockly.Events.CHANGE){
-           clearTimeout(timer);
-           timer=setTimeout(changeCode,3000);
-       }
+        if (event.type === Blockly.Events.CREATE || event.type === Blockly.Events.DELETE || event.type === Blockly.Events.BLOCK_DRAG
+            || event.type === Blockly.Events.CHANGE) {
+
+            clearTimeout(timer);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            timer = setTimeout(handleInactivity, 5000);
+        }
     }, [])
 
     /**

@@ -14,6 +14,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import {useTheme} from "@mui/material";
 import {Themes} from "../../utils/constants";
 import {myCode} from "../../services/generativeAI";
+import LoaderComponent from "../loader/loaderComponent";
 
 /**x
  * Code Editor to display Js code and python code.
@@ -23,9 +24,9 @@ import {myCode} from "../../services/generativeAI";
  */
 
 function CodeEditor(params) {
-    const [codeValue, setCodeValue] = useState('');
-    const [finalCode,setFinalCode]=useState('');
+    const [finalCode, setFinalCode] = useState('');
     const editorRef = useRef(null);
+    // const [loader,setLoader]=useState(false);
     const {
         workspace,
         currentProjectXml,
@@ -39,7 +40,6 @@ function CodeEditor(params) {
     const {theme} = useContext(ThemeContext);
     const [isLandscape, setIsLandscape] = useState(window.matchMedia("(max-height: 500px) and (max-width: 1000px) and (orientation: landscape)").matches);
     const [isTabletQuery, setIsTabletQuery] = useState(window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches);
-
     useEffect(() => {
         const handleOrientationChange = () => {
             setIsLandscape(
@@ -51,35 +51,54 @@ function CodeEditor(params) {
         window.addEventListener("resize", handleOrientationChange);
     }, []);
 
-    //handle the toggling between javascript and python editor
+    // Handle the toggling between javascript and python editor
     useEffect(() => {
         const editor = ace.edit(editorRef.current);
         let code;
         let mode;
         if (category === Constants.py) {
-            console.log("in python code")
             code = pythonGenerator.workspaceToCode(workspace);
             mode = "ace/mode/python";
         } else if (category === Constants.js) {
-            console.log("in js code")
             code = javascriptGenerator.workspaceToCode(workspace);
             mode = "ace/mode/javascript";
         }
-
-        setCodeValue(code);
-
         // When the drawer is open, trigger an API request to fetch the data.
+        const currentCategory = category;
 
         if (drawer) {
-            // if blocks is move
             if (isBlockEventChange) {
-                myCode(codeValue).then((res) => {
-                   setFinalCode(res);
-                });
-                setIsBlockEventChange(false);
+                setFinalCode('');
+
+                if (code !== '') {
+                    myCode(code).then((res) => {
+                        console.log("Category is :::::",category,"Also current category is ::::::",currentCategory);
+                        if (category === currentCategory) {
+                            console.log("Code is :::::", code);
+                            console.log("Response fetched from API key", res);
+
+                            // Extra things are included in the response.
+                            const cleanedCode = res.replace(/```javascript/g, '').replace(/```/g, '');
+
+                            // Remove the first commented line
+                            let lines = cleanedCode.split('\n');
+                            lines = lines.slice(1);
+                            let correctedResponse = lines.join('\n');
+
+                            // console.log("Final response that i get ::::::",correctedResponse);
+                            setFinalCode(correctedResponse);
+                            setIsBlockEventChange(false);
+                        }
+                        // setLoader(false);
+                    }).catch((e) => {
+                        console.log(e);
+                        setFinalCode("");
+                        setIsBlockEventChange(false);
+                    })
+                } else {
+                    setFinalCode("Hi OpenBot Playground :");
+                }
             }
-        } else {
-            console.log("Drawer is not open ");
         }
         editor.session.setMode(mode);
         editor.setOption("useWorker", false);
@@ -97,18 +116,34 @@ function CodeEditor(params) {
         return () => {
             editor.destroy();
         };
-    }, [workspace, currentProjectXml, category, drawer, theme, isBlockEventChange,finalCode]);
+    }, [workspace, currentProjectXml, category, drawer, theme, isBlockEventChange, finalCode, setIsBlockEventChange]);
 
     return (<div>
-        <div style={{zIndex: 2, position: "absolute", top: isLandscape ? "100%" : "30%"}}>
+        <div style={{
+            zIndex: 2, position: "absolute", top: isLandscape ? "100%" : "30%", whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word'
+        }}>
             <RightSlider/></div>
+        {(finalCode === '' && drawer) && <div style={{
+            zIndex: 3,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}>
+            <LoaderComponent/></div>}
         <div ref={editorRef} style={{
             position: "absolute",
             zIndex: 1,
             height: '100%',
             width: '100%',
             backgroundColor: theme === "dark" ? "#202020" : '#FFFFFF',
-            fontSize: isMobile ? "13px" : isLandscape ? "13px" : isTabletQuery ? "19px" : "15px"
+            fontSize: isMobile ? "13px" : isLandscape ? "13px" : isTabletQuery ? "19px" : "15px",
         }}/>
     </div>)
 }
