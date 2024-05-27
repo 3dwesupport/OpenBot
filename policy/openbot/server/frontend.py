@@ -45,8 +45,8 @@ async def init_frontend(app: web.Application):
 
     version = get_pkg_version(frontend_pkg)
 #    To run frontend through python server change the public directory path and run release.sh
-    public_dir = "/Users/hardikgarg/Desktop/server/OpenBot/policy/frontend/openbot_frontend"
-#     public_dir = openbot_frontend.where()
+#     public_dir = "/Users/hardikgarg/Desktop/server/OpenBot/policy/frontend/openbot_frontend"
+    public_dir = openbot_frontend.where()
     print("public_dir::",public_dir)
     print("Running frontend:", version)
     print("Frontend path:", public_dir)
