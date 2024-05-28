@@ -25,7 +25,7 @@ async def init_frontend(app: web.Application):
         run_frontend_dev_server()
         return
 
-    frontend_pkg = "openbot_frontend"
+    frontend_pkg = "openbot_training_frontend"
     version = get_pkg_version(frontend_pkg)
 
     installed = f"{frontend_pkg}=={version}"
@@ -34,19 +34,19 @@ async def init_frontend(app: web.Application):
     for line in open(os.path.join(base_dir, "requirements_web.txt"), "r"):
         if line.startswith(frontend_pkg):
             required = line.strip()
-
     if required != installed:
         print("Installing frontend:", required)
         check_call([sys.executable, "-m", "pip", "install", required])
 
-    import openbot_frontend
+    import openbot_training_frontend
 
-    importlib.reload(openbot_frontend)
+    importlib.reload(openbot_training_frontend)
 
     version = get_pkg_version(frontend_pkg)
+
 #    To run frontend through python server change the public directory path and run release.sh
-#     public_dir = "/Users/hardikgarg/Desktop/server/OpenBot/policy/frontend/openbot_frontend"
-    public_dir = openbot_frontend.where()
+#     public_dir = "/Users/hardikgarg/Desktop/server/OpenBot/policy/frontend/openbot_training_frontend"
+    public_dir = openbot_training_frontend.where()
     print("public_dir::",public_dir)
     print("Running frontend:", version)
     print("Frontend path:", public_dir)

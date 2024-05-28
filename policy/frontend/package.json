@@ -1,5 +1,5 @@
 {
-  "name": "openbot_frontend",
+  "name": "openbot_training_frontend",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",

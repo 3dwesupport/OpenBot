@@ -100,7 +100,7 @@ dependencies:
     - numpy==1.24.2
     - numpyencoder==0.3.0
     - oauthlib==3.2.2
-    - openbot-frontend==0.7.0
+    - openbot-training-frontend==0.6.0
     - opt-einsum==3.3.0
     - packaging==23.0
     - pandocfilters==1.5.0

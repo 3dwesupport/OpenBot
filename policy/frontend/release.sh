@@ -4,7 +4,7 @@ set -e
 
 cd $(dirname $0)
 
-rm -rf build dist openbot_frontend
+rm -rf build dist openbot_training_frontend
 
 yarn install
 yarn build
@@ -12,6 +12,6 @@ yarn build
 eval "$(conda shell.bash hook)"
 conda activate openbot
 
-mv build openbot_frontend
+mv build openbot_training_frontend
 python setup.py sdist
 twine upload dist/*

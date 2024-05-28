@@ -26,5 +26,5 @@ yarn-error.log*
 
 # pypi
 dist/
-openbot_frontend/
-openbot_frontend.egg-info/
+openbot_training_frontend/
+openbot_training_frontend.egg-info/
