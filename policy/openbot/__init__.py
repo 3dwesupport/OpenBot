@@ -12,3 +12,4 @@ models_dir = os.path.join(base_dir, "models")
 
 
 mkdir(models_dir)
+mkdir(dataset_dir)
