@@ -127,17 +127,17 @@ async def createDataset(params):
 async def createIdDirectory(params):
     id_dir = os.path.join(dataset_dir,params["id"])
     update_shared_variable(params["accessToken"])
-    if not os.path.isdir(id_dir):
+    if not os.path.exists(id_dir):
         os.mkdir(id_dir)
     upload_dir = os.path.join(dataset_dir,params["id"], "uploaded")
     train_data_dir = os.path.join(dataset_dir,params["id"], "train_data")
     test_data_dir = os.path.join(dataset_dir,params["id"], "test_data")
 
-    if not os.path.isdir(upload_dir):
+    if not os.path.exists(upload_dir):
         os.mkdir(upload_dir)
-    if not os.path.isdir(train_data_dir):
+    if not os.path.exists(train_data_dir):
         os.mkdir(train_data_dir)
-    if not os.path.isdir(test_data_dir):
+    if not os.path.exists(test_data_dir):
         os.mkdir(test_data_dir)
 
     if len(os.listdir(train_data_dir)) < 1:
