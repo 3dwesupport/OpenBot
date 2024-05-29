@@ -45,11 +45,10 @@ export async function googleSigIn() {
     const signIn = await signInWithPopup(auth, provider);
     localStorage.setItem(localStorageKeys.isSignIn, "true");
     const uid = auth?.currentUser?.uid; // Assuming auth is of type Auth | undefined\
-    if (uid !== undefined) {
+    if (uid != undefined) {
         localStorage.setItem(localStorageKeys.uid, uid);
         // @ts-ignore: Property 'credential' does not exist on type 'UserCredential'
         localStorage.setItem(localStorageKeys.accessToken, signIn._tokenResponse.oauthAccessToken);
-        await jsonRpc('createIdDirectory', {})
     }
     return auth.currentUser;
 }

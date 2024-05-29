@@ -13,6 +13,7 @@ import {LogoutModal} from "./modals/LogoutModal";
 import {localStorageKeys} from "./utils/constants";
 import {useToggle} from "./utils/useToggle";
 import google from "./assets/icons/google-icon.png"
+import {jsonRpc} from "./utils/ws";
 
 function App() {
     const [user, setUser] = useState({name: "Google Sign In"});
@@ -31,14 +32,13 @@ function App() {
 
     function handleSignIn() {
         console.log("clicked sign in");
-        googleSigIn().then((res) => {
-            if (res != undefined) {
-                console.log("res after google sign In::", res?.displayName);
-                setUser({
-                    name: res.displayName ?? "Google Sign In"
-                });
-                setIsSignIn("true");
-            }
+        googleSigIn().then(async (res) => {
+            console.log("res after google sign In::", res?.displayName);
+            setUser({
+                name: res?.displayName ?? "Google Sign In"
+            });
+            await jsonRpc('createIdDirectory', {})
+            setIsSignIn("true");
         })
     }
 
