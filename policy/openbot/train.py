@@ -378,6 +378,8 @@ def load_data(tr: Training, verbose=0):
 def visualize_train_data(tr: Training,id):
     utils.show_batch(dataset=tr.train_ds, policy=tr.hyperparameters.POLICY, model=None)
     print("train_preview.png path:::",models_dir)
+    if not os.path.exists(os.path.join(models_dir,id)):
+        os.makedirs(os.path.join(models_dir,id))
     utils.savefig(os.path.join(models_dir,id, "train_preview.png"))
 
 

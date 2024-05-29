@@ -15,6 +15,7 @@ import {useToggle} from "./utils/useToggle";
 import google from "./assets/icons/google-icon.png"
 import {jsonRpc} from "./utils/ws";
 
+
 function App() {
     const [user, setUser] = useState({name: "Google Sign In"});
     const [show, userModal] = useToggle();
@@ -57,24 +58,26 @@ function App() {
                                 <Nav.Item href="#/uploaded">Uploaded</Nav.Item>
                                 <Nav.Item href="#/train">Train</Nav.Item>
                             </Nav>
-                            <Nav pullRight>
-                                <Nav.Item>{isSignIn === "true" ?
-                                    <Button onClick={() => {
-                                        userModal()
-                                    }}>{user.name}</Button> :
-                                    <Button style={{
-                                        color: "black", display: "flex",
-                                        justifyContent: "space-evenly", width: 170
-                                    }} onClick={handleSignIn}>
-                                        <img src={google}
-                                             style={{
-                                                 height: 25,
-                                             }}
-                                             alt="Google-sign-in"/>
-                                        Google Sign In
-                                    </Button>}</Nav.Item>
-                            </Nav>
                         </Navbar.Body>
+                        <Nav pullRight>
+                            <Nav.Item>{
+                                <Button size={"sm"} style={{
+                                    display: "flex",
+                                    justifyContent: "space-evenly",
+                                    alignItems: "center",
+                                    backgroundColor: "#FFFFFF",
+                                    width: 150
+                                }} onClick={() => {
+                                    if (isSignIn === "true") {
+                                        userModal()
+                                    } else {
+                                        handleSignIn()
+                                    }
+                                }}>
+                                    <img src={google} style={{height: 25}} alt="Google-sign-in"/>
+                                    {isSignIn === "true" ? user.name : "Google Sign In"}
+                                </Button>}</Nav.Item>
+                        </Nav>
                     </Navbar>
                 </Header>
                 <Content>

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="openbot_training_frontend",
-    version="0.7.0",
+    version="0.8.0",
     description="OpenBot model training package",
     url="https://github.com/3dwesupport/OpenBot",
     author="Hardik Garg",

@@ -100,7 +100,7 @@ dependencies:
     - numpy==1.24.2
     - numpyencoder==0.3.0
     - oauthlib==3.2.2
-    - openbot-training-frontend==0.7.0
+    - openbot-training-frontend==0.8.0
     - opt-einsum==3.3.0
     - packaging==23.0
     - pandocfilters==1.5.0
@@ -114,7 +114,7 @@ dependencies:
     - prompt-toolkit==3.0.36
     - protobuf==3.19.6
     - psutil==5.9.4
-    - ptyprocess==0.7.0
+    - ptyprocess==0.8.0
     - pure-eval==0.2.2
     - pyasn1==0.4.8
     - pyasn1-modules==0.2.8
