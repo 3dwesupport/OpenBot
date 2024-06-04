@@ -52,6 +52,7 @@ def ip4_address():
             if "addr" not in link:
                 continue
             ip4 = link["addr"]
+            print("ip4:::",ip4)
             if ip4.startswith("127.") or ip4.startswith("10."):
                 print(f"Skip address {ip4} @ interface {interface}")
                 continue
