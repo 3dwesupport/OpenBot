@@ -23,7 +23,9 @@ async def register(app: web.Application):
 
 async def run_test(zc):
     desc = {}
-    local_ip = ip4_address()
+#     if you deploy your app you have to use the internal IP address otherwise use ip4_address()
+#     local_ip = ip4_address()
+    local_ip = "10.128.0.2"
     name = (
         os.getenv("OPENBOT_NAME", socket.gethostname())
         .replace(".local", "")
@@ -42,22 +44,8 @@ async def run_test(zc):
     print("Registration of the service with name:", name)
     await zc.register_service(info)
 
-def get_local_ip():
-    try:
-        # Create a temporary socket
-        temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        temp_socket.connect(("8.8.8.8", 80))  # Connect to a public IP address
-        local_ip = temp_socket.getsockname()[0]  # Get the local IP address
-        temp_socket.close()  # Close the temporary socket
-        print(f"Local IP: {local_ip}")
-        return local_ip
-    except socket.error as e:
-        print(f"Could not get local IP: {e}")
-        return None
-
 
 def ip4_address():
-    local_ip = get_local_ip()
     for interface in interfaces():
         addresses = ifaddresses(interface)
         if AF_INET not in addresses:
@@ -66,7 +54,6 @@ def ip4_address():
             if "addr" not in link:
                 continue
             ip4 = link["addr"]
-            print("ip4:::",ip4)
             if ip4.startswith("127.") or ip4.startswith("10."):
                 print(f"Skip address {ip4} @ interface {interface}")
                 continue
