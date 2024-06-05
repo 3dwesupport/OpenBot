@@ -24,10 +24,11 @@ async def register(app: web.Application):
 async def run_test(zc):
     desc = {}
 #     if you deploy your app you have to use the internal IP address otherwise use ip4_address()
-#     local_ip = ip4_address()
-    local_ip = "35.184.47.240"
+    local_ip = ip4_address()
+#     local_ip = "35.184.47.240/"
+    print("hostname():::",socket.gethostname())
     name = (
-        os.getenv("OPENBOT_NAME", socket.gethostname())
+        os.getenv("OPENBOT_NAME", "OpenBot-training")
         .replace(".local", "")
         .replace(".", "-")
     )
