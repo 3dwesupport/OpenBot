@@ -25,7 +25,7 @@ async def run_test(zc):
     desc = {}
 #     if you deploy your app you have to use the internal IP address otherwise use ip4_address()
 #     local_ip = ip4_address()
-    local_ip = "34.30.61.20"
+    local_ip = "34.123.203.135"
     name = (
         os.getenv("OPENBOT_NAME", socket.gethostname())
         .replace(".local", "")
