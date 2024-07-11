@@ -589,3 +589,4 @@ public class AutopilotFragment extends CameraFragment {
         binding.controllerContainer.driveMode.setAlpha(1.0f);
     }
 }
+

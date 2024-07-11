@@ -8,9 +8,6 @@
  */
 
 import {ErrorDisplay} from '../utils/error-display.js'
-import {deleteCookie, getCookie} from '../index'
-import {localStorageKeys} from '../utils/constants'
-import {uploadServerUsage} from '../firebase/APIs'
 
 /**
  * function to connect websocket to remote server
@@ -20,7 +17,6 @@ export function Connection () {
     const connectToServer = async () => {
         const ws = new WebSocket(`ws://${window.location.hostname}:8080/ws`)
         // const ws = new WebSocket(`ws://verdant-imported-peanut.glitch.me`);
-        // const ws = new WebSocket(`ws://cooked-onyx-tamarind.glitch.me`);
         return new Promise((resolve, reject) => {
             const timer = setInterval(() => {
                 if (ws.readyState === 1) {
@@ -52,6 +48,7 @@ export function Connection () {
                 idSent = true
             } else {
                 console.log(webSocketMessage.data)
+                console.log('Data Displayed')
                 onData(webSocketMessage.data)
             }
         }
@@ -59,15 +56,6 @@ export function Connection () {
         ws.onclose = () => {
             errDisplay.set('Disconnected from the server. To reconnect, reload this page.')
             idSent = false
-            if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
-                if (getCookie(localStorageKeys.serverStartTime)) {
-                    const time = new Date()
-                    uploadServerUsage(new Date(getCookie(localStorageKeys.serverStartTime)), time).then(() => {
-                        deleteCookie(localStorageKeys.serverStartTime)
-                        deleteCookie(localStorageKeys.serverEndTime)
-                    })
-                }
-            }
         }
 
         ws.onopen = () => {

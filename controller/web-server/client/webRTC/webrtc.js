@@ -1,6 +1,3 @@
-import Cookies from 'js-cookie'
-import {localStorageKeys} from '../utils/constants'
-
 /**
  * function to enable webRTC connection
  * @param connection
@@ -23,12 +20,13 @@ export function WebRTC (connection) {
 
         const {RTCSessionDescription, RTCIceCandidate} = window
         let webRtcEvent
+        console.log(typeof data)
         if (typeof data === 'string') {
             webRtcEvent = JSON.parse(data)
         } else {
             webRtcEvent = data
         }
-
+        // WebRTC type
         switch (webRtcEvent.type) {
             case 'offer':
                 peerConnection.setRemoteDescription(
@@ -64,14 +62,26 @@ export function WebRTC (connection) {
         console.log('WebRTC: start...')
 
         peerConnection = new RTCPeerConnection()
-
         peerConnection.onconnectionstatechange = () => {
             if (peerConnection?.connectionState === 'connected') {
-                const time = new Date()
-                Cookies.set(localStorageKeys.serverStartTime, time)
             }
         }
+
         this.dataChannel = peerConnection.createDataChannel('dataChannel') // Use this.dataChannel to set it as a property
+        console.log("readyState::", this.dataChannel.readyState)
+        console.log('DataChannel Open:::', this.dataChannel.onopen)
+        console.log('DataChannel On Message:::', this.dataChannel.onmessage)
+
+        peerConnection.ondatachannel = (event) => {
+            const dataChannel = event.channel
+            dataChannel.onopen = () => {
+                // eventHandlers.onDataChannelOpened(dataChannel);
+            }
+        }
+
+        this.dataChannel.onopen = () => {
+            console.log('DataChannel is open Ready to send the message:')
+        }
         this.dataChannel.onmessage = (event) => {
             // Handle incoming messages here
             const message = event.data
@@ -102,6 +112,7 @@ export function WebRTC (connection) {
         console.log(this.dataChannel)
         if (this.dataChannel && this.dataChannel.readyState === 'open') {
             this.dataChannel.send(message)
+            // console.log(`Message is send ::: ${message}`)
         } else {
             console.log('WebRTC: Data channel is not open. Cannot send message.')
         }
