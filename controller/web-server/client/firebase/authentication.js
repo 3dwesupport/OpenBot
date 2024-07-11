@@ -9,14 +9,13 @@ import {localStorageKeys} from '../utils/constants'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: 'AIzaSyCITlkh63TnSnJQBlzqbJwwtBDr_w3e1Pg',
-    authDomain: 'opencode-openbot.firebaseapp.com',
-    databaseURL: 'https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app',
-    projectId: 'opencode-openbot',
-    storageBucket: 'opencode-openbot.appspot.com',
-    messagingSenderId: '955078484078',
-    appId: '1:955078484078:web:64774c120f9d3a0f65867f',
-    measurementId: 'G-SZJL3F5QXF'
+    apiKey: import.meta.env.SNOWPACK_PUBLIC_FIREBASE_API_KEY,
+    authDomain: import.meta.env.SNOWPACK_PUBLIC_AUTH_DOMAIN,
+    projectId: import.meta.env.SNOWPACK_PUBLIC_PROJECT_ID,
+    storageBucket: import.meta.env.SNOWPACK_PUBLIC_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.SNOWPACK_PUBLIC_MESSAGING_SENDER_ID,
+    appId: import.meta.env.SNOWPACK_PUBLIC_APP_ID,
+    measurementId: import.meta.env.SNOWPACK_PUBLIC_MEASUREMENT_ID,
 }
 
 const app = initializeApp(firebaseConfig)
@@ -53,10 +52,10 @@ export function googleSigIn () {
  * @returns {Promise<void>}
  */
 export async function googleSignOut () {
-    signOut(auth).then(() => {
-        localStorage.setItem(localStorageKeys.user, null)
-        localStorage.setItem(localStorageKeys.isSignIn, false.toString())
-    }).catch((error) => {
-        console.log('Sign-out error ', error)
-    })
+ signOut(auth).then(() => {
+  localStorage.setItem(localStorageKeys.user, null)
+  localStorage.setItem(localStorageKeys.isSignIn, false.toString())
+ }).catch((error) => {
+  console.log('Sign-out error ', error)
+ })
 }
