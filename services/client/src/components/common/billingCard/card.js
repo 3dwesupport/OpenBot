@@ -119,7 +119,11 @@ export function BillingCard(props) {
                 <div className={style.planServices}>
                     {cardDetails.services.map((item, key) =>
                         <div key={key} style={{display: "flex", gap: "10px"}}>
-                            <img src={theme === Themes.dark ? Images.whiteCheckMark : cardDetails.checkSign}
+                            <img src={ theme === Themes.dark
+                                ? Images.whiteCheckMark
+                                : (isActivePlan.status && isActivePlan.type === cardDetails.type
+                                    ? Images.blackCheckMark
+                                    : cardDetails.checkSign)}
                                  width={"20px"} height={"20px"} alt={"check"}/>
                             {item}
                         </div>

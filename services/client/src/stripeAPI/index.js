@@ -119,27 +119,27 @@ export const switchSubscriptionPlans = async (planType) => {
     }
 }
 
-/**
- * function to renew Plans
- * @param planType
- * @returns {Promise<void>}
- */
-export const renewSubscriptionPlans = async (planType) => {
-    try {
-        let subscriptionId = await getSubscriptionId();
-        console.log("Subscription ID::", subscriptionId);
-        const response = await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/subscription/renew-subscription?subscriptionId=${subscriptionId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        console.log("Response ::", response.url);
-        window.location.href = response.url;
-    } catch (e) {
-        console.error(e);
-    }
-}
+// /**
+//  * function to renew Plans
+//  * @param planType
+//  * @returns {Promise<void>}
+//  */
+// export const renewSubscriptionPlans = async (planType) => {
+//     try {
+//         let subscriptionId = await getSubscriptionId();
+//         console.log("Subscription ID::", subscriptionId);
+//         const response = await fetch(`${process.env.REACT_APP_DOMAIN_ADDRESS}/subscription/renew-subscription?subscriptionId=${subscriptionId}`, {
+//             method: "GET",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             }
+//         });
+//         console.log("Response ::", response.url);
+//         window.location.href = response.url;
+//     } catch (e) {
+//         console.error(e);
+//     }
+// }
 
 /**
  * function to create customer portal for customers

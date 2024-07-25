@@ -3,7 +3,7 @@ import style from "./billing.module.css";
 import {Constants, errorToast, localStorageKeys, Themes, userPlan} from "../../utils/constants";
 import {BillingCard} from "../../components/common/billingCard/card";
 import {ThemeContext} from "../../App";
-import {handleCheckout, renewSubscriptionPlans, switchSubscriptionPlans} from "../../stripeAPI";
+import {handleCheckout, switchSubscriptionPlans} from "../../stripeAPI";
 import {addSubscription, getDocDetails} from "../../database/APIs/subscription";
 import {AnalyticsLoader} from "../../components/common/loader/loader";
 import {useLocation} from "react-router-dom";
@@ -73,9 +73,9 @@ export function Billing() {
                 } if (planStatus.type === "free") {   // first time checkout to standard
                     return handleCheckout(e);
                 } else if (planStatus.type === "standard" && planStatus.status === Constants.expired) { // renew Standard Plans
-                    return renewSubscriptionPlans(e);
+                    return handleCheckout(e);
                 } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // switch Premium plans
-                    return switchSubscriptionPlans(e);
+                    return handleCheckout(e);
                 }
                 return;
 
@@ -87,7 +87,7 @@ export function Billing() {
                 } else if (planStatus.type === "standard") { // if first time standard plan checkout either Active or expired then switch to premium
                     return switchSubscriptionPlans(e);
                 } else if (planStatus.type === "premium" && planStatus.status === Constants.expired) { // renew Premium plans API
-                    return renewSubscriptionPlans(e);
+                    return handleCheckout(e);
                 }
 
             default:

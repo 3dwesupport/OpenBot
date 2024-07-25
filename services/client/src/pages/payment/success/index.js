@@ -25,16 +25,16 @@ export function PaymentSuccess() {
             const newSearchParams = new URLSearchParams(window.location.search);
             newSearchParams.delete('amount');
             window.history.replaceState({}, '', `${location.pathname}${newSearchParams.toString()}`);
-            const cookieOptions = {
-                // domain: '.openbot.org',
-                domain: 'localhost',
-                // domain: ".itinker.io",
-                secure: true,
-                expires: new Date(new Date().getTime() + (60 * 60 * 1000)),
-            };
-            addSubscription(localStorage.getItem(localStorageKeys.UID), Constants.standard).then(async (res) => {
-                Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
-            });
+            // const cookieOptions = {
+            //     // domain: '.openbot.org',
+            //     domain: 'localhost',
+            //     // domain: ".itinker.io",
+            //     secure: true,
+            //     expires: new Date(new Date().getTime() + (60 * 60 * 1000)),
+            // };
+            // addSubscription(localStorage.getItem(localStorageKeys.UID), Constants.standard).then(async (res) => {
+            //     Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+            // });
         }
     })
 

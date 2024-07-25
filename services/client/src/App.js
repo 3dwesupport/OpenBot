@@ -97,11 +97,11 @@ function App() {
                 console.log("Which type changed :::",change);
                 if (change.type === "added") {
                     console.log("New city: ", change.doc.data());
-                    Cookies.set("subscriptionUpdated",`${JSON.stringify(change.doc.data())}`);
+                    Cookies.set(localStorageKeys.planDetails,`${JSON.stringify(change.doc.data())}`);
                 }
                 if (change.type === "modified") {
                     console.log("Modified city: ", change.doc.data());
-                    Cookies.set("subscriptionUpdated",`${JSON.stringify(change.doc.data())}`);
+                    Cookies.set(localStorageKeys.planDetails,`${JSON.stringify(change.doc.data())}`);
                 }
             })
         })
