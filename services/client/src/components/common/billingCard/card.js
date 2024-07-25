@@ -121,7 +121,7 @@ export function BillingCard(props) {
                         <div key={key} style={{display: "flex", gap: "10px"}}>
                             <img src={ theme === Themes.dark
                                 ? Images.whiteCheckMark
-                                : (isActivePlan.status && isActivePlan.type === cardDetails.type
+                                : (isActivePlan.status===(Constants.active) && isActivePlan.type === cardDetails.type
                                     ? Images.blackCheckMark
                                     : cardDetails.checkSign)}
                                  width={"20px"} height={"20px"} alt={"check"}/>
@@ -141,7 +141,7 @@ export function BillingCard(props) {
                              backgroundColor: Colors.buttonBackgroundColor,
                              color: Colors.buttonColor, fontWeight: "bold", height: "40px", borderRadius: "10px",
                              marginTop: cardDetails.type === Constants.premium && "-15px"
-                         }}>{isActivePlan.type === cardDetails.type ? (isActivePlan.status === Constants.expired && upgradePlans.upgradePlanType) : upgradePlans.planType}</div>}
+                         }}>{isActivePlan.type === cardDetails.type ? (isActivePlan.status === Constants.expired && upgradePlans.planType) : upgradePlans.planType}</div>}
                 {(cardDetails.type === Constants.free && isActivePlan.status === Constants.expired) && (
                     <p style={{fontWeight: "bold", fontSize: "18px"}}>Note: Your free trial has ended. Please upgrade to
                         continue.</p>)}
