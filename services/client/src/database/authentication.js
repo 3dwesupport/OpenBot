@@ -56,7 +56,7 @@ export async function googleSigIn() {
         };
 
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
-            Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+            Cookies.set(localStorageKeys.planDetails, JSON.stringify(res));
         });
         localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
         let customToken = await getCustomToken(auth?.currentUser?.uid);

@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import {getCustomToken} from "./database/APIs/profile";
 import {ToastContainer} from "react-toastify";
 import {query, where, onSnapshot, collection} from "@firebase/firestore";
+import {addSubscription} from "./database/APIs/subscription";
 
 export const ThemeContext = createContext(null);
 
@@ -58,6 +59,9 @@ function App() {
                         secure: true,
                         expires: expirationDate,
                     };
+                    await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
+                        Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+                    });
                     let customToken = await getCustomToken(auth?.currentUser?.uid);
                     Cookies.set(localStorageKeys.accessToken, result.credential?.accessToken, cookieOptions);
                     Cookies.set(localStorageKeys.user, customToken, cookieOptions);
