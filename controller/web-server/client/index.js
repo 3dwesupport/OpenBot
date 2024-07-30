@@ -25,7 +25,7 @@ const connection = new Connection();
  const botMessageHandler = new BotMessageHandler(connection)
 
  const onData = data => {
-  const msg = JSON.parse(data)
+  // const msg = JSON.parse(data)
   botMessageHandler.handle(JSON.parse(data).status, connection)
  }
 
@@ -185,7 +185,7 @@ function handleOkButtonClick () {
  * function to handle subscribe now button
  */
 function handleSubscription () {
- window.open('','_blank')
+ window.open('', '_blank')
  console.log('Navigate to subscription page')
 }
 
@@ -238,7 +238,8 @@ function handleSingleSignOn () {
    localStorage.setItem(localStorageKeys.user, JSON.stringify(res.user))
    localStorage.setItem(localStorageKeys.isSignIn, true.toString())
    getUserPlan().then((res) => {
-    Cookies.set(localStorageKeys.planDetails, JSON.stringify(res))
+    console.log("res:::",res)
+    Cookies.set(localStorageKeys.serverPlanDetails, JSON.stringify(res))
     checkPlanExpiration()
    })
    deleteCookie(localStorageKeys.user)
@@ -302,7 +303,6 @@ function handleAuthChangedOnRefresh () {
  }
 }
 
-
 // handling user usage for server duration when refreshing or closing page
 window.onunload = function () {
  if (getCookie(localStorageKeys.serverStartTime)) {
@@ -316,10 +316,10 @@ window.onunload = function () {
  */
 export function checkPlanExpiration () {
  if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
-  const details = getCookie(localStorageKeys.planDetails)
+  const details = getCookie(localStorageKeys.serverPlanDetails)
+  console.log('details:::', details)
   if (details) {
    const items = JSON.parse(details)
-   console.log(items);
    let isExpired = false
    let isIdSend = false
    getServerDetails().then((res) => {

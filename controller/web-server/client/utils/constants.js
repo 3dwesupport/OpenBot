@@ -6,7 +6,7 @@ export const localStorageKeys = {
     serverId: 'serverId',
     serverEndTime: 'serverEndTime',
     serverStartTime: 'serverStartTime',
-    planDetails : 'planDetails'
+    serverPlanDetails : 'serverPlanDetails'
 }
 
 export const tables = {
