@@ -76,7 +76,7 @@ export async function googleSigIn() {
         };
         await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
             console.log("res::", res)
-            Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+            Cookies.set(localStorageKeys.playgroundPlanDetails, JSON.stringify(res), cookieOptions);
         });
         await setConfigData();
         return signIn
@@ -97,7 +97,7 @@ export async function googleSignOut() {
         // delete_cookie("user");
 
         Cookies.remove(localStorageKeys.accessToken, " ");
-        Cookies.remove(localStorageKeys.planDetails);
+        Cookies.remove(localStorageKeys.playgroundPlanDetails);
         localStorage.setItem(localStorageKeys.uid, "");
         Cookies.remove('CookieConsent');
 

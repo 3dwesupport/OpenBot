@@ -101,10 +101,10 @@ export const getDocDetails = async (value, table, fieldName) => {
  * @returns {Promise<{planType: *, count: number}>}
  */
 export const sumUploadCode = async () => {
-    const details = getCookie(localStorageKeys.planDetails)
+    const details = getCookie(localStorageKeys.playgroundPlanDetails)
     console.log("All plan details :::",details);
     if(!details){
-        alert("You don't have any planDetails");
+        alert("You don't have any playgroundPlanDetails");
         googleSignOut().then();
     }
     else{

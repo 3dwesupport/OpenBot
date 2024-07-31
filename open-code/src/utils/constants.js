@@ -132,7 +132,7 @@ export const localStorageKeys = {
     accessToken: "accessToken",
     configData: "configData",
     theme: "theme",
-    planDetails: "planDetails",
+    playgroundPlanDetails: "playgroundPlanDetails",
     uid: "uid"
 }
 

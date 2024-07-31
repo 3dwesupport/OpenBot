@@ -68,7 +68,7 @@ function App() {
                     };
                     await addSubscription(auth?.currentUser?.uid).then(async (res) => {
                         console.log("res::", res)
-                        Cookies.set(localStorageKeys.planDetails, JSON.stringify(res), cookieOptions);
+                        Cookies.set(localStorageKeys.playgroundPlanDetails, JSON.stringify(res), cookieOptions);
                     });
                 }
             });
@@ -151,11 +151,11 @@ function App() {
                     console.log("change::",change)
                     if (change.type === "added") {
                         console.log("New city: ", change.doc.data());
-                        Cookies.set("planDetails",change.doc.data());
+                        Cookies.set("playgroundPlanDetails",change.doc.data());
                     }
                     if (change.type === "modified") {
                         console.log("Modified city: ", change.doc.data());
-                        Cookies.set("planDetails",change.doc.data());
+                        Cookies.set("playgroundPlanDetails",change.doc.data());
                     }
                 });
 
