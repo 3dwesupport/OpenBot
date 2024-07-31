@@ -59,9 +59,7 @@ export async function googleSigIn() {
             Cookies.set(localStorageKeys.planDetails, JSON.stringify(res));
         });
         localStorage.setItem(localStorageKeys.UID, auth?.currentUser?.uid);
-        let customToken = await getCustomToken(auth?.currentUser?.uid);
         Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, cookieOptions);
-        Cookies.set(localStorageKeys.user, customToken, cookieOptions);
         return signIn;
     }
 }
