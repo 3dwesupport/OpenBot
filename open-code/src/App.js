@@ -148,14 +148,14 @@ function App() {
             onSnapshot(q, (snapshot) => {
                 console.log("Data fetched ::::", snapshot);
                 snapshot.docChanges().forEach((change) => {
-                    console.log("change::",change)
+                    console.log("change::", change)
                     if (change.type === "added") {
                         console.log("New city: ", change.doc.data());
-                        Cookies.set("playgroundPlanDetails",change.doc.data());
+                        Cookies.set("playgroundPlanDetails", change.doc.data());
                     }
                     if (change.type === "modified") {
                         console.log("Modified city: ", change.doc.data());
-                        Cookies.set("playgroundPlanDetails",change.doc.data());
+                        Cookies.set("playgroundPlanDetails", change.doc.data());
                     }
                 });
 
@@ -165,6 +165,22 @@ function App() {
         }
     }, []);
 
+    useEffect(() => {
+        const q = query(collection(db, "subscription"), where("uid", "==", localStorage.getItem(localStorageKeys.UID)));
+        onSnapshot(q, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                console.log("Which type changed :::", change);
+                if (change.type === "added") {
+                    console.log("New city: ", change.doc.data());
+                    Cookies.set(localStorageKeys.playgroundPlanDetails, `${JSON.stringify(change.doc.data())}`);
+                }
+                if (change.type === "modified") {
+                    console.log("Modified city: ", change.doc.data());
+                    Cookies.set(localStorageKeys.playgroundPlanDetails, `${JSON.stringify(change.doc.data())}`);
+                }
+            })
+        })
+    })
 
     useEffect(() => {
         if (isSessionExpire) {
