@@ -91,8 +91,17 @@ function App() {
             let result = cookie
             localStorage.setItem("isSigIn", "true");
             auth.signInWithCustomToken(result).then((res) => {
-
                 delete_cookie("user");
+                const cookieOptions = {
+                    // domain: '.openbot.org',
+                    domain: 'localhost',
+                    // domain: ".itinker.io",
+                    secure: true,
+                };
+                addSubscription(auth?.currentUser?.uid).then(async (res) => {
+                    console.log("res::", res)
+                    Cookies.set(localStorageKeys.playgroundPlanDetails, JSON.stringify(res), cookieOptions);
+                });
             })
                 .catch((error) => {
                     console.log("error::", error);
@@ -164,23 +173,6 @@ function App() {
             })
         }
     }, []);
-
-    useEffect(() => {
-        const q = query(collection(db, "subscription"), where("uid", "==", localStorage.getItem(localStorageKeys.UID)));
-        onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                console.log("Which type changed :::", change);
-                if (change.type === "added") {
-                    console.log("New city: ", change.doc.data());
-                    Cookies.set(localStorageKeys.playgroundPlanDetails, `${JSON.stringify(change.doc.data())}`);
-                }
-                if (change.type === "modified") {
-                    console.log("Modified city: ", change.doc.data());
-                    Cookies.set(localStorageKeys.playgroundPlanDetails, `${JSON.stringify(change.doc.data())}`);
-                }
-            })
-        })
-    })
 
     useEffect(() => {
         if (isSessionExpire) {

@@ -36,6 +36,31 @@ function App() {
     }, [])
 
     useEffect(() => {
+        console.log(localStorage.getItem(localStorageKeys.UID))
+
+        if (localStorage.getItem("isSigIn") === "true") {
+            const q = query(collection(db, "subscription"), where("uid", "==", localStorage.getItem(localStorageKeys.uid)));
+            onSnapshot(q, (snapshot) => {
+                console.log("Data fetched ::::", snapshot);
+                snapshot.docChanges().forEach((change) => {
+                    console.log("change::", change)
+                    if (change.type === "added") {
+                        console.log("New city: ", change.doc.data());
+                        Cookies.set("playgroundPlanDetails", change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        console.log("Modified city: ", change.doc.data());
+                        Cookies.set("playgroundPlanDetails", change.doc.data());
+                    }
+                });
+
+            }, (error) => {
+                console.log("error during fetch data from firebase :");
+            })
+        }
+    }, []);
+
+    useEffect(() => {
         if (isAndroid) {
             auth.getRedirectResult().then(async function (result) {
                 if (result.credential) {
@@ -93,23 +118,6 @@ function App() {
             document.body.classList.replace("dark", "light"); //for background theme
         }
     };
-
-    useEffect(()=>{
-        const q=query(collection(db,"subscription"),where("uid","==",localStorage.getItem(localStorageKeys.UID)));
-        onSnapshot(q,(snapshot)=>{
-            snapshot.docChanges().forEach((change)=>{
-                console.log("Which type changed :::",change);
-                if (change.type === "added") {
-                    console.log("New city: ", change.doc.data());
-                    Cookies.set(localStorageKeys.planDetails,`${JSON.stringify(change.doc.data())}`);
-                }
-                if (change.type === "modified") {
-                    console.log("Modified city: ", change.doc.data());
-                    Cookies.set(localStorageKeys.planDetails,`${JSON.stringify(change.doc.data())}`);
-                }
-            })
-        })
-    })
 
     return (
         <ThemeContext.Provider value={{theme, toggleTheme}}>

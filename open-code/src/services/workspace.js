@@ -348,6 +348,7 @@ function getConfigData() {
 /**
  * function to filter and set models in blocks
  * @param modelType
+ * @param assetType
  * @returns {unknown[]|undefined|null}
  */
 function filterModels(modelType, assetType) {
