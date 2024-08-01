@@ -46,11 +46,11 @@ function App() {
                     console.log("change::", change)
                     if (change.type === "added") {
                         console.log("New city: ", change.doc.data());
-                        Cookies.set("playgroundPlanDetails", change.doc.data());
+                        Cookies.set("planDetails", change.doc.data());
                     }
                     if (change.type === "modified") {
                         console.log("Modified city: ", change.doc.data());
-                        Cookies.set("playgroundPlanDetails", change.doc.data());
+                        Cookies.set("planDetails", change.doc.data());
                     }
                 });
 
