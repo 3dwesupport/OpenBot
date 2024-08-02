@@ -26,20 +26,21 @@ export function Billing() {
     let uid = localStorage.getItem(localStorageKeys.UID);
 
     useEffect(() => {
-        setIsAnalysisLoader(true);
-        getDocDetails(uid).then(doc => {
-            const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? Constants.active : Constants.expired;
-            setPlanStatus({
-                type: doc.data.sub_type,
-                status: updatedStatus
-            })
-            setIsAnalysisLoader(false);
-        })
-            .catch(error => {
+        if (localStorage.getItem("isSigIn") === "true") {
+            setIsAnalysisLoader(true);
+            getDocDetails(uid).then(doc => {
+                const updatedStatus = (new Date(doc.data.sub_end_date.seconds * 1000 + doc.data.sub_end_date.nanoseconds / 1e6) >= new Date()) ? Constants.active : Constants.expired;
+                setPlanStatus({
+                    type: doc.data.sub_type,
+                    status: updatedStatus
+                })
                 setIsAnalysisLoader(false);
-                console.error("Error during fetching data:");
             })
-    }, [uid]);
+                .catch(error => {
+                    setIsAnalysisLoader(false);
+                    console.error("Error during fetching data:");
+                })
+        } }, [uid]);
 
     useEffect(() => {
         const newSearchParams = new URLSearchParams(location.search);
