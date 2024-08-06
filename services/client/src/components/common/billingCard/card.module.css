@@ -1,0 +1,92 @@
+.choosePlanDiv {
+    width: 31%;
+    border-radius: 10px;
+    height: 480px;
+    overflow: scroll;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .13);
+}
+
+.cardChildDiv {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    font-family: Gilroy-Medium, sans-serif;
+    flex: 1;
+}
+.innerChild{
+    text-align: right;
+    font-family: Gilroy-Medium, sans-serif;
+    padding: 10px 20px 0px 0px;
+
+}
+.activePlan {
+    background-color: rgb(48, 48, 48);
+    /*height:420px;*/
+}
+
+.descriptionDiv {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.planTitle {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+.innerDiv{
+    flex:1;
+}
+.activeDot{
+    width:10px;
+    height:10px;
+    background-color: #3EB489;
+    border-radius:80%;
+    margin-right: 10px;
+}
+.inActiveDot{
+    width:10px;
+    height:10px;
+    background-color: red;
+    border-radius:80%;
+    margin-right: 10px;
+}
+.planCostDiv {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.planButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    cursor: pointer;
+}
+
+.planServices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+@media only screen and (max-width: 821px) {
+    .choosePlanDiv {
+        width: 100%;
+        height: 350px;
+    }
+
+    .cardChildDiv {
+        padding: 20px;
+        gap: 25px;
+        font-size: 14px;
+    }
+}
+
+.buttonFilter {
+    filter: blur(0.5px); /* Adjust the blur radius as needed */
+}
