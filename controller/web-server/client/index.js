@@ -12,12 +12,14 @@ import {Keyboard} from './keyboardHandlers/keyboard.js'
 import {BotMessageHandler} from './keyboardHandlers/bot-message-handler'
 import {Commands} from './keyboardHandlers/commands'
 import {RemoteKeyboard} from './keyboardHandlers/remote_keyboard'
-import {uploadServerUsage, getServerDetails} from './firebase/APIs'
+import {uploadServerUsage} from './firebase/APIs'
 import {WebRTC} from './webRTC/webrtc.js'
 import Cookies from 'js-cookie'
 import {googleSigIn, googleSignOut} from './firebase/authentication'
-import {Constants, localStorageKeys} from './utils/constants'
+import {localStorageKeys} from './utils/constants'
 import {handleAccessToken, handleAuthChangedOnRefresh, handleServerDetailsOnSSO} from './serverHandler/index.js'
+
+export let signedInUser = JSON.parse(localStorage.getItem(localStorageKeys.user))
 
 const connection = new Connection();
 (async () => {
@@ -70,8 +72,6 @@ const connection = new Connection();
     keyboard.start(onKeyPress, onQuit)
 })()
 
-export let signedInUser = JSON.parse(localStorage.getItem(localStorageKeys.user))
-
 const signInButton = document.getElementsByClassName('google-sign-in-button')[0]
 signInButton.addEventListener('click', handleSignInButtonClick)
 const cancelButton = document.getElementById('logout-cancel-button')
@@ -108,7 +108,7 @@ function handleSignInButtonClick() {
 /**
  * function to sendId to remote server
  */
-function sendId() {
+export function sendId() {
     const response = {
         roomId: signedInUser.email
     }
@@ -152,7 +152,7 @@ function hideLogoutWrapper() {
 /**
  * function to display logout popup
  */
-function showLogoutWrapper() {
+export function showLogoutWrapper() {
     const logout = document.getElementsByClassName('logout-wrapper')[0]
     logout.style.display = 'block'
 }
@@ -160,7 +160,7 @@ function showLogoutWrapper() {
 /**
  * function to display expiration popup
  */
-function showExpirationWrapper() {
+export function showExpirationWrapper() {
     const expire = document.getElementsByClassName('plan-expiration-model')[0]
     expire.style.display = 'block'
 }
@@ -220,7 +220,7 @@ export const deleteCookie = (name) => {
 
 handleAccessToken()
 handleServerDetailsOnSSO()
-handleAuthChangedOnRefresh()
+handleAuthChangedOnRefresh(signedInUser)
 
 // handling user usage for server duration when refreshing or closing page
 window.onunload = function () {
@@ -230,41 +230,3 @@ window.onunload = function () {
     }
 }
 
-/**
- * function to check whether user subscription expires or not
- */
-export function checkPlanExpiration() {
-    if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
-        const details = getCookie(localStorageKeys.serverPlanDetails)
-        console.log('details:::', details)
-        if (details) {
-            const items = JSON.parse(details)
-            let isExpired = false
-            let isIdSend = false
-            getServerDetails().then((res) => {
-                const endTimeCheckInterval = setInterval(() => {
-                    if (new Date() >= new Date(items?.planEndDate)) { // If subscription time is reached
-                        clearInterval(endTimeCheckInterval)
-                        isExpired = true
-                        showExpirationWrapper()
-                    } else if (items?.planType === Constants.free && res >= 60) { // If free 60 minutes are over
-                        clearInterval(endTimeCheckInterval)
-                        isExpired = true
-                        showExpirationWrapper()
-                    } else if (items?.planType === Constants.standard && res >= 60 * 50) { // If standard and 3000 minutes are over
-                        clearInterval(endTimeCheckInterval)
-                        isExpired = true
-                        showExpirationWrapper()
-                    } else if (items?.planType === Constants.premium && res >= 60 * 480) { // If premium and 28800 minutes are over
-                        clearInterval(endTimeCheckInterval)
-                        isExpired = true
-                        showExpirationWrapper()
-                    } else if (!isExpired && !isIdSend) {
-                        sendId()
-                        isIdSend = true
-                    }
-                }, 100)// 1 minute in milliseconds
-            })
-        }
-    }
-}

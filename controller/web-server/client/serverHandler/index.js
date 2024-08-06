@@ -1,14 +1,16 @@
-import {localStorageKeys} from '../utils/constants.js'
+import {Constants, localStorageKeys} from '../utils/constants.js'
 import {signInWithCustomToken} from 'firebase/auth'
 import {auth} from '../firebase/authentication.js'
-import {getUserPlan, uploadServerUsage} from '../firebase/APIs.js'
+import {getServerDetails, getUserPlan, uploadServerUsage} from '../firebase/APIs.js'
 import Cookies from 'js-cookie'
-import {checkPlanExpiration, deleteCookie, getCookie, signedInUser} from '../index.js'
+import {deleteCookie, getCookie, sendId, showExpirationWrapper} from '../index.js'
+
+export let signedInUser = JSON.parse(localStorage.getItem(localStorageKeys.user))
 
 /**
- * function to handle single sign on from openbot dashboard
+ * function to handle single sign on from openBot dashboard
  */
-function handleSingleSignOn() {
+export function handleSingleSignOn() {
     const cookie = getCookie(localStorageKeys.user)
     if (cookie) {
         const result = cookie
@@ -21,7 +23,6 @@ function handleSingleSignOn() {
             localStorage.setItem(localStorageKeys.user, JSON.stringify(res.user))
             localStorage.setItem(localStorageKeys.isSignIn, true.toString())
             getUserPlan().then((res) => {
-                console.log("res:::", res)
                 Cookies.set(localStorageKeys.serverPlanDetails, JSON.stringify(res))
                 checkPlanExpiration()
             })
@@ -33,6 +34,9 @@ function handleSingleSignOn() {
     }
 }
 
+/**
+ * function to handle server details
+ */
 export function handleServerDetailsOnSSO() {
     const cookie = getCookie(localStorageKeys.user)
     if (cookie) {
@@ -62,7 +66,7 @@ export function handleAccessToken() {
 /**
  * function to handle auth status on refreshing page
  */
-export function handleAuthChangedOnRefresh() {
+export function handleAuthChangedOnRefresh(signedInUser) {
     if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
         setTimeout(() => {
             auth.onAuthStateChanged((res) => {
@@ -83,5 +87,44 @@ export function handleAuthChangedOnRefresh() {
                 }
             })
         }, 1000)
+    }
+}
+
+/**
+ * function to check whether user subscription expires or not
+ */
+export function checkPlanExpiration() {
+    if (localStorage.getItem(localStorageKeys.isSignIn) === 'true') {
+        const details = getCookie(localStorageKeys.serverPlanDetails)
+        console.log('details:::', details)
+        if (details) {
+            const items = JSON.parse(details)
+            let isExpired = false
+            let isIdSend = false
+            getServerDetails().then((res) => {
+                const endTimeCheckInterval = setInterval(() => {
+                    if (new Date() >= new Date(items?.planEndDate)) { // If subscription time is reached
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (items?.planType === Constants.free && res >= 60) { // If free 60 minutes are over
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (items?.planType === Constants.standard && res >= 60 * 50) { // If standard and 3000 minutes are over
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (items?.planType === Constants.premium && res >= 60 * 480) { // If premium and 28800 minutes are over
+                        clearInterval(endTimeCheckInterval)
+                        isExpired = true
+                        showExpirationWrapper()
+                    } else if (!isExpired && !isIdSend) {
+                        sendId()
+                        isIdSend = true
+                    }
+                }, 100)// 1 minute in milliseconds
+            })
+        }
     }
 }

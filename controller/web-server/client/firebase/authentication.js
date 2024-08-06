@@ -3,7 +3,8 @@ import {getAuth, signOut, signInWithPopup, GoogleAuthProvider} from 'firebase/au
 import {getFirestore} from '@firebase/firestore'
 import {getStorage} from 'firebase/storage'
 import Cookies from 'js-cookie'
-import {checkPlanExpiration, deleteCookie} from '../index'
+import { deleteCookie} from '../index'
+import {checkPlanExpiration} from '../serverHandler/index.js'
 import {getUserPlan} from './APIs'
 import {localStorageKeys} from '../utils/constants'
 
