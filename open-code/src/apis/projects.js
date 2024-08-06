@@ -1,14 +1,15 @@
+
 import {
     addDoc,
     collection,
-    doc,
-    updateDoc,
     where,
     query,
-    getDocs, and, writeBatch, getAggregateFromServer, sum
+    getDocs, and, writeBatch, getCountFromServer
 } from "firebase/firestore";
-import {auth, db} from "../services/firebase";
-import {Month, tables} from "../utils/constants";
+import {auth, db, googleSignOut} from "../services/firebase";
+import {localStorageKeys, tables} from "../utils/constants";
+import {nanoid} from "nanoid";
+import {getCookie} from "../services/workspace";
 
 /**
  * function to set user usage for projects in firebase firestore
@@ -17,31 +18,34 @@ import {Month, tables} from "../utils/constants";
  */
 export async function setProjectDetails(projectName) {
     const date = new Date();
-    const year = date.getFullYear();
-    const getMonth = date.getMonth();
     const details = {
-        name: projectName,
+        projectName: projectName,
         uid: auth?.currentUser.uid,
-        status: {
-            year: year,
-            month: Month[getMonth],
-            update: 1
-        },
+        projectId: nanoid(),
+        created_at: date
     };
+
+    const projectActivity = {
+        updated_at: date,
+        projectId: "",
+        uid: auth?.currentUser.uid
+    }
     try {
-        let docDetails = await getDocDetails(projectName, tables.projects, "name");
+        let docDetails = await getDocDetails(projectName, tables.projects, "projectName");
         if (docDetails === null) {
             await addDoc(collection(db, tables.projects),
                 details
-            ).then();
-        } else {
-            const projectsRef = doc(db, tables.projects, docDetails?.id);
-            let updatedData = docDetails?.data;
-            updatedData.status.update += 1;
-            await updateDoc(projectsRef,
-                updatedData
-            ).then(() => {
+            ).then(async () => {
+                projectActivity.projectId = details.projectId
+                await addDoc(collection(db, tables.projectsActivity),
+                    projectActivity
+                ).then();
             });
+        } else {
+            projectActivity.projectId = docDetails?.data.projectId;
+            await addDoc(collection(db, tables.projectsActivity),
+                projectActivity
+            ).then();
         }
     } catch (e) {
         console.log("error in uploading projects::", e);
@@ -56,11 +60,11 @@ export async function setProjectDetails(projectName) {
  */
 export async function renameAllProjects(oldProjectName, newProjectName) {
     try {
-        const ordersQuery = query(collection(db, tables.projects), and(where("name", '==', oldProjectName), where("uid", '==', auth?.currentUser.uid)));
+        const ordersQuery = query(collection(db, tables.projects), and(where("projectName", '==', oldProjectName), where("uid", '==', auth?.currentUser.uid)));
         const querySnapshot = await getDocs(ordersQuery);
         const batch = writeBatch(db);
         querySnapshot.forEach((document) => {
-            batch.update(document.ref, {name: newProjectName});
+            batch.update(document.ref, {projectName: newProjectName});
         });
         await batch.commit();
     } catch (e) {
@@ -77,9 +81,7 @@ export async function renameAllProjects(oldProjectName, newProjectName) {
  */
 export const getDocDetails = async (value, table, fieldName) => {
     try {
-        const year = new Date().getFullYear();
-        const getMonth = new Date().getMonth();
-        const ordersQuery = query(collection(db, table), and(where(fieldName, '==', value), where("uid", '==', auth?.currentUser.uid), where("status.year", '==', year), where("status.month", '==', Month[getMonth])));
+        const ordersQuery = query(collection(db, table), and(where(fieldName, '==', value), where("uid", '==', auth?.currentUser.uid)));
         const querySnapshot = await getDocs(ordersQuery);
         let response = null;
         querySnapshot.forEach((doc) => {
@@ -96,16 +98,28 @@ export const getDocDetails = async (value, table, fieldName) => {
 
 /**
  * function to get projects compile time
- * @returns {Promise<number>}
+ * @returns {Promise<{planType: *, count: number}>}
  */
 export const sumUploadCode = async () => {
-    try {
-        const ordersQuery = query(collection(db, tables.projects), and(where("uid", '==', auth?.currentUser.uid)));
-        const snapshot = await getAggregateFromServer(ordersQuery, {
-            totalCompileCode: sum('status.update')
-        });
-        return snapshot.data().totalCompileCode;
-    } catch (e) {
-        console.log(e);
+    const details = getCookie(localStorageKeys.playgroundPlanDetails)
+    console.log("All plan details :::", details);
+    if (!details) {
+        alert("You don't have any playgroundPlanDetails");
+        googleSignOut().then();
+    }
+    else {
+        if (details) {
+            const items = JSON.parse(details);
+            console.log("Items", items);
+            const startDate = new Date(items?.sub_start_date);
+            const endDate = new Date(items.sub_end_date);
+            try {
+                const ordersQuery = query(collection(db, tables.projectsActivity), and(where("uid", '==', auth?.currentUser.uid), where("updated_at", '>=', startDate), where("updated_at", '<=', endDate)));
+                const snapshot = await getCountFromServer(ordersQuery);
+                return {count: snapshot.data().count, planType: items.sub_type, planEndDate: endDate};
+            } catch (e) {
+                console.log(e);
+            }
+        }
     }
 }
