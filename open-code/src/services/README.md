@@ -1,5 +1,13 @@
 ## Firebase Google Sign-In Authentication
 
+<p align="center">
+  <span>English</span> |
+  <a href="README.zh-CN.md">简体中文</a> |
+  <a href="README.de-DE.md">Deutsch</a> |
+  <a href="README.fr-FR.md">Français</a> |
+  <a href="README.es-ES.md">Español</a>
+</p>
+
 - #### Usage
   In web application, we use Firebase for Google sign-in authentication to upload OpenBot Playground projects on Google
   Drive. If you clone this project and run on your device, you must set up your own Firebase project because the
@@ -129,10 +137,10 @@
     - The Google Drive API should appear in the search results. Click on it.
       On the next page, you'll find information about the API. Click the "Enable" button to enable it for your project.
       Once enabled, you'll be able to access and manage the Google Drive and Drive API settings.
-  
+
       <img style="padding-right: 2%; padding-top: 2%; padding-bottom: 2%;" src="../../../docs/images/google_drive_result.jpg" alt="Google Cloud Console" width="30%"/>
       <img style="padding-right: 2%; padding-top: 2%; padding-bottom: 2%;" src="../../../docs/images/google_drive_enable_API.jpg" alt="Google Cloud Console" width="30%"/>
-
+    
 ### Troubleshooting
 
 Here are some common issues that may occur during the Firebase configuration process and their corresponding solutions.

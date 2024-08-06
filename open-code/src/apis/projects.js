@@ -102,15 +102,15 @@ export const getDocDetails = async (value, table, fieldName) => {
  */
 export const sumUploadCode = async () => {
     const details = getCookie(localStorageKeys.playgroundPlanDetails)
-    console.log("All plan details :::",details);
-    if(!details){
+    console.log("All plan details :::", details);
+    if (!details) {
         alert("You don't have any playgroundPlanDetails");
         googleSignOut().then();
     }
-    else{
+    else {
         if (details) {
             const items = JSON.parse(details);
-            console.log("Items",items);
+            console.log("Items", items);
             const startDate = new Date(items?.sub_start_date);
             const endDate = new Date(items.sub_end_date);
             try {

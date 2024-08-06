@@ -20,6 +20,8 @@ export const Toolbox = (props) => {
                 <Block type="start"/>
                 <Block type="forever"/>
                 <Block type="wait"/>
+                <Block type="display_sensors"/>
+                <Block type="display_string"/>
                 <Block type="controls_if" gap="8">
                     <Value name="IF0">
                         <Shadow type="logic_boolean">

@@ -2,12 +2,20 @@
 
 # OpenBot Playground
 
+<p align="center">
+  <span>English</span> |
+  <a href="README.zh-CN.md">简体中文</a> |
+  <a href="README.de-DE.md">Deutsch</a> |
+  <a href="README.fr-FR.md">Français</a> |
+  <a href="README.es-ES.md">Español</a>
+</p>
+
 OpenBot Playground is a drag and drop platform to support OpenBot application, where anyone can build instructions for
 the robot.
 
 ## Getting Started
 
-You can run this application directly from the [Link](http://openbot.itinker.io "Link").
+You can run this application directly from the [Link](https://www.playground.openbot.org/ "Link").
 
 You can also run it locally via creating a local copy of the project. To achieve this, navigate into
 the `openBot/open-code` folder, [set firebase project](src/services/README.md) and run application.
@@ -47,7 +55,7 @@ This project allows users to store their data both locally and on `Google Drive`
 automatically stored in the `local storage` of the user's device. As changes are made to the project, the local storage
 is updated in real-time.
 
-Additionally, users can upload their project to Google Drive by clicking on the [upload icon](#upload-in-drive). This
+Additionally, users can upload their project to Google Drive by clicking on the [upload button](#generate-Code). This
 allows users to access their project from any device with internet access, making it easier to work on the project from
 different locations.
 
@@ -109,15 +117,15 @@ two buttons.
   The "Sign-in" button opens a Google sign-in popup on the screen and prompts you to enter your email for login, with
   all necessary permissions granted, including modifying ***Google Drive***.
   <p align="left">
-  <img style="padding-right: 2%;" src="../docs/images/playground_signIn.gif" alt="Playground Sign In" width="60%" height="20%"/>
+  <img style="padding-right: 2%;" src="../docs/images/playground_sign-in.gif" alt="Playground Sign In" width="60%" height="20%"/>
   </p>
 
 - #### Profile Options
   Upon successful sign-in, you will have options to edit your profile and log out. The "Edit Profile" button opens a
   popup where you can update your profile image, display name and date of birth.
   <p align="left">
-  <img style="padding-right: 2%;" src="../docs/images/playground_edit_profile_logout_popup 2.jpg" alt="Playground Sign In" width="45%"/>
-  <img style="padding-right: 2%;" src="../docs/images/playground_edit_profile_modal 2.jpg" alt="Playground Sign In" width="45%" />
+  <img style="padding-right: 2%;" src="../docs/images/playground_edit_profile_logout_popup.jpg" alt="Playground Sign In" width="45%"/>
+  <img style="padding-right: 2%;" src="../docs/images/playground_edit_profile_modal.jpg" alt="Playground Sign In" width="45%" />
   </p>
 
 - #### AutoSync:
@@ -140,7 +148,7 @@ two buttons.
       functionalities. In the center, the project name is displayed with a downward arrow, providing options for
       renaming and deleting the project.
        <p align="left">
-       <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_workspace_rename__del 2.jpg" alt="Playground Sign In" width="50%" height="50%" />
+       <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_workspace_rename.jpg" alt="Playground Sign In" width="50%" height="50%" />
        </p>
 
     - On the right side, a help button has been added, featuring three sections that explain how to effectively
@@ -154,9 +162,9 @@ two buttons.
 
 Carousal's container explains how Application works.
 <p>
-<img style="padding-right: 2%;" src="../docs/images/home_carousal1.jpg" alt="home_carousal1" width="30%"/>
-<img style="padding-right: 2%;" src="../docs/images/home_carousal2.jpg" alt="home_carousal2" width="30%"/>
-<img style="padding-right: 2%;" src="../docs/images/home_carousal3.jpg" alt="home_carousal3" width="30%"/>
+<img style="padding-right: 2%;" src="../docs/images/playground_home_carousal1.jpg" alt="home_carousal1" width="30%"/>
+<img style="padding-right: 2%;" src="../docs/images/playground_home_carousal2.jpg" alt="home_carousal2" width="30%"/>
+<img style="padding-right: 2%;" src="../docs/images/playground_home_carousal3.jpg" alt="home_carousal3" width="30%"/>
 </p>
 
 ### Project Section
@@ -171,9 +179,9 @@ If the user enters a name already assigned to another project, the system will a
 appending an integer to the end of the name.
 
 <p align="left">
-<img style="padding-right: 2%;" src="../docs/images/create_new_Project.jpg" alt="Create New Project" width="30%"/>
-<img style="padding-right: 2%;" src="../docs/images/my_Project.jpg" alt="my Project" width="30%"/>
-<img style="padding-right: 2%;" src="../docs/images/myProjectOption.jpg" alt="option" width="30%"/>
+<img style="padding-right: 2%;" src="../docs/images/playground_create_new_project.jpg" alt="Create New Project" width="30%"/>
+<img style="padding-right: 2%;" src="../docs/images/playground_my_project.jpg" alt="my Project" width="30%"/>
+<img style="padding-right: 2%;" src="../docs/images/playground_my_project_option.jpg" alt="option" width="30%"/>
 </p>
 
 ### WorkSpace
@@ -200,19 +208,16 @@ JavaScript and Python.
       openBot-PlayGround folder.
     - User should not create same name file in openBot-PlayGround folder.
   <p align="left">
-  <img style="padding-right: 2%; margin-top: 2%;" src="../docs/images/google_drive_folder.jpg" alt="Generate Code" width="35%" />
-  <img style="padding-right: 2%; margin-top: 2%" src="../docs/images/playground_Drive .jpg" alt="Generate Code" width="70%"/>
-  </p>
+  <img style="padding-right: 2%;" src="../docs/images/playground_google_drive_folder.jpg" alt="Generate Code" width="25%" />
+    <p></p>
+  <img style="padding-right: 2%;" src="../docs/images/playground_drive.jpg" alt="Generate Code" width="45%"/>
 
 - #### Generate Code
   Generate Code button on the Playground bottom bar serves three important functions. Firstly, it generates a QR code
-  that
-  represents the link of the JavaScript/Python file uploaded to the user's Google Drive as part of the project. This QR
+  that represents the link of the JavaScript/Python file uploaded to the user's Google Drive as part of the project. This QR
   code is displayed in a side window for easy access and sharing. Secondly, the button uploads a JavaScript/Python
   file containing the code for the project to the user's Google Drive. And lastly, uploading an XML file which
-  represents
-  the
-  current project's block configuration. This XML file contains the structure and arrangement of the blocks used in the
+  represents the current project's block configuration. This XML file contains the structure and arrangement of the blocks used in the
   project.
 
     - `Convenient Sharing` -
@@ -241,7 +246,7 @@ JavaScript and Python.
   corresponding code in the side window simultaneously. The options to choose a language enables you to examine and
   evaluate the correctness of the blocks.
   <p align="left">
-  <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_codeEditor.jpg" alt="Playground code editor" width="50%" height="50%" />
+  <img style="padding-right: 2%;margin-top: 2%" src="../docs/images/playground_code_editor.jpg" alt="Playground code editor" width="50%" height="50%" />
   </p>
 
 - #### Add Model
