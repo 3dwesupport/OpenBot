@@ -15,7 +15,15 @@ import remarkGfm from 'remark-gfm';
  */
 const ChatBox = (props) => {
     const {
-        conversation, handlePauseClick, setIsTyping, setLoader, loader, allChatMessages, chatContainerRef,
+        conversation,
+        handlePauseClick,
+        setIsTyping,
+        setLoader,
+        loader,
+        allChatMessages,
+        chatContainerRef,
+        setCodeBufferLoader,
+        codeBufferLoader
     } = props;
     const theme = useContext(ThemeContext);
     return (
@@ -47,6 +55,8 @@ const ChatBox = (props) => {
                 setIsTyping={setIsTyping}
                 allChatMessages={allChatMessages}
                 id={conversation.id}
+                setCodeBufferLoader={setCodeBufferLoader}
+                codeBufferLoader={codeBufferLoader}
                 setLoader={setLoader}
                 loader={loader}
                 chatContainerRef={chatContainerRef}
@@ -72,56 +82,33 @@ const UserMessage = ({timestamp, message}) => (
 /**
  * AssistantResponse component renders assistant's response with typewriter effect.
  * Manages display of response content, loader, and scrolling behavior.
- * @param timestamp
- * @param message
- * @param paused
- * @param setIsTyping
- * @param setLoader
- * @param loader
- * @param allChatMessages
- * @param id
- * @param chatContainerRef
  * @returns {Element}
  * @constructor
+ * @param props
  */
-const AssistantResponse = ({
-                               timestamp,
-                               message,
-                               paused,
-                               setIsTyping,
-                               setLoader,
-                               loader,
-                               allChatMessages,
-                               id,
-                               chatContainerRef,
-                           }) => {
+const AssistantResponse = (props) => {
+    const {
+        timestamp,
+        message,
+        paused,
+        setIsTyping,
+        setLoader,
+        loader,
+        codeBufferLoader,
+        allChatMessages,
+        id,
+        chatContainerRef,
+    } = props;
     const [displayedMessage, setDisplayedMessage] = useState('');
     const theme = useContext(ThemeContext);
-
+    //Effect hook to manage loading state and update the displayed message when dependencies change.
     useEffect(() => {
         setLoader(message === '');
 
         if (message !== '') {
-            let index = 0;
-
-            const regex = /<xml xmlns="https:\/\/developers.google.com\/blockly\/xml">[\s\S]*?<\/xml>/;
-            const cleanMessage = message.replace(regex, '');
-            if (allChatMessages.length === id) {
-                const interval = setInterval(() => {
-                    if (paused) {
-                        clearInterval(interval);
-                    } else if (index <= cleanMessage.length) {
-                        setDisplayedMessage(cleanMessage.slice(0, index));
-                        index++;
-                    }
-                    if (index > cleanMessage.length) {
-                        setIsTyping(false);
-                        clearInterval(interval);
-                    }
-                }, 10);
-                return () => clearInterval(interval);
-            }
+            setDisplayedMessage(message);
         }
+
     }, [message, paused, allChatMessages.length, id, setIsTyping, setLoader]);
 
     //useEffect for auto scrolling the content
@@ -130,6 +117,7 @@ const AssistantResponse = ({
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [displayedMessage, chatContainerRef, loader, allChatMessages.length]);
+
 
     return (
         <div
@@ -152,6 +140,7 @@ const AssistantResponse = ({
                         color: theme.theme === Themes.dark ? Colors.whiteFont : '#000000',
                     }}
                 >
+
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -181,6 +170,19 @@ const AssistantResponse = ({
                     >
                         {displayedMessage}
                     </ReactMarkdown>
+                    {codeBufferLoader && allChatMessages.length === id && (
+                        <div className={theme.theme === Themes.dark ? styles.loaderHeadingDark : styles.loaderHeading}
+                             style={{marginTop: "20px"}}>Generating Code
+                            <span
+                                style={{marginLeft: '10px'}}
+                                className={`${styles.loaderContainer} ${
+                                    theme.theme === Themes.dark ? styles.whiteLoader : styles.loader
+                                }`}
+                            >
+                        </span>
+                        </div>
+
+                    )}
                     <div className={styles.timestamp}>{timestamp}</div>
                 </div>
             )}

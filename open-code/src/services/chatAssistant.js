@@ -1,41 +1,105 @@
 import {finalPrompt} from "../utils/prompt";
-/**
- * API to get the assistant response
- * @param {string} userPrompt - The prompt provided by the user
- * @param {AbortSignal} signal - Abort signal to cancel the request
- * @param currentXML
- * @returns {Promise<string>} - The AI response or an error message
- */
-export const getAIMessage = async (userPrompt, currentXML, signal) => {
 
-    const url = `https://api.openai.com/v1/chat/completions`; // backend API endpoint
-    // const personaItem = persona.filter((item) => item.key === personaIndex);
+/**
+ * API to get the assistant response with streaming
+ * @param userPrompt
+ * @param currentXML
+ * @param signal
+ * @param onMessage
+ * @returns {Promise<string>}
+ */
+export const getAIMessage = async (userPrompt, currentXML, signal, onMessage) => {
+    const url = `https://api.openai.com/v1/chat/completions`;
+
     try {
         const response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`, // Ensure you have the right API key here
+                "Authorization": `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
             },
+
             body: JSON.stringify({
                 "messages": [
                     {role: 'system', content: finalPrompt + "\nInput XML : " + currentXML},
-                    {
-                        role: 'user',
-                        content: userPrompt
-                    }
+                    {role: 'user', content: userPrompt}
                 ],
-                "model": "gpt-4o-mini",
-                "stream": false
+                model: "gpt-4o-mini-2024-07-18",
+                stream: true,
+                response_format: {
+                    type: "json_schema",
+                    json_schema: {
+                        name: "blockly_chat_assistant",
+                        description: `Response structure should follow the given json schema structure:
+                        $$CONTENT$$ key  does not have any xml but  $$RESPONSE$$ key have only xml code in it.
+                       `,
+                        schema: {
+                            type: "object",
+                            strict: true,
+                            properties: {
+                                $$CONTENT$$: {
+                                    type: "string",
+                                    description: `Make sure you Provide only an explanation in clear, simple text. This section should describe the purpose and usage of the Blockly blocks. Do not include any XML code or technical details in this part—just the explanation`
+                                },
+                                $$RESPONSE$$: {
+                                    type: "string",
+                                    description: `Ensure you Provide only valid XML code for the Blockly blocks. Do not include any explanations in this section—only XML code.`
+                                },
+                            },
+                            required: ["$$CONTENT$$", "$$RESPONSE$$"],
+                            additionalProperties: false
+                        },
+                    }
+                }
             }),
             signal
         });
 
-        const result = await response.json();
-        return result.choices[0].message.content;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let resultText = '';
+
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+
+            // Decode the stream chunk
+            const chunk = decoder.decode(value, {stream: true});
+            // Stop if the request was aborted
+            if (signal.aborted) {
+                return "Request was cancelled.";
+
+            }
+            const parsedChunk = chunk
+                .split("\n")
+                .filter(line => line.trim()) // Filter out empty lines
+                .map(line => line.replace(/^data: /, "")) // Remove "data: " prefix
+                .map(line => {
+                    try {
+                        return JSON.parse(line);
+                    } catch (e) {
+                        console.error("JSON parse error:", e);
+                        return null;
+                    }
+                })
+                .filter(parsed => parsed !== null);
+            for (const parsed of parsedChunk) {
+                const content = parsed?.choices[0]?.delta?.content;
+                if (content) {
+                    onMessage(content);  // Update UI with new content
+                    resultText += content;
+                }
+                if (parsed?.choices[0]?.finish_reason === "stop") {
+                    onMessage("Done");
+                    return resultText;
+                }
+            }
+        }
+
+        return resultText;
+
     } catch (error) {
         if (error.name === 'AbortError') {
-            console.log('Request cancelled');
             return "Request was cancelled.";
         } else {
             console.error('Error occurred:', error);

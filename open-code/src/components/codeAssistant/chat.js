@@ -9,6 +9,7 @@ import {colors as Colors} from "../../utils/color";
 import {StoreContext} from "../../context/context";
 import {addBlocksToWorkspace} from "../blockly/imageConverter";
 import {getCurrentProject} from "../../services/workspace";
+import {cleanAndFormatResponse, handler} from "../../utils/handler";
 
 /**
  * Chat component handles user interactions and displays chat interface.
@@ -25,7 +26,7 @@ const Chat = ({drawer}) => {
     const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
     const abortControllerRef = useRef(null);
     const chatContainerRef = useRef(null);
-
+    const [codeBufferLoader, setCodeBufferLoader] = useState(false);
     const [allChatMessages, setAllChatMessages] = useState([{
         userMessage: "",
         AIMessage: ChatConstants.Message,
@@ -58,19 +59,57 @@ const Chat = ({drawer}) => {
             id: allChatMessages.length + 1,
             AITimestamp: "",
             paused: false
-        }));// Updates current message state with user input
+        }));
         abortControllerRef.current = new AbortController();
-        getAIMessage(userInput,  getCurrentProject().xmlValue,abortControllerRef.current.signal).then((res) => {
-            if (res !== undefined) {
-                addBlocksToWorkspace(res, workspace).then(() => {
+        let messageBuffer = '';
+
+        //Handles incoming message chunks from the api on streaming.
+        const onMessage = (chunk) => {
+
+            messageBuffer += chunk;
+
+
+            if (messageBuffer.includes('$$RESPONSE$$')) {
+                setCodeBufferLoader(true);
+            } else {
+                setCodeBufferLoader(false);
+            }
+            if ((messageBuffer.includes('$$CONTENT$$":"')) && chunk !== '":"') {
+                setIsTyping(true);
+                //to stop displaying xml
+                //|| messageBuffer.includes('BLOCKLY_XML_CODE":"') || "','"
+                if (messageBuffer.includes('","')) {
+                    if ("$$RESPONSE$$") {
+                        messageBuffer = '';
+                        setIsTyping(false);
+                    }
+                    //setCodeBufferLoader(true);
+                } else {
+                    // setCodeBufferLoader(false);
                     setCurrentMessage((prevState) => ({
-                        ...prevState, AIMessage: res, AITimestamp: timestamp,
+                        ...prevState, AIMessage: prevState.AIMessage + chunk, AITimestamp: timestamp,
                     }));
-                })
+                }
+            }
+        };
+
+        // To add the blocks to the current workspace
+        getAIMessage(userInput, getCurrentProject().xmlValue, abortControllerRef.current.signal, onMessage).then((res) => {
+            if (res !== undefined) {
+                let finalMessage = handler(res);
+                if (finalMessage !== undefined) {
+                    setCodeBufferLoader(false);
+                    setCurrentMessage((prevState) => ({
+                        ...prevState, AIMessage: finalMessage, AITimestamp: timestamp,
+                    }));
+                } else {
+                    setCodeBufferLoader(false);
+                }
+                addBlocksToWorkspace(res, workspace)
                     .catch((e) => {
                         console.log("Error in creating block png-->", e);
                         setCurrentMessage((prevState) => ({
-                            ...prevState, AIMessage: res + "\n" + Errors.error8, AITimestamp: timestamp,
+                            ...prevState, AIMessage: finalMessage + "\n" + Errors.error8, AITimestamp: timestamp,
                         }));
                     })
             } else {
@@ -79,31 +118,32 @@ const Chat = ({drawer}) => {
                 }));
             }
         }).catch((e) => {
+            setCodeBufferLoader(false);
             console.log(e);
-            setCurrentMessage((prevState) => ({
-                ...prevState, AIMessage: Errors.error6, AITimestamp: timestamp
-            }));
         });
 
         setInputValue('');
     };
 
-    //Handles user click on pause button
-
+    //function to pause the content
     const handlePauseClick = () => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
         setIsTyping(false);
-        if (currentMessage.AIMessage !== "") {
+        const finalMessage = cleanAndFormatResponse(currentMessage.AIMessage.replace(/\n+/g, ' ').trim());
+
+        setCurrentMessage((prevState) => ({
+            ...prevState, AIMessage: finalMessage, AITimestamp: timestamp
+        }));
+        if (loader && allChatMessages.length === currentMessage.id) {
             setCurrentMessage((prevState) => ({
-                ...prevState, paused: true
+                ...prevState, AIMessage: Errors.error7, AITimestamp: timestamp
             }));
         }
     };
 
     //Effect to update allChatMessages when currentMessage changes
-
     useEffect(() => {
         if (currentMessage.AIMessage) {
             setAllChatMessages((prevMessages) => {
@@ -120,7 +160,6 @@ const Chat = ({drawer}) => {
 
 
     // Effect to scroll chat container to bottom when messages or AI message changes
-
     useEffect(() => {
         if (chatContainerRef.current && chatContainerRef.current.scrollHeight !== null) {
 
@@ -163,6 +202,8 @@ const Chat = ({drawer}) => {
                 setIsTyping={setIsTyping}
                 allChatMessages={allChatMessages}
                 setLoader={setLoader}
+                setCodeBufferLoader={setCodeBufferLoader}
+                codeBufferLoader={codeBufferLoader}
                 loader={loader}
                 chatContainerRef={chatContainerRef}
 
@@ -177,6 +218,7 @@ const Chat = ({drawer}) => {
         /> : ""}
     </div>);
 };
+
 /**
  * Component for rendering input field and send/pause button
  * @param inputValue
@@ -189,6 +231,7 @@ const Chat = ({drawer}) => {
  */
 const ChatBottomBar = ({inputValue, handleSendClick, setInputValue, isTyping, handlePauseClick}) => {
     const theme = useContext(ThemeContext);
+
     return (<div className={styles.chatBottomBar}>
         <input
             style={{
