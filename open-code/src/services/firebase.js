@@ -13,6 +13,7 @@ import {getAuth, signOut} from "firebase/auth";
 import {localStorageKeys, tables} from "../utils/constants";
 import {setConfigData} from "./workspace";
 import configData from "../config.json";
+import Cookies from 'js-cookie';
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -64,7 +65,11 @@ export async function googleSigIn() {
     } else {
         const signIn = await auth.signInWithPopup(provider);
         localStorage.setItem("isSigIn", "true");
-        localStorage.setItem(localStorageKeys.accessToken, signIn.credential?.accessToken);
+        Cookies.set(localStorageKeys.accessToken, signIn.credential?.accessToken, {
+            expires: new Date(Date.now() + 60 * 60 * 1000), // Expires in 1 hour
+            secure: true,
+            sameSite: 'strict',
+        });
         await setConfigData();
         return signIn
     }
@@ -79,7 +84,7 @@ export async function googleSignOut() {
     signOut(auth).then(() => {
         window.location.reload()
         localStorage.setItem("isSigIn", "false")
-        localStorage.setItem(localStorageKeys.accessToken, " ");
+        Cookies.remove(localStorageKeys.accessToken);
         localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
         // delete_cookie("user");
     }).catch((error) => {
@@ -95,7 +100,7 @@ export async function getDateOfBirth() {
     const docRef = doc(db, "users", auth.currentUser?.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        if(docSnap.data()?.dob) {
+        if (docSnap.data()?.dob) {
             const date = new Date(docSnap.data().dob.toDate());
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1

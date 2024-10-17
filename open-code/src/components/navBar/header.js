@@ -17,6 +17,7 @@ import {autoSync, deleteProjectFromStorage} from "../../services/workspace";
 import {colors} from "../../utils/color";
 import {signOut} from "firebase/auth";
 import configData from "../../config.json";
+import Cookies from "js-cookie";
 
 /**
  * Open-code's header which contains logo, project name on playground screen and help button, profile signIn
@@ -76,7 +77,7 @@ export function Header() {
         if (isOnline) {
             signOut(auth).then(() => {
                 localStorage.setItem("isSigIn", "false")
-                localStorage.setItem(localStorageKeys.accessToken, " ");
+                Cookies.set(localStorageKeys.accessToken, " ");
                 localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
                 googleSigIn().then(response => {
                     setTimeoutId(true);

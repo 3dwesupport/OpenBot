@@ -5,6 +5,7 @@ import {createContext, useEffect, useState} from "react";
 import {localStorageKeys, Themes} from "./utils/constants";
 import {auth, googleSignOut} from "./services/firebase";
 import {ToastContainer} from "react-toastify";
+import Cookies from "js-cookie";
 
 export const ThemeContext = createContext(null);
 
@@ -47,7 +48,7 @@ function App() {
         if (isAndroid) {
             auth.getRedirectResult().then(async function (result) {
                 if (result.credential) {
-                    localStorage.setItem(localStorageKeys.accessToken, result.credential.accessToken);
+                    Cookies.set(localStorageKeys.accessToken, result.credential.accessToken);
                     localStorage.setItem("isSigIn", "true");
                     setUser({
                         photoURL: result.user?.photoURL,
@@ -59,52 +60,19 @@ function App() {
         }
     }, [])
 
-    /**
-     * function to get cookie from storage
-     * @param cname
-     * @returns {string}
-     */
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let splitParams = decodedCookie.split(';');
-        for (let i = 0; i < splitParams.length; i++) {
-            let cookieName = splitParams[i];
-            while (cookieName.charAt(0) === ' ') {
-                cookieName = cookieName.substring(1);
-            }
-            if (cookieName.indexOf(name) === 0) {
-                return cookieName.substring(name.length, cookieName.length);
-            }
-        }
-        return "";
-    }
-
-    /**
-     * function to delete a cookie
-     * @param name
-     */
-    const delete_cookie = function (name) {
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    };
 
     //handled single sign-on from dashboard
     useEffect(() => {
-        let cookie = getCookie("user");
+        let cookie = Cookies.get("user");
         if (cookie) {
             let result = cookie
             localStorage.setItem("isSigIn", "true");
             auth.signInWithCustomToken(result).then((res) => {
-                delete_cookie("user");
+                Cookies.remove("user");
             })
                 .catch((error) => {
                     console.log("error::", error);
                 })
-        }
-        let tokenCookie = getCookie("accessToken");
-        if (tokenCookie) {
-            localStorage.setItem(localStorageKeys.accessToken, tokenCookie);
-            delete_cookie("accessToken");
         }
     }, []);
 

@@ -1,5 +1,6 @@
 import {Constants, errorToast, localStorageKeys} from "../utils/constants";
 import {FormatDate, getCurrentProject} from "./workspace";
+import Cookies from "js-cookie";
 
 /**
  * function that upload project data on Google Drive
@@ -202,9 +203,8 @@ export async function getFolderId() {
  * @returns {string}
  */
 export function getAccessToken() {
-    return localStorage.getItem(localStorageKeys.accessToken)
+    return Cookies.get(localStorageKeys.accessToken);
 }
-
 
 /**
  * create file in google drive openBot folder

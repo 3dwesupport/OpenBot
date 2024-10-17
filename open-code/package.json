@@ -22,6 +22,7 @@
     "firebase-admin": "^11.10.1",
     "firebaseui": "^6.1.0",
     "heic2any": "^0.0.4",
+    "js-cookie": "^3.0.5",
     "js-tokens": "^8.0.1",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
