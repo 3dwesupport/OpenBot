@@ -184,8 +184,9 @@ export function Header() {
                                                            setIsHelpCenterModal={setIsHelpCenterModal}/>}
                     {/*Session expire pop up*/}
                     {isSessionExpireModal && <PopUpModal setVariable={setIsSessionExpireModal}
-                                                         headerText={"Session Expired"}
-                                                         containText={"Your session has expired.Please login again to continue."}
+                                                         headerText={<span
+                                                             style={{fontWeight: 1200}}>{"Session Expired"}</span>}
+                                                         containText={"Your session has expired. Please login again to continue."}
                                                          buttonText={"Login"}
                                                          handleButtonClick={handleSignIn}/>}
                 </div>
