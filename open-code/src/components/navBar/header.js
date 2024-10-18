@@ -75,31 +75,28 @@ export function Header() {
     //function to handle sign in
     const handleSignIn = () => {
         if (isOnline) {
+            setIsSessionExpireModal(false);
             signOut(auth).then(() => {
-                localStorage.setItem("isSigIn", "false")
-                Cookies.set(localStorageKeys.accessToken, " ");
+                localStorage.setItem("isSigIn", "false");
+                Cookies.remove(localStorageKeys.accessToken);
                 localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
                 googleSigIn().then(response => {
                     setTimeoutId(true);
-                    setIsSessionExpireModal(false);
                     setUser({
                         photoURL: response?.user.photoURL,
                         displayName: response?.user.displayName,
                         email: response?.user.email
                     });
-                    window.location.reload()
                 }).catch((error) => {
-                    console.log("signIn error: ", error)
-                    setIsSessionExpireModal(false);
+                    console.log("signIn error: ", error);
                 });
             }).catch((error) => {
-                console.log("Sign-out error ", error)
+                console.log("Sign-out error: ", error);
             });
-
         } else {
-            errorToast(Constants.InternetOffMsg)
+            errorToast(Constants.InternetOffMsg);
         }
-    }
+    };
 
     //Loader while getting date of birth
     function SimpleBackdrop() {

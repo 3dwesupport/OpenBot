@@ -20,7 +20,6 @@ import navbarStyle from "../navBar/navbar.module.css";
 import BlueText from "../fonts/blueText";
 import {ModelUploadingComponent} from "./modelUploadingComponent";
 import SubscriptionModel from "../subscription/subscriptionModel";
-import {setProjectDetails} from "../../apis/projects";
 import Cookies from "js-cookie";
 
 /**
@@ -50,7 +49,7 @@ export const BottomBar = () => {
         workspace,
         isError,
         setIsError, setCategory,
-        setIsSessionExpireModal
+        setIsSessionExpireModal,
     } = useContext(StoreContext);
 
     //handling error states on playground
@@ -191,6 +190,7 @@ export const BottomBar = () => {
                         })
                     }
                 } else {
+                    setDrawer(false);
                     setIsSessionExpireModal(true);
                 }
             } else {
