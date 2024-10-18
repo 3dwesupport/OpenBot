@@ -191,6 +191,7 @@ export const BottomBar = () => {
                     }
                 } else {
                     setDrawer(false);
+                    setCode(false);
                     setIsSessionExpireModal(true);
                 }
             } else {
