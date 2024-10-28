@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import styles from "./chat.module.css";
-import ChatBox from '../chatBox/messagebox';
 import {getAIMessage} from "../../services/chatAssistant";
 import {Images} from "../../utils/images.js";
 import {Themes, Errors, ChatConstants} from '../../utils/constants.js';
@@ -9,7 +8,8 @@ import {colors as Colors} from "../../utils/color";
 import {StoreContext} from "../../context/context";
 import {addBlocksToWorkspace} from "../blockly/imageConverter";
 import {getCurrentProject} from "../../services/workspace";
-import {cleanAndFormatResponse, handler} from "../../utils/handler";
+import {handler} from "../../utils/handler";
+import ChatBox from "../chatBox/messagebox";
 
 /**
  * Chat component handles user interactions and displays chat interface.
@@ -28,22 +28,30 @@ const Chat = ({drawer}) => {
     const chatContainerRef = useRef(null);
     const [codeBufferLoader, setCodeBufferLoader] = useState(false);
     const [allChatMessages, setAllChatMessages] = useState([{
-        userMessage: "",
-        AIMessage: ChatConstants.Message,
         id: 1,
+        userMessage: "",
+        AIMessage: ChatConstants.Message, // Initial welcome message
         userTimestamp: "",
         AITimestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
         paused: false
-    },]);
+    }, {
+        id: 2,
+        userMessage: "", // Message for choosing persona
+        AIMessage: " ",
+        userTimestamp: "",
+        AITimestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
+        paused: false
+    }]);
     const [currentMessage, setCurrentMessage] = useState({
+        id: 3,  // Starting with id 3 since id 2 is reserved for persona selection
         userMessage: "",
         AIMessage: "",
-        id: 2,
         userTimestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
         AITimestamp: "",
         paused: false
     });
 
+    const [persona, setPersona] = useState("");
     //Handles user click on send button
     const handleSendClick = async () => {
         const userInput = inputValue.trim().toLowerCase();
@@ -95,16 +103,14 @@ const Chat = ({drawer}) => {
                     setIsTyping(false);
                 } else {
                     setCurrentMessage((prevState) => ({
-                        ...prevState,
-                        AIMessage: prevState.AIMessage + formattedChunk,
-                        AITimestamp: timestamp,
+                        ...prevState, AIMessage: prevState.AIMessage + formattedChunk, AITimestamp: timestamp,
                     }));
                 }
             }
         };
 
         // To add the blocks to the current workspace
-        getAIMessage(userInput, getCurrentProject().xmlValue, abortControllerRef.current.signal, onMessage).then((res) => {
+        getAIMessage(userInput, persona, getCurrentProject().xmlValue, abortControllerRef.current.signal, onMessage).then((res) => {
             if (res !== undefined) {
                 let finalMessage = handler(res);
                 if (finalMessage !== undefined) {
@@ -163,6 +169,49 @@ const Chat = ({drawer}) => {
         }
     }, [currentMessage]);
 
+    // Function to apply typing effect to the latest message in allChatMessages
+    const applyTypingEffect = (fullText, typingSpeed = 20) => {
+        let currentIndex = 0;
+
+        const typeCharacter = () => {
+            setAllChatMessages((prevMessages) => {
+                const updatedMessages = [...prevMessages];
+                const latestMessage = updatedMessages[updatedMessages.length - 1];
+
+                // Update only the latest message
+                latestMessage.AIMessage = fullText.slice(0, currentIndex + 1);
+                updatedMessages[updatedMessages.length - 1] = latestMessage;
+
+                return updatedMessages;
+            });
+
+            currentIndex++;
+
+            if (currentIndex < fullText.length) {
+                setTimeout(typeCharacter, typingSpeed);
+            }
+        };
+
+        typeCharacter();
+    };
+
+    //Effect for setting persona character message
+    useEffect(() => {
+        if (persona) {
+            setAllChatMessages((prevMessages) => [...prevMessages, {
+                id: prevMessages.length + 1,
+                userMessage: "",
+                AIMessage: "",
+                userTimestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
+                AITimestamp: "",
+                paused: false
+            }]);
+            setTimeout(() => {
+                applyTypingEffect(ChatConstants.PersonaMessage);
+            }, 80);
+        }
+    }, [persona]);
+
 
     // Effect to scroll chat container to bottom when messages or AI message changes
     useEffect(() => {
@@ -211,7 +260,7 @@ const Chat = ({drawer}) => {
                 codeBufferLoader={codeBufferLoader}
                 loader={loader}
                 chatContainerRef={chatContainerRef}
-
+                setPersona={setPersona}
             />))}
         </div>
         {drawer ? <ChatBottomBar
