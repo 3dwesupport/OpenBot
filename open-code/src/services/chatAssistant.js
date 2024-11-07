@@ -1,4 +1,6 @@
-import {blocklyFinalPrompt,personaFinalPrompt} from "../utils/prompt";
+import { blocklyFinalPrompt, personaFinalPrompt } from "../utils/prompt";
+
+let conversationHistory = [];
 
 /**
  * API to get the assistant response with streaming
@@ -12,6 +14,16 @@ import {blocklyFinalPrompt,personaFinalPrompt} from "../utils/prompt";
 export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMessage) => {
     const url = `https://api.openai.com/v1/chat/completions`;
 
+    conversationHistory.push({ role: 'user', content: userPrompt });
+
+    const messages = [
+        {
+            role: 'system',
+            content: persona ? personaFinalPrompt(persona) : blocklyFinalPrompt + "\nInput XML : " + currentXML
+        },
+        ...conversationHistory
+    ];
+
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -21,13 +33,7 @@ export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMe
             },
 
             body: JSON.stringify({
-                "messages": [
-                    {
-                        role: 'system',
-                        content: persona ? personaFinalPrompt(persona) : blocklyFinalPrompt + "\nInput XML : " + currentXML
-                    },
-                    {role: 'user', content: userPrompt}
-                ],
+                messages,
                 model: "gpt-4o-mini-2024-07-18",
                 stream: true,
                 response_format: {
@@ -87,14 +93,22 @@ export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMe
                     }
                 })
                 .filter(parsed => parsed !== null);
+
             for (const parsed of parsedChunk) {
                 const content = parsed?.choices[0]?.delta?.content;
                 if (content) {
-                    onMessage(content);  // Update UI with new content
+                    onMessage(content);
                     resultText += content;
                 }
                 if (parsed?.choices[0]?.finish_reason === "stop") {
                     onMessage("Done");
+
+                    conversationHistory.push({ role: 'assistant', content: resultText });
+
+                    if (conversationHistory.length > 7) {
+                        conversationHistory = conversationHistory.slice(-7);
+                    }
+
                     return resultText;
                 }
             }
