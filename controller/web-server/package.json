@@ -30,7 +30,6 @@
   "license": "ISC",
   "dependencies": {
     "@firebase/firestore": "^4.6.4",
-    "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
     "dotenv": "^16.4.5",
     "firebase": "^10.1.0",
     "js-cookie": "^3.0.5",

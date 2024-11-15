@@ -10,6 +10,7 @@
   },
   "author": "Nitish Pratap",
   "dependencies": {
+    "@openai/realtime-api-beta": "github:openai/openai-realtime-api-beta",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dnssd2": "^1.0.0",
