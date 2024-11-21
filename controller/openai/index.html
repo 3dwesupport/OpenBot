@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+</head>
+<body>
+<h1>WebSocket Client</h1>
+<label for="messageInput"></label><textarea id="messageInput" placeholder="Type your message here"></textarea>
+<button id="sendButton">Send</button>
+<div id="responseContainer"></div>
+
+<script>
+    // Connect to the WebSocket server
+    const ws = new WebSocket('ws://localhost:8081');
+
+    ws.onopen = () => {
+        console.log('WebSocket connection opened');
+    };
+
+    ws.onmessage = (event) => {
+        console.log('Message from server:', event.data);
+
+        // Display server response
+        const responseContainer = document.getElementById('responseContainer');
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = `Server: ${event.data}`;
+        responseContainer.appendChild(messageDiv);
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+
+    // Send message to the server
+    document.getElementById('sendButton').addEventListener('click', () => {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value;
+
+        if (message) {
+            const messageObj = { text: message }; // Format message
+            ws.send(JSON.stringify(messageObj));
+            console.log('Message sent:', message);
+
+            // Display user message
+            const responseContainer = document.getElementById('responseContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = `You: ${message}`;
+            responseContainer.appendChild(messageDiv);
+
+            messageInput.value = ''; // Clear input
+        } else {
+            alert('Please enter a message before sending');
+        }
+    });
+</script>
+</body>
+</html>
