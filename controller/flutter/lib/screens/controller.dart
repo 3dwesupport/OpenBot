@@ -49,7 +49,7 @@ class ControllerState extends State<Controller> {
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
   String serverUrl =
-      'ws://192.168.1.24:8081'; // Replace with your Node.js server URL
+      'ws://192.168.1.27:8081'; // Replace with your Node.js server URL
 
   Future<void> videoConnection() async {
     initRenderers();
