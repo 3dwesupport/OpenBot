@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -49,7 +48,7 @@ class ControllerState extends State<Controller> {
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
   String serverUrl =
-      'ws://192.168.1.27:8081'; // Replace with your Node.js server URL
+      'ws://192.168.1.39:8081'; // Replace with your Node.js server URL
 
   Future<void> videoConnection() async {
     initRenderers();
@@ -160,25 +159,24 @@ class ControllerState extends State<Controller> {
     getNewDiscoverServices();
   }
 
-  void _connectToWebSocket() async {
-    await _webSocketService.connect();
-  }
-
   @override
   void dispose() {
     _webSocketService.close();
-    _messageController.dispose();
     super.dispose();
   }
 
-  void _sendMessage() {
-    final text = _messageController.text;
-    if (text.isNotEmpty) {
-      _webSocketService.sendMessage(text);
-      _messageController.clear();
-    }
-  }
+  void _connectToWebSocket() async {
+    await _webSocketService.connect();
 
+    // Register the client after a successful connection
+    _webSocketService.registerClient();
+
+    // Listen for incoming messages
+    _webSocketService.messages.listen((message) {
+      print('Received message: $message');
+      // Handle transcript or other messages in your UI
+    });
+  }
   Future<void> getNewDiscoverServices() async {
     final discovery = await startDiscovery('_openbot-server._tcp.');
     discovery.addServiceListener((service, status) {
@@ -280,8 +278,13 @@ class ControllerState extends State<Controller> {
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               mirror: mirroredVideo,
             ),
-            ControlSelector(setMirrorVideo, indicatorLeft, indicatorRight,
-                services, _peerConnection)
+            ControlSelector(
+                updateMirrorView: setMirrorVideo,
+                indicatorLeft: indicatorLeft,
+                indicatorRight: indicatorRight,
+                networkServices: services,
+                peerConnection: _peerConnection,
+                websocket: _webSocketService)
           ],
         ),
         debugShowCheckedModeBanner: false,

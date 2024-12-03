@@ -4,7 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/screens/tiltingPhoneMode.dart';
+import 'package:permission_handler/permission_handler.dart';
 
+import '../websocket/websockets.dart';
 import 'onScreenMode.dart';
 
 class ControlSelector extends StatefulWidget {
@@ -13,10 +15,16 @@ class ControlSelector extends StatefulWidget {
   final bool indicatorRight;
   final List<Service> networkServices;
   final RTCPeerConnection? peerConnection;
+  final WebSocketService? websocket;
 
-  const ControlSelector(this.updateMirrorView, this.indicatorLeft,
-      this.indicatorRight, this.networkServices, this.peerConnection,
-      {super.key});
+  const ControlSelector(
+      {this.updateMirrorView,
+       required this.indicatorLeft,
+      required this.indicatorRight,
+      required this.networkServices,
+      this.peerConnection,
+      this.websocket,
+      super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -38,6 +46,45 @@ class ControlSelectorState extends State<ControlSelector> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> handleMicButton() async {
+    try {
+      // Example: Prompt user to grant microphone access
+      var hasPermission = await Permission.microphone.isGranted;
+      if (!hasPermission) {
+        hasPermission = await Permission.microphone.request().isGranted;
+      }
+
+      if (hasPermission) {
+        Fluttertoast.showToast(
+          msg: "Mic is now active!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+        );
+        // Add logic to start audio recording or streaming
+        // For example, start a WebRTC audio track, or call a speech-to-text API
+        print("Microphone functionality triggered!");
+      } else {
+        Fluttertoast.showToast(
+          msg: "Microphone access denied!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Error accessing mic: $e",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 
   // Function to generate DropdownMenuItem widgets
@@ -114,105 +161,112 @@ class ControlSelectorState extends State<ControlSelector> {
           backgroundColor: Colors.transparent,
           body: Center(
               child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          Fluttertoast.showToast(
-                              msg: "Double tap on screen to get back",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.BOTTOM,
-                              backgroundColor: Colors.grey,
-                              textColor: Colors.white,
-                              fontSize: 18);
-                          setState(() {
-                            isScreenMode = true;
-                          });
-                        },
-                        child: modeOptionContainer(
-                          "Use On-Screen Controls to Drive",
-                          "images/controller_icon.png",
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Fluttertoast.showToast(
-                              msg: "Double tap on screen to get back",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.BOTTOM,
-                              backgroundColor: Colors.grey,
-                              textColor: Colors.white,
-                              fontSize: 18);
-                          setState(() {
-                            isTiltingPhoneMode = true;
-                          });
-                        },
-                        child: modeOptionContainer(
-                          "Drive by tilting\nthe phone",
-                          "images/tilting_phone_icon.png",
-                        ),
-                      ),
-                    ],
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      Fluttertoast.showToast(
+                          msg: "Double tap on screen to get back",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.grey,
+                          textColor: Colors.white,
+                          fontSize: 18);
+                      setState(() {
+                        isScreenMode = true;
+                      });
+                    },
+                    child: modeOptionContainer(
+                      "Use On-Screen Controls to Drive",
+                      "images/controller_icon.png",
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      DropdownButton(
-                        value: dropDownValue,
-                        borderRadius: const BorderRadius.all(Radius.circular(3)),
-                        underline: Container(),
-                        dropdownColor: const Color(0xFF0071C5),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFFffffff),
-                        ),
-                        menuMaxHeight: 150,
-                        items: buildDropdownMenuItems(),
-                        onChanged: (String? serverName) {
-                          setState(() {
-                            dropDownValue = serverName!;
-                          });
-                          if (serverName != "No server") {
-                            clientSocket?.writeln("{server: $serverName}");
-                          } else {
-                            clientSocket?.writeln("{server: noServerFound}");
-                          }
-                        },
-                      ),
-                      controlButton("Logs", "{command: LOGS}"),
-                      controlButton("Noise", "{command: NOISE}"),
-                      controlButton("Network", "{command: NETWORK}"),
-                      controlButton("Game", "{command: DRIVE_MODE}"),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        isManualMode ? "Manual Mode" : "VAD Mode",
-                        style: const TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                      Switch(
-                        value: isManualMode,
-                        onChanged: (value) {
-                          setState(() {
-                            isManualMode = value;
-                          });
-                          clientSocket?.writeln(
-                            "{mode: ${isManualMode ? 'MANUAL' : 'VAD'}}",
-                          );
-                        },
-                      ),
-                    ],
+                  GestureDetector(
+                    onTap: () {
+                      Fluttertoast.showToast(
+                          msg: "Double tap on screen to get back",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.grey,
+                          textColor: Colors.white,
+                          fontSize: 18);
+                      setState(() {
+                        isTiltingPhoneMode = true;
+                      });
+                    },
+                    child: modeOptionContainer(
+                      "Drive by tilting\nthe phone",
+                      "images/tilting_phone_icon.png",
+                    ),
                   ),
                 ],
-              )));
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DropdownButton(
+                    value: dropDownValue,
+                    borderRadius: const BorderRadius.all(Radius.circular(3)),
+                    underline: Container(),
+                    dropdownColor: const Color(0xFF0071C5),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFffffff),
+                    ),
+                    menuMaxHeight: 150,
+                    items: buildDropdownMenuItems(),
+                    onChanged: (String? serverName) {
+                      setState(() {
+                        dropDownValue = serverName!;
+                      });
+                      if (serverName != "No server") {
+                        clientSocket?.writeln("{server: $serverName}");
+                      } else {
+                        clientSocket?.writeln("{server: noServerFound}");
+                      }
+                    },
+                  ),
+                  controlButton("Logs", "{command: LOGS}"),
+                  controlButton("Noise", "{command: NOISE}"),
+                  controlButton("Network", "{command: NETWORK}"),
+                  controlButton("Game", "{command: DRIVE_MODE}"),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isManualMode ? "Manual Mode" : "VAD Mode",
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Switch(
+                    value: isManualMode,
+                    onChanged: (value) {
+                      setState(() {
+                        isManualMode = value;
+                      });
+                      clientSocket?.writeln(
+                        "{mode: ${isManualMode ? 'MANUAL' : 'VAD'}}",
+                      );
+                    },
+                  ),
+                  if (isManualMode)
+                    IconButton(
+                      icon: const Icon(Icons.mic, color: Colors.white),
+                      onPressed: () {
+                        widget.websocket?.sendMessage("hello what is python");
+                      },
+                    ),
+                ],
+              ),
+            ],
+          )));
     }
   }
 

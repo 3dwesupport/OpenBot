@@ -45,6 +45,7 @@ dependencies:
   video_player: ^2.4.10
   flutter_webrtc: ^0.12.1+hotfix.1
   fluttertoast: ^8.1.2
+  permission_handler: ^11.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:uuid/uuid.dart';
 
 class WebSocketService {
   final String url;
+  final String clientId = const Uuid().v4();
 
   WebSocketService({required this.url});
 
@@ -16,10 +18,10 @@ class WebSocketService {
     try {
       _socket = await WebSocket.connect(url);
       print('Connected to WebSocket server');
+      // Listen for incoming messages
       _socket?.listen(
         (message) {
-          _messageController
-              .add(message); // Add incoming messages to the stream
+          _handleMessage(message);
         },
         onDone: () {
           print('WebSocket connection closed');
@@ -33,12 +35,45 @@ class WebSocketService {
     }
   }
 
+  /// Handle incoming WebSocket messages
+  void _handleMessage(String message) {
+    try {
+      final decodedMessage = jsonDecode(message);
+
+      // Check the type of the message
+      if (decodedMessage['type'] == 'transcript') {
+        final transcript = decodedMessage['transcript'];
+        _messageController.add(transcript); // Add transcript to the stream
+        print('Received transcript: $transcript');
+      } else {
+        _messageController.add(message); // Add other messages to the stream
+        print('Received other message: $message');
+      }
+    } catch (e) {
+      print('Error decoding message: $e');
+    }
+  }
   /// Send a message to the WebSocket server
   void sendMessage(String message) {
     if (_socket != null && _socket!.readyState == WebSocket.open) {
-      _socket!.add(jsonEncode({"text": message}));
+      final payload = jsonEncode({
+        "clientId": clientId,
+        "text": message,
+      });
+      _socket!.add(payload);
+      print('Message sent: $message $clientId');
     } else {
-      print('WebSocket is not connected');
+      print('WebSocket is not connected or not open: ${_socket?.readyState}');
+    }
+  }
+
+  void registerClient() {
+    if (_socket != null && _socket!.readyState == WebSocket.open) {
+      final payload = jsonEncode({
+        "clientId": clientId,
+      });
+      _socket!.add(payload);
+      print('Client registered with ID: $clientId');
     }
   }
 
