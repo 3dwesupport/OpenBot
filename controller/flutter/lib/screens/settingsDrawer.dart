@@ -14,7 +14,9 @@ class SettingsDrawer extends StatefulWidget {
 
 class _SettingsDrawerState extends State<SettingsDrawer> {
   List<bool> isSelected = [false, false];
+  bool isVADMode = false;
   String dropDownValue = 'No server';
+  List<bool> isSelectedMode = [true, false];
   late List<DropdownMenuItem<String>> items = [];
   bool isNoise = false;
   bool isNetwork = false;
@@ -180,20 +182,61 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               const SizedBox(
                 width: 54,
               ),
-
               Switch(
-                  value: isNoise,
-                  onChanged: (bool value) {
-                    setState(() {
-                      isNoise = value;
-                    });
-                    if (isNoise) {
-                      clientSocket?.writeln("{command: NOISE}");
-                    }
-                  },
+                value: isNoise,
+                onChanged: (bool value) {
+                  setState(() {
+                    isNoise = value;
+                  });
+                  if (isNoise) {
+                    clientSocket?.writeln("{command: NOISE}");
+                  }
+                },
                 activeColor: const Color(0xFF0071C5),
               )
             ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 30, top: 35),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start, // Align to the left
+              children: [
+                const Text(
+                  'Mode',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF0071C5),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 50.0), // Adjust this value to shift left by a certain amount
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align children of Column to the left
+                    children: [
+                      // Switch widget
+                      Switch(
+                        value: isVADMode,
+                        onChanged: (bool value) {
+                          setState(() {
+                            isVADMode = value;
+                          });
+                        },
+                        activeColor: const Color(0xFF0071C5),
+                      ),
+                      // Mode name displayed below the Switch
+                      Text(
+                        isVADMode ? 'VAD' : 'Manual',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Color(0xFFffffff),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
