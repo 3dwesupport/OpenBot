@@ -10,6 +10,7 @@ import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
 import '../utils/constants.dart';
+import '../websocket/websockets.dart';
 import 'discoveringDevices.dart';
 
 const String serviceTypeRegister = '_openbot._tcp';
@@ -38,6 +39,7 @@ class ControllerState extends State<Controller> {
   var _nextPort = 56360;
 
   int get nextPort => _nextPort++;
+  late WebSocketService _webSocketService;
 
   setMirrorVideo() {
     setState(() {
@@ -47,6 +49,8 @@ class ControllerState extends State<Controller> {
 
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
+  String serverUrl =
+      'ws://192.168.1.39:8081';  // Replace with your Node.js server URL
 
   Future<void> videoConnection() async {
     initRenderers();
@@ -153,7 +157,27 @@ class ControllerState extends State<Controller> {
     super.initState();
     registerNewService();
     videoConnection();
+    _webSocketService = WebSocketService(url: serverUrl);
     getNewDiscoverServices();
+  }
+
+  @override
+  void dispose() {
+    _webSocketService.close();
+    super.dispose();
+  }
+
+  void _connectToWebSocket() async {
+    await _webSocketService.connect();
+
+    // Register the client after a successful connection
+    _webSocketService.registerClient();
+
+    // Listen for incoming messages
+    _webSocketService.messages.listen((message) {
+      print('Received message: $message');
+      // Handle transcript or other messages in your UI
+    });
   }
 
   Future<void> getNewDiscoverServices() async {
@@ -234,6 +258,7 @@ class ControllerState extends State<Controller> {
       setState(() {
         videoView = true;
       });
+      _connectToWebSocket();
     } else if (status == "false") {
       setState(() {
         videoView = false;
