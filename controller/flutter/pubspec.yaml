@@ -45,6 +45,7 @@ dependencies:
   video_player: ^2.4.10
   flutter_webrtc: ^0.12.1+hotfix.1
   fluttertoast: ^8.1.2
+  toggle_switch: ^2.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -86,7 +87,7 @@ flutter:
     - images/right_indicator_icon_white.png
     - images/forward_icon.png
     - images/reverse_icon.png
-#     - images/a_dot_ham.jpeg
+  #     - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
