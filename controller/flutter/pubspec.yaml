@@ -46,6 +46,7 @@ dependencies:
   flutter_webrtc: ^0.12.1+hotfix.1
   fluttertoast: ^8.1.2
   toggle_switch: ^2.3.0
+  avatar_glow: 3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -9,6 +9,7 @@ import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
+import '../common/animated_mic_button.dart';
 import '../utils/constants.dart';
 import '../websocket/websockets.dart';
 import 'discoveringDevices.dart';
@@ -37,6 +38,7 @@ class ControllerState extends State<Controller> {
   bool isScreenMode = false;
   String fragmentType = "";
   var _nextPort = 56360;
+  bool animate = true;
 
   int get nextPort => _nextPort++;
   late WebSocketService _webSocketService;
@@ -291,20 +293,29 @@ class ControllerState extends State<Controller> {
             Positioned(
               left: isTiltingPhoneMode ? 45 : 110,
               top: 16.0, // Adjust the top margin as needed
-              child: Container(
-                // padding: EdgeInsets.only(left: ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(45),
-                  color: Colors.transparent,
-                ),
-                child: FloatingActionButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  // FloatingActionButton
+                  FloatingActionButton(
                     backgroundColor: Colors.white.withOpacity(0.5),
                     onPressed: () {
                       setState(() {
                         isSettings = true;
                       });
                     },
-                    child: const Icon(Icons.menu)),
+                    child: const Icon(Icons.menu),
+                  ),
+                  SizedBox(width: 500),
+                  //AnimatedMicButton
+                  AnimatedMicButton(
+                    animate: animate,
+                    onPressed: () {
+                      print('mic pressed');
+                      // Add mic functionality here
+                    },
+                  ),
+                ],
               ),
             ),
             if (isSettings)
