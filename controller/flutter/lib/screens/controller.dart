@@ -39,6 +39,7 @@ class ControllerState extends State<Controller> {
   String fragmentType = "";
   var _nextPort = 56360;
   bool animate = true;
+  bool isManual = true;
 
   int get nextPort => _nextPort++;
   late WebSocketService _webSocketService;
@@ -276,6 +277,11 @@ class ControllerState extends State<Controller> {
 
     await unregister(registration);
   }
+  void onVADModeChanged() {
+    setState(() {
+      isManual = !isManual;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -307,14 +313,14 @@ class ControllerState extends State<Controller> {
                     child: const Icon(Icons.menu),
                   ),
                   SizedBox(width: 500),
-                  //AnimatedMicButton
-                  AnimatedMicButton(
-                    animate: animate,
-                    onPressed: () {
-                      print('mic pressed');
-                      // Add mic functionality here
-                    },
-                  ),
+                  if (isManual) // Only show mic button if not in VAD mode
+                    AnimatedMicButton(
+                      animate: animate,
+                      onPressed: () {
+                        print('mic pressed');
+                        // Add mic functionality here
+                      },
+                    ),
                 ],
               ),
             ),
@@ -338,6 +344,9 @@ class ControllerState extends State<Controller> {
                         isTiltingPhoneMode = newTiltingMode;
                         isScreenMode = newScreenMode;
                       });
+                    },
+                    onVADModeChanged: () { // Add this line
+                      onVADModeChanged(); // Call the method to update the state
                     },
                   ),
                 ],

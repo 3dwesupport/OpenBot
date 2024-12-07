@@ -6,8 +6,10 @@ import 'package:toggle_switch/toggle_switch.dart';
 class SettingsDrawer extends StatefulWidget {
   final List<Service> networkServices;
   final Function(bool, bool) onSettingsChanged;
+  final Function onVADModeChanged;
 
-  SettingsDrawer(this.networkServices, this.onSettingsChanged, {super.key});
+  SettingsDrawer(this.networkServices, this.onSettingsChanged,
+      {required this.onVADModeChanged, super.key});
 
   @override
   _SettingsDrawerState createState() => _SettingsDrawerState();
@@ -70,6 +72,10 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
     }));
     return items;
   }
+
+
+  int _currentIndex = 0; // Maintain the current index
+
 
   @override
   Widget build(BuildContext context) {
@@ -219,20 +225,31 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                     child: ToggleSwitch(
                       minWidth: 80.0,
                       cornerRadius: 20.0,
-                      initialLabelIndex: isVADMode ? 0 : 1,
+                      initialLabelIndex: _currentIndex, // Use the state to set the initial index
                       activeFgColor: Colors.white,
                       inactiveBgColor: Colors.grey,
                       inactiveFgColor: Colors.white,
                       totalSwitches: 2,
-                      labels: ['Manual','VAD'],
+                      labels: ['Manual', 'VAD'],
                       activeBgColors: [
                         [const Color(0xFF0071C5)],
                         [const Color(0xFF0071C5)],
                       ],
                       onToggle: (index) {
-                        setState(() {
-                          isVADMode = index == 0;
-                        });
+                        // Prevent toggling on the same item
+                        if (index != _currentIndex) {
+                          setState(() {
+                            _currentIndex = index!; // Update the current index
+                          });
+                          widget.onVADModeChanged();
+
+                          // Log the selected mode
+                          if (index == 0) {
+                            print('Selected mode: Manual');
+                          } else {
+                            print('Selected mode: VAD');
+                          }
+                        }
                       },
                     ),
                   ),
