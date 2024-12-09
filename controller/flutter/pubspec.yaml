@@ -47,6 +47,9 @@ dependencies:
   fluttertoast: ^8.1.2
   toggle_switch: ^2.3.0
   avatar_glow: 3.0.1
+  permission_handler: ^10.4.3
+  flutter_sound: ^9.17.6
+  speech_to_text: ^7.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

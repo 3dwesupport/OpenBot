@@ -29,7 +29,7 @@ class ControllerState extends State<Controller> {
   final registrations = <Registration>[];
   ServerSocket? _serverSocket;
   Stream<Uint8List>? _broadcast;
-  bool videoView = false;
+  bool videoView = true;
   bool mirroredVideo = false;
   bool indicatorLeft = false;
   bool indicatorRight = false;
@@ -161,9 +161,13 @@ class ControllerState extends State<Controller> {
     registerNewService();
     videoConnection();
     _webSocketService = WebSocketService(url: serverUrl);
+    testWebsocket();
     getNewDiscoverServices();
   }
 
+  testWebsocket() {
+    _connectToWebSocket();
+  }
   @override
   void dispose() {
     _webSocketService.close();
@@ -181,6 +185,12 @@ class ControllerState extends State<Controller> {
       print('Received message: $message');
       // Handle transcript or other messages in your UI
     });
+  }
+
+  void _sendAudio(String audioPath) async {
+    final file = File(audioPath);
+    final audioBytes = await file.readAsBytes();
+    _webSocketService.sendMessage(base64Encode(audioBytes));
   }
 
   Future<void> getNewDiscoverServices() async {
@@ -261,7 +271,7 @@ class ControllerState extends State<Controller> {
       setState(() {
         videoView = true;
       });
-      _connectToWebSocket();
+      // _connectToWebSocket();
     } else if (status == "false") {
       setState(() {
         videoView = false;
@@ -316,10 +326,7 @@ class ControllerState extends State<Controller> {
                   if (isManual) // Only show mic button if not in VAD mode
                     AnimatedMicButton(
                       animate: animate,
-                      onPressed: () {
-                        print('mic pressed');
-                        // Add mic functionality here
-                      },
+                        onAudioCaptured: _sendAudio,
                     ),
                 ],
               ),
