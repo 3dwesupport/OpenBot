@@ -58,10 +58,10 @@ class WebSocketService {
     if (_socket != null && _socket!.readyState == WebSocket.open) {
       final payload = jsonEncode({
         "clientId": clientId,
-        "text": message,
+        "audio": message,
       });
       _socket!.add(payload);
-      print('Message sent: $message $clientId');
+      print('Message sent: $message');
     } else {
       print('WebSocket is not connected or not open: ${_socket?.readyState}');
     }

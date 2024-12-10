@@ -50,6 +50,7 @@ dependencies:
   permission_handler: ^10.4.3
   flutter_sound: ^9.17.6
   speech_to_text: ^7.0.0
+  openai_realtime_dart: ^0.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

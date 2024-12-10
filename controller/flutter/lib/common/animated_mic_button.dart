@@ -24,12 +24,40 @@ class _AnimatedMicButtonState extends State<AnimatedMicButton> {
   FlutterSound flutterSound = FlutterSound();
 
   bool _isRecording = false;
-
+  String? _audioPath;
 
   @override
   void initState() {
     super.initState();
+    _initializeRecorder();
   }
+
+  Future<void> _initializeRecorder() async {
+    var status = await Permission.microphone.request();
+    if (status.isGranted) {
+      await _recorder.openRecorder();
+    } else {
+      throw Exception("Microphone permission not granted");
+    }
+  }
+
+  Future<void> _startRecording() async {
+    final dir = Directory.systemTemp;
+    _audioPath = '${dir.path}/audio.wav';
+    await _recorder.startRecorder(toFile: _audioPath);
+    setState(() => _isRecording = true);
+  }
+
+  Future<void> _stopRecording() async {
+    await _recorder.stopRecorder();
+    setState(() => _isRecording = false);
+
+    if (_audioPath != null) {
+      widget.onAudioCaptured(_audioPath!);
+
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +74,13 @@ class _AnimatedMicButtonState extends State<AnimatedMicButton> {
           backgroundColor: Colors.transparent,
           child: GestureDetector(
             onTapDown: (details) {
+              print("details::$details");
+              _startRecording();
               // Start recording when the button is pressed
               print("Start Recording");
             },
             onTapUp: (details) {
+              _stopRecording();
               // Stop recording when the button is released
               print("Stop Recording");
             },
