@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
+import 'package:openai_realtime_dart/src/schema/generated/schema/schema.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
+import '../common/RealTimeConnectionService.dart';
 import '../common/animated_mic_button.dart';
 import '../utils/constants.dart';
 import '../websocket/websockets.dart';
@@ -38,11 +40,12 @@ class ControllerState extends State<Controller> {
   bool isScreenMode = false;
   String fragmentType = "";
   var _nextPort = 56360;
-  bool animate = true;
+  bool animate = false;
   bool isManual = true;
 
   int get nextPort => _nextPort++;
   late WebSocketService _webSocketService;
+  late RealTimeConnectionService _realTimeConnectionService;
 
   setMirrorVideo() {
     setState(() {
@@ -160,11 +163,16 @@ class ControllerState extends State<Controller> {
     super.initState();
     registerNewService();
     videoConnection();
+    _realTimeConnectionService = RealTimeConnectionService();
     _webSocketService = WebSocketService(url: serverUrl);
-    testWebsocket();
+    // testWebsocket();
+    realTimeConnect();
     getNewDiscoverServices();
   }
 
+  realTimeConnect(){
+    _realTimeConnectionService.realTimeConnect();
+  }
   testWebsocket() {
     _connectToWebSocket();
   }
@@ -182,7 +190,6 @@ class ControllerState extends State<Controller> {
 
     // Listen for incoming messages
     _webSocketService.messages.listen((message) {
-      print('Received message: $message');
       // Handle transcript or other messages in your UI
     });
   }
@@ -326,7 +333,9 @@ class ControllerState extends State<Controller> {
                   if (isManual) // Only show mic button if not in VAD mode
                     AnimatedMicButton(
                       animate: animate,
-                        onAudioCaptured: _sendAudio,
+                      sendAudioBuffer : (audioBuffer){
+                      _realTimeConnectionService.sendUserMessage(audioBuffer);
+                    }, createClientResponse: () => _realTimeConnectionService.createResponse(),
                     ),
                 ],
               ),
