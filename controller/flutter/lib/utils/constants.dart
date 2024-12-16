@@ -27,4 +27,5 @@ class Constants {
   static String shorten(String? id) {
     return id?.toString().substring(0, 4) ?? 'unknown';
   }
+  static const openAIKey = ""; //Enter your Open Ai key here
 }

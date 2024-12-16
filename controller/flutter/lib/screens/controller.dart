@@ -6,14 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
-import 'package:openai_realtime_dart/src/schema/generated/schema/schema.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
 import '../common/RealTimeConnectionService.dart';
-import '../common/animated_mic_button.dart';
+import '../common/MicButton.dart';
+import '../common/sound_player.dart';
 import '../utils/constants.dart';
-import '../websocket/websockets.dart';
 import 'discoveringDevices.dart';
 
 const String serviceTypeRegister = '_openbot._tcp';
@@ -31,7 +30,7 @@ class ControllerState extends State<Controller> {
   final registrations = <Registration>[];
   ServerSocket? _serverSocket;
   Stream<Uint8List>? _broadcast;
-  bool videoView = true;
+  bool videoView = false;
   bool mirroredVideo = false;
   bool indicatorLeft = false;
   bool indicatorRight = false;
@@ -44,8 +43,23 @@ class ControllerState extends State<Controller> {
   bool isManual = true;
 
   int get nextPort => _nextPort++;
-  late WebSocketService _webSocketService;
   late RealTimeConnectionService _realTimeConnectionService;
+  final soundPlayer = SoundPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    registerNewService();
+    videoConnection();
+    _realTimeConnectionService = RealTimeConnectionService();
+    getNewDiscoverServices();
+    openSoundPlayer();
+    onAudioProcessed();
+  }
+
+  openSoundPlayer() async {
+    await soundPlayer.init();
+  }
 
   setMirrorVideo() {
     setState(() {
@@ -55,8 +69,6 @@ class ControllerState extends State<Controller> {
 
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
-  String serverUrl =
-      'ws://192.168.1.39:8081';  // Replace with your Node.js server URL
 
   Future<void> videoConnection() async {
     initRenderers();
@@ -158,47 +170,17 @@ class ControllerState extends State<Controller> {
     enableLogging(LogTopic.calls);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    registerNewService();
-    videoConnection();
-    _realTimeConnectionService = RealTimeConnectionService();
-    _webSocketService = WebSocketService(url: serverUrl);
-    // testWebsocket();
-    realTimeConnect();
-    getNewDiscoverServices();
-  }
-
-  realTimeConnect(){
+  realTimeConnect() {
     _realTimeConnectionService.realTimeConnect();
   }
-  testWebsocket() {
-    _connectToWebSocket();
-  }
+
   @override
   void dispose() {
-    _webSocketService.close();
+    soundPlayer.dispose();
+    _realTimeConnectionService.disconnect();
     super.dispose();
   }
 
-  void _connectToWebSocket() async {
-    await _webSocketService.connect();
-
-    // Register the client after a successful connection
-    _webSocketService.registerClient();
-
-    // Listen for incoming messages
-    _webSocketService.messages.listen((message) {
-      // Handle transcript or other messages in your UI
-    });
-  }
-
-  void _sendAudio(String audioPath) async {
-    final file = File(audioPath);
-    final audioBytes = await file.readAsBytes();
-    _webSocketService.sendMessage(base64Encode(audioBytes));
-  }
 
   Future<void> getNewDiscoverServices() async {
     final discovery = await startDiscovery('_openbot-server._tcp.');
@@ -278,7 +260,7 @@ class ControllerState extends State<Controller> {
       setState(() {
         videoView = true;
       });
-      // _connectToWebSocket();
+      realTimeConnect();
     } else if (status == "false") {
       setState(() {
         videoView = false;
@@ -294,10 +276,17 @@ class ControllerState extends State<Controller> {
 
     await unregister(registration);
   }
+
   void onVADModeChanged() {
     setState(() {
       isManual = !isManual;
     });
+  }
+
+  onAudioProcessed() {
+    _realTimeConnectionService.onAudioCompleted = (Uint8List audio) {
+     soundPlayer.play(audio);
+    };
   }
 
   @override
@@ -311,8 +300,15 @@ class ControllerState extends State<Controller> {
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               mirror: mirroredVideo,
             ),
-            ControlSelector(setMirrorVideo, indicatorLeft, indicatorRight,
-                services, _peerConnection, isTiltingPhoneMode, isScreenMode,fragmentType),
+            ControlSelector(
+                setMirrorVideo,
+                indicatorLeft,
+                indicatorRight,
+                services,
+                _peerConnection,
+                isTiltingPhoneMode,
+                isScreenMode,
+                fragmentType),
             Positioned(
               left: isTiltingPhoneMode ? 45 : 110,
               top: 16.0, // Adjust the top margin as needed
@@ -333,9 +329,11 @@ class ControllerState extends State<Controller> {
                   if (isManual) // Only show mic button if not in VAD mode
                     AnimatedMicButton(
                       animate: animate,
-                      sendAudioBuffer : (audioBuffer){
-                      _realTimeConnectionService.sendUserMessage(audioBuffer);
-                    }, createClientResponse: () => _realTimeConnectionService.createResponse(),
+                      sendAudioBuffer: (audioBuffer) {
+                        _realTimeConnectionService.sendUserMessage(audioBuffer);
+                      },
+                      createClientResponse: () =>
+                          _realTimeConnectionService.createResponse(),
                     ),
                 ],
               ),
@@ -361,8 +359,8 @@ class ControllerState extends State<Controller> {
                         isScreenMode = newScreenMode;
                       });
                     },
-                    onVADModeChanged: () { // Add this line
-                      onVADModeChanged(); // Call the method to update the state
+                    onVADModeChanged: () {
+                      onVADModeChanged();
                     },
                   ),
                 ],

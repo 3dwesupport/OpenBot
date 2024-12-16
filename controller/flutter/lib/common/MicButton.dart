@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
@@ -13,7 +12,10 @@ class AnimatedMicButton extends StatefulWidget {
   final Function createClientResponse;
 
   const AnimatedMicButton(
-      {required this.sendAudioBuffer, required this.animate, super.key, required this.createClientResponse});
+      {required this.sendAudioBuffer,
+      required this.animate,
+      super.key,
+      required this.createClientResponse});
 
   @override
   AnimatedMicButtonState createState() => AnimatedMicButtonState();
@@ -21,7 +23,7 @@ class AnimatedMicButton extends StatefulWidget {
 
 class AnimatedMicButtonState extends State<AnimatedMicButton> {
   bool _isListening = false;
-  late final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
+  final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   bool _hasPermission = false;
   String? _audioFilePath;
 
@@ -40,7 +42,6 @@ class AnimatedMicButtonState extends State<AnimatedMicButton> {
 
   Future<void> _startRecording() async {
     if (_hasPermission) {
-      // Ensure the recorder is opened before starting
       await _recorder.openRecorder();
       setState(() {
         _isListening = true;
@@ -109,11 +110,9 @@ class AnimatedMicButtonState extends State<AnimatedMicButton> {
           child: GestureDetector(
             onLongPressStart: (_) {
               _startRecording();
-              print("Recording started");
             },
             onLongPressEnd: (_) {
               _stopRecording();
-              print("Recording stopped");
             },
             child: Container(
               width: 80,
