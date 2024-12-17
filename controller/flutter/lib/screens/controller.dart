@@ -181,7 +181,6 @@ class ControllerState extends State<Controller> {
     super.dispose();
   }
 
-
   Future<void> getNewDiscoverServices() async {
     final discovery = await startDiscovery('_openbot-server._tcp.');
     discovery.addServiceListener((service, status) {
@@ -283,9 +282,11 @@ class ControllerState extends State<Controller> {
     });
   }
 
+  //Playing realtime audio with running drive commands
   onAudioProcessed() {
     _realTimeConnectionService.onAudioCompleted = (Uint8List audio) {
-     soundPlayer.play(audio);
+      soundPlayer.play(audio);
+      _realTimeConnectionService.processAIGeneratedDriveCommands();
     };
   }
 
