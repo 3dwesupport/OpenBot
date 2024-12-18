@@ -93,8 +93,7 @@ class RealTimeConnectionService {
       },
     );
 
-    await client.updateSession(instructions: 'You are a great, upbeat friend.');
-    await client.updateSession(voice: Voice.coral);
+    await client.updateSession(instructions: Constants.instructions);
 
     await client.updateSession(
       inputAudioFormat: AudioFormat.pcm16,
