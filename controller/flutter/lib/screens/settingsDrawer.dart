@@ -73,6 +73,60 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
     return items;
   }
 
+  // Function to show the dialog
+  void _showModeDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Rounded corners
+          ),
+          backgroundColor: Colors.white, // Change to fit your theme
+          title: Row(
+            children: [
+              Icon(
+                Icons.info_outline, // Choose an appropriate icon
+                color: Colors.blue,
+              ),
+              SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   int _currentIndex = 0; // Maintain the current index
 
@@ -243,11 +297,13 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                           });
                           widget.onVADModeChanged();
 
-                          // Log the selected mode
+                          // Show a popup with the selected mode message
                           if (index == 0) {
-                            print('Selected mode: Manual');
+                            // Manual mode selected
+                            _showModeDialog('Manual Mode Activated', 'Now press the mic.');
                           } else {
-                            print('Selected mode: VAD');
+                            // VAD mode selected
+                            _showModeDialog('VAD Mode Activated', 'Start speaking.');
                           }
                         }
                       },
