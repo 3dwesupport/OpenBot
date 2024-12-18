@@ -12,7 +12,7 @@ class SoundPlayer {
     }
   }
   Future<void> play(Uint8List audio) async {
-    await _soundPlayer.startPlayerFromStream();
+    await _soundPlayer.startPlayerFromStream(sampleRate: 26000);
     await _soundPlayer.feedFromStream(audio);
     await _soundPlayer.stopPlayer();
   }
