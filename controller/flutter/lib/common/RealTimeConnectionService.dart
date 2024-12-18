@@ -32,7 +32,7 @@ class RealTimeConnectionService {
       ToolDefinition(
         name: 'control_robot',
         description:
-            'Use this function to control the movement of the robot and give the value of l and r',
+        'Use this function to control the movement of the robot and give the value of l and r',
         parameters: {
           'type': 'object',
           'properties': {
@@ -43,57 +43,58 @@ class RealTimeConnectionService {
             'speed': {
               'type': 'number',
               'description':
-                  'Speed of the robot (0 to 255 for forward, -255 to 0 for backward).',
+              'Speed of the robot (0 to 255 for forward, -255 to 0 for backward).',
             },
           },
           'required': ['direction'],
         },
       ),
-      (Map<String, dynamic> params) {
+          (Map<String, dynamic> params) {
         final String direction = params['direction'];
-        final int speed = params.containsKey('speed') ? params['speed'] : 100;
+        final int speedInput = params.containsKey('speed') ? params['speed'] : 150;
 
-        int l = 0;
-        int r = 0;
+        // Normalize speed and ensure floating-point division
+        final double normalizedSpeed = (speedInput / 192.0).clamp(-1.0, 1.0);
+
+        double l = 0.0;
+        double r = 0.0;
 
         switch (direction) {
           case 'forward':
-            l = speed.clamp(128, 255);
-            r = speed.clamp(128, 255);
+            l = normalizedSpeed;
+            r = normalizedSpeed;
             break;
 
           case 'backward':
-            l = (-speed).clamp(-255, -128);
-            r = (-speed).clamp(-255, -128);
+            l = normalizedSpeed;
+            r = normalizedSpeed;
             break;
 
           case 'circular':
-            l = 192;
-            r = 255;
+            l = 0.8;
+            r = 1.0;
             break;
 
           case 'stop':
-            l = 0;
-            r = 0;
+            l = 0.0;
+            r = 0.0;
             break;
 
           default:
             throw Exception(
                 'Invalid direction. Use forward, backward, circular, or stop.');
         }
+        l = double.parse(l.toStringAsFixed(2));
+        r = double.parse(r.toStringAsFixed(2));
+        left=l;
+        right=r;
 
-        print("l value $l");
-        print("r value $r");
-
-        left = l.toDouble();
-        right = r.toDouble();
-        // Return values
         return {'l': l, 'r': r};
       },
     );
 
     await client.updateSession(instructions: 'You are a great, upbeat friend.');
-    await client.updateSession(voice: Voice.verse);
+    await client.updateSession(voice: Voice.coral);
 
     await client.updateSession(
       inputAudioFormat: AudioFormat.pcm16,
@@ -106,7 +107,6 @@ class RealTimeConnectionService {
     client.on(RealtimeEventType.conversationUpdated, (event) {
       final result = (event as RealtimeEventConversationUpdated).result;
       final content = result.item?.formatted?.transcript;
-      print("content::: $content");
       final audio = result.item?.formatted?.audio;
       if (result.item?.item.status == ItemStatus.completed) {
         if (audio != null) {
@@ -124,27 +124,19 @@ class RealTimeConnectionService {
   }
 
   void processAIGeneratedDriveCommands() {
-    const int intervalMilliseconds = 100; // Call every 100 ms
-    const int durationMilliseconds = 3000; // Run for 3 seconds
+    const int intervalMilliseconds = 100;
+    const int durationMilliseconds = 3000;
     int elapsedTime = 0;
 
-    // Start periodic timer
     driveCommandTimer = Timer.periodic(
       Duration(milliseconds: intervalMilliseconds),
           (timer) {
-        // Call the drive command function
-            print("left::$left");
-            print("right::$right");
 
-            DriveCommandReducer.filter(right, left);
+            DriveCommandReducer.filter(right,left);
 
-        // Update elapsed time
         elapsedTime += intervalMilliseconds;
-
-        // Stop after 3 seconds
         if (elapsedTime >= durationMilliseconds) {
           timer.cancel();
-          print("Stopped processing drive commands after 3 seconds.");
         }
       },
     );
