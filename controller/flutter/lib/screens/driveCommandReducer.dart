@@ -7,8 +7,6 @@ class DriveCommandReducer {
   static double withinRange = .02;
 
   static void filter(double rightValue, double leftValue) {
-    print("leftValue in filter::$leftValue");
-    print("rightValue in filter::$rightValue");
     if (isDifferent(rightValue, leftValue)) {
       lastLeft = leftValue;
       lastRight = rightValue;
