@@ -276,7 +276,7 @@ class ControllerState extends State<Controller> {
     await unregister(registration);
   }
 
-  void onVADModeChanged() {
+  void onVADModeChanged(String turnDetection) {
     setState(() {
       isManual = !isManual;
     });
@@ -360,8 +360,8 @@ class ControllerState extends State<Controller> {
                         isScreenMode = newScreenMode;
                       });
                     },
-                    onVADModeChanged: () {
-                      onVADModeChanged();
+                    onVADModeChanged: (String turnDetection) {
+                      onVADModeChanged(turnDetection);
                     },
                   ),
                 ],

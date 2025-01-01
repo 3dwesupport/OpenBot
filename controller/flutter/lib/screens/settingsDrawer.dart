@@ -249,7 +249,9 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                         setState(() {
                           _currentIndex = index!;
                         });
-                        widget.onVADModeChanged();
+                        // Update turn detection logic
+                        String turnDetection = index == 0 ? 'none' : 'server_vad';
+                        widget.onVADModeChanged(turnDetection);
 
                         // Show a toast message
                         if (index == 0) {
