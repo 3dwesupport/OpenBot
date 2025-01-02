@@ -50,7 +50,7 @@ class RealTimeConnectionService {
                   'speed': {
                     'type': 'number',
                     'description':
-                        'Speed of the robot (0 to 255 for forward, -255 to 0 for backward).',
+                        'Speed of the robot (0 to 255 positive value for forward, -255 to 0 negative for backward).',
                   },
                   'duration': {
                     'type': 'number',
@@ -143,7 +143,9 @@ class RealTimeConnectionService {
       if (result.item?.item.status == ItemStatus.completed) {
         if (audio != null) {
           onAudioCompleted(audio);
-        } else {}
+        } else {
+          print("Audio is not available");
+        }
       }
     });
   }
@@ -156,7 +158,6 @@ class RealTimeConnectionService {
   }
 
   Future<void> processAIGeneratedDriveCommands() async {
-
     // Ensure the script is only processed once
     if (!isScriptFound && fullScript.isNotEmpty) {
       isScriptFound = true; // Mark the script as found
@@ -164,7 +165,6 @@ class RealTimeConnectionService {
       try {
         // Iterate over the fullScript to process each command in order
         for (var command in fullScript) {
-
           // Ensure the command has 'values' with left_speed and right_speed
           if (command.containsKey('values') &&
               command['values'] is Map<String, dynamic>) {
@@ -199,7 +199,6 @@ class RealTimeConnectionService {
         // Mark script processing as complete after all commands are processed
         isScriptFound = false;
         fullScript = [];
-        print("All commands processed. isscript:: $isScriptFound");
       }
     } else {
       print("Script already processed or empty.");

@@ -178,9 +178,9 @@ class ControllerState extends State<Controller> {
   void dispose() {
     soundPlayer.dispose();
     _realTimeConnectionService.disconnect();
-    super.dispose();
   }
 
+  ///getNewDiscoverServices : Function to get new discover services
   Future<void> getNewDiscoverServices() async {
     final discovery = await startDiscovery('_openbot-server._tcp.');
     discovery.addServiceListener((service, status) {
@@ -256,11 +256,12 @@ class ControllerState extends State<Controller> {
 
   setDeviceConnected(status) {
     if (status == "true") {
+      realTimeConnect();
       setState(() {
         videoView = true;
       });
-      realTimeConnect();
     } else if (status == "false") {
+      dispose();
       setState(() {
         videoView = false;
       });

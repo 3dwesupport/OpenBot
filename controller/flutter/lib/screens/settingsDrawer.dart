@@ -222,7 +222,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Text(
-                  'Mode',
+                  'Voice Pilot',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
@@ -230,9 +230,9 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 50.0),
+                  padding: const EdgeInsets.only(left: 14.0),
                   child: ToggleSwitch(
-                    minWidth: 80.0,
+                    minWidth: 75.0,
                     cornerRadius: 20.0,
                     initialLabelIndex: _currentIndex,
                     activeFgColor: Colors.white,
@@ -250,15 +250,17 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                           _currentIndex = index!;
                         });
                         // Update turn detection logic
-                        String turnDetection = index == 0 ? 'none' : 'server_vad';
+                        String turnDetection =
+                            index == 0 ? 'none' : 'server_vad';
                         widget.onVADModeChanged(turnDetection);
 
                         // Show a toast message
                         if (index == 0) {
                           _showToast(
-                              'Manual Mode Activated. Now press the mic.');
+                              'Manual Mode Enabled. Tap the microphone to proceed');
                         } else {
-                          _showToast('VAD Mode Activated. Start speaking.');
+                          _showToast(
+                              'VAD Mode Activated. You may start speaking');
                         }
                       }
                     },
