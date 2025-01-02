@@ -211,5 +211,6 @@ class RealTimeConnectionService {
 
   disconnect() async {
     await client.disconnect();
+    client.removeTool("control_robot");
   }
 }
