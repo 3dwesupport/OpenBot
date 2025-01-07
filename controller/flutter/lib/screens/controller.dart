@@ -172,6 +172,7 @@ class ControllerState extends State<Controller> {
 
   realTimeConnect() {
     _realTimeConnectionService.realTimeConnect();
+    openSoundPlayer();
   }
 
   @override
