@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.openbot.flutter_controller">
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Optional: Add this permission if you want to use bluetooth telephony device like headset/earbuds -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- Optional: Add this permission if you want to save your recordings in public folders -->
