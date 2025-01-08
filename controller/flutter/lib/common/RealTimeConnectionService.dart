@@ -11,10 +11,23 @@ class RealTimeConnectionService {
   double left = 0.0;
   double right = 0.0;
   late List<Map<String, dynamic>> fullScript = [];
+  String turnDetectionMode = " ";
 
   final client = RealtimeClient(
     apiKey: apiKey,
   );
+
+  // Function to set the detection mode and update the session
+  void setTurnDetection(String mode) {
+    turnDetectionMode = mode;
+    print("Turn Detection Mode set to: $turnDetectionMode");
+
+    client.updateSession(
+      turnDetection: turnDetectionMode == 'none'
+          ? null
+          : TurnDetection(type: TurnDetectionType.serverVad),
+    );
+  }
 
   final RealtimeConversation conversation = RealtimeConversation();
   static const String apiKey = Constants.openAIKey;

@@ -282,6 +282,7 @@ class ControllerState extends State<Controller> {
     setState(() {
       isManual = !isManual;
     });
+    _realTimeConnectionService.setTurnDetection(turnDetection);
   }
 
   //Playing realtime audio with running drive commands
