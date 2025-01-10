@@ -27,20 +27,20 @@ class SoundPlayer {
         await _soundPlayer.stopPlayer();
       }
 
-      // Configure the audio stream
-      await _soundPlayer.startPlayerFromStream(sampleRate: 26000);
+        // Configure the audio stream
+        await _soundPlayer.startPlayerFromStream(sampleRate: 26000);
 
-      // Feed the audio data
-      await _soundPlayer.feedFromStream(audio);
+        // Feed the audio data
+        await _soundPlayer.feedFromStream(audio);
+      audio = Uint8List(0);
     } catch (e) {
       print('Error playing audio: $e');
     }
   }
-
-  Future<void> dispose() async {
+  
+  Future<void> close() async {
     if (_isPlayerInitialized) {
-      await _soundPlayer.closePlayer();
-      _isPlayerInitialized = false;
+    _soundPlayer.closePlayer();
     }
   }
 

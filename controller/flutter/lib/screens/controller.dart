@@ -53,8 +53,6 @@ class ControllerState extends State<Controller> {
     videoConnection();
     _realTimeConnectionService = RealTimeConnectionService();
     getNewDiscoverServices();
-    openSoundPlayer();
-    onAudioProcessed();
   }
 
   openSoundPlayer() async {
@@ -173,11 +171,12 @@ class ControllerState extends State<Controller> {
   realTimeConnect() {
     _realTimeConnectionService.realTimeConnect();
     openSoundPlayer();
+    onAudioProcessed();
   }
 
-  @override
-  void dispose() {
-    soundPlayer.dispose();
+
+  void closeService() {
+    soundPlayer.close();
     _realTimeConnectionService.disconnect();
   }
 
@@ -262,7 +261,7 @@ class ControllerState extends State<Controller> {
         videoView = true;
       });
     } else if (status == "false") {
-      dispose();
+      closeService();
       setState(() {
         videoView = false;
       });
@@ -283,6 +282,9 @@ class ControllerState extends State<Controller> {
       isManual = !isManual;
     });
     _realTimeConnectionService.setTurnDetection(turnDetection);
+    if (turnDetection == "server_vad") {
+      // Play activation sound
+    }
   }
 
   //Playing realtime audio with running drive commands
