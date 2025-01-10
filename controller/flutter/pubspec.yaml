@@ -121,3 +121,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+    - sounds/vad_mode_activated.wav
+    - sounds/manual_mode_activated.wav

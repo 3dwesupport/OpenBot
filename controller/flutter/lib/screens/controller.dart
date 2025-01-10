@@ -284,6 +284,10 @@ class ControllerState extends State<Controller> {
     _realTimeConnectionService.setTurnDetection(turnDetection);
     if (turnDetection == "server_vad") {
       // Play activation sound
+      soundPlayer.playFromAsset('sounds/vad_mode_activated.wav');
+    }
+    else{
+      soundPlayer.playFromAsset('sounds/manual_mode_activated.wav');
     }
   }
 

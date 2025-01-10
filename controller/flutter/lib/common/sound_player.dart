@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:flutter_sound/public/flutter_sound_player.dart';
 
 class SoundPlayer {
@@ -12,6 +13,23 @@ class SoundPlayer {
     } catch (e) {
       print('Error initializing SoundPlayer: $e');
       _isPlayerInitialized = false;
+    }
+  }
+
+  //Function to play audio on mode selection
+  Future<void> playFromAsset(String assetPath) async {
+    if (!_isPlayerInitialized) {
+      print('Player not initialized. Call init() first.');
+      return;
+    }
+    try {
+      ByteData data = await rootBundle.load(assetPath);
+      Uint8List audioData = data.buffer.asUint8List();
+      await _soundPlayer.startPlayer(
+        fromDataBuffer: audioData,
+      );
+    } catch (e) {
+      print('Error playing WAV audio: $e');
     }
   }
 
