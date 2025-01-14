@@ -25,7 +25,7 @@ class Controller extends StatefulWidget {
   State createState() => ControllerState();
 }
 
-class ControllerState extends State<Controller> {
+class ControllerState extends State<Controller> with SingleTickerProviderStateMixin {
   final List<Service> services = [];
   final registrations = <Registration>[];
   ServerSocket? _serverSocket;
@@ -45,6 +45,8 @@ class ControllerState extends State<Controller> {
   int get nextPort => _nextPort++;
   late RealTimeConnectionService _realTimeConnectionService;
   final soundPlayer = SoundPlayer();
+  late AnimationController _micAnimationController;
+  late Animation<double> _micAnimation;
 
   @override
   void initState() {
@@ -53,6 +55,15 @@ class ControllerState extends State<Controller> {
     videoConnection();
     _realTimeConnectionService = RealTimeConnectionService();
     getNewDiscoverServices();
+    _micAnimationController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this, // Requires SingleTickerProviderStateMixin
+    )..repeat(reverse: true);
+
+    // Define a scaling animation
+    _micAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _micAnimationController, curve: Curves.easeInOut),
+    );
   }
 
   openSoundPlayer() async {
@@ -180,6 +191,12 @@ class ControllerState extends State<Controller> {
     _realTimeConnectionService.disconnect();
   }
 
+  @override
+  void dispose() {
+    // Dispose of the mic animation controller
+    _micAnimationController.dispose();
+    super.dispose();
+  }
   ///getNewDiscoverServices : Function to get new discover services
   Future<void> getNewDiscoverServices() async {
     final discovery = await startDiscovery('_openbot-server._tcp.');
@@ -284,9 +301,11 @@ class ControllerState extends State<Controller> {
     _realTimeConnectionService.setTurnDetection(turnDetection);
     if (turnDetection == "server_vad") {
       // Play activation sound
+      _micAnimationController.repeat(reverse: true);
       soundPlayer.playFromAsset('sounds/vad_mode_activated.wav');
     }
     else{
+      _micAnimationController.stop();
       soundPlayer.playFromAsset('sounds/manual_mode_activated.wav');
     }
   }
@@ -299,93 +318,121 @@ class ControllerState extends State<Controller> {
     };
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (videoView) {
-      return MaterialApp(
-        home: Stack(
-          children: [
-            RTCVideoView(
-              _remoteVideoRenderer,
-              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-              mirror: mirroredVideo,
+@override
+Widget build(BuildContext context) {
+  if (videoView) {
+    return MaterialApp(
+      home: Stack(
+        children: [
+          // Video View
+          RTCVideoView(
+            _remoteVideoRenderer,
+            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            mirror: mirroredVideo,
+          ),
+
+          // Control Selector Overlay
+          ControlSelector(
+            setMirrorVideo,
+            indicatorLeft,
+            indicatorRight,
+            services,
+            _peerConnection,
+            isTiltingPhoneMode,
+            isScreenMode,
+            fragmentType,
+          ),
+
+          // Settings Button and Mic Button Row
+          Positioned(
+            left: isTiltingPhoneMode ? 45 : 110,
+            top: 16.0, // Adjust the top margin as needed
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                // Floating Action Button for Settings
+                FloatingActionButton(
+                  backgroundColor: Colors.white.withOpacity(0.5),
+                  onPressed: () {
+                    setState(() {
+                      isSettings = true;
+                    });
+                  },
+                  child: const Icon(Icons.menu),
+                ),
+
+                // Spacer
+                const SizedBox(width: 444),
+
+                // Manual Mode: Animated Mic Button
+                if (isManual)
+                  AnimatedMicButton(
+                    animate: animate,
+                    sendAudioBuffer: (audioBuffer) {
+                      _realTimeConnectionService.sendUserMessage(audioBuffer);
+                    },
+                    createClientResponse: () =>
+                        _realTimeConnectionService.createResponse(),
+                  )
+                else
+                // VAD Mode: Animated Mic Icon
+                  AnimatedBuilder(
+                    animation: _micAnimationController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _micAnimation.value,
+                        child: Icon(
+                          Icons.mic,
+                          color: Colors.blue,
+                          size: 40,
+                        ),
+                      );
+                    },
+                  ),
+              ],
             ),
-            ControlSelector(
-                setMirrorVideo,
-                indicatorLeft,
-                indicatorRight,
-                services,
-                _peerConnection,
-                isTiltingPhoneMode,
-                isScreenMode,
-                fragmentType),
-            Positioned(
-              left: isTiltingPhoneMode ? 45 : 110,
-              top: 16.0, // Adjust the top margin as needed
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // FloatingActionButton
-                  FloatingActionButton(
-                    backgroundColor: Colors.white.withOpacity(0.5),
-                    onPressed: () {
-                      setState(() {
-                        isSettings = true;
-                      });
-                    },
-                    child: const Icon(Icons.menu),
+          ),
+
+          // Settings Drawer
+          if (isSettings)
+            Stack(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isSettings = false;
+                    });
+                  },
+                  child: Container(
+                    color: Colors.transparent,
                   ),
-                  SizedBox(width: 500),
-                  if (isManual) // Only show mic button if not in VAD mode
-                    AnimatedMicButton(
-                      animate: animate,
-                      sendAudioBuffer: (audioBuffer) {
-                        _realTimeConnectionService.sendUserMessage(audioBuffer);
-                      },
-                      createClientResponse: () =>
-                          _realTimeConnectionService.createResponse(),
-                    ),
-                ],
-              ),
+                ),
+                SettingsDrawer(
+                  services,
+                      (bool newTiltingMode, bool newScreenMode) {
+                    setState(() {
+                      isTiltingPhoneMode = newTiltingMode;
+                      isScreenMode = newScreenMode;
+                    });
+                  },
+                  onVADModeChanged: (String turnDetection) {
+                    onVADModeChanged(turnDetection);
+                  },
+                ),
+              ],
             ),
-            if (isSettings)
-              Stack(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isSettings = false;
-                      });
-                    },
-                    child: Container(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  SettingsDrawer(
-                    services,
-                    (bool newTiltingMode, bool newScreenMode) {
-                      setState(() {
-                        isTiltingPhoneMode = newTiltingMode;
-                        isScreenMode = newScreenMode;
-                      });
-                    },
-                    onVADModeChanged: (String turnDetection) {
-                      onVADModeChanged(turnDetection);
-                    },
-                  ),
-                ],
-              ),
-          ],
-        ),
-        debugShowCheckedModeBanner: false,
-      );
-    } else {
-      return const MaterialApp(
-        home: DiscoveringDevice(),
-        debugShowCheckedModeBanner: false,
-      );
-    }
+        ],
+      ),
+      debugShowCheckedModeBanner: false,
+    );
+  } else {
+    // Discovering Device View
+    return const MaterialApp(
+      home: DiscoveringDevice(),
+      debugShowCheckedModeBanner: false,
+    );
   }
+}
 
   void processMessageFromBot(items) {
     String sdp = "";
