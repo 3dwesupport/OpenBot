@@ -195,6 +195,7 @@ public class AutopilotFragment extends CameraFragment {
         tracker = new MultiBoxTracker(requireContext());
 
         Timber.i("Camera orientation relative to screen canvas: %d", sensorOrientation);
+        System.out.println("Camera orientation relative to screen canvas: %d", sensorOrientation);
 
         recreateNetwork(getModel(), getDevice(), getNumThreads());
         if (autopilot == null) {
