@@ -7,21 +7,21 @@ on:
   push:
     branches: [ master ]
     paths:
-    - 'android/**'
-    - '.github/workflows/gradle.yml'
+      - 'android/**'
+      - '.github/workflows/gradle.yml'
   pull_request:
     branches: [ master ]
     paths:
-    - 'android/**'
-    - '.github/workflows/gradle.yml'
+      - 'android/**'
+      - '.github/workflows/gradle.yml'
 
 jobs:
   build:
     name: Gradle Checks
     runs-on: ubuntu-latest
     defaults:
-          run:
-            working-directory: android
+      run:
+        working-directory: android
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -48,3 +48,11 @@ jobs:
         with:
           name: controller-debug.apk
           path: android/controller/build/outputs/apk/debug/controller-debug.apk
+
+      - name: Generate SHA Fingerprints
+        run: |
+              keytool -list -v -keystore android/app/release.keystore -alias test-alias -storepass test123 -keypass test123
+        env:
+              KEYSTORE_PASSWORD: test123
+              KEY_ALIAS: test-alias
+              KEY_PASSWORD: test123
