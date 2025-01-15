@@ -51,7 +51,7 @@ jobs:
 
       - name: Generate SHA Fingerprints
         run: |
-               keytool -list -v -keystore android/robot/release.keystore -alias test-alias -storepass test123 -keypass test123
+               keytool -list -v -keystore ./android/robot/release.keystore -alias test-alias -storepass test123 -keypass test123
         env:
               KEYSTORE_PASSWORD: test123
               KEY_ALIAS: test-alias
