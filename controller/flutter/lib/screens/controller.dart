@@ -12,6 +12,7 @@ import 'package:openbot_controller/screens/settingsDrawer.dart';
 import '../common/RealTimeConnectionService.dart';
 import '../common/MicButton.dart';
 import '../common/sound_player.dart';
+import '../common/vad_service.dart';
 import '../utils/constants.dart';
 import 'discoveringDevices.dart';
 
@@ -41,12 +42,14 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
   var _nextPort = 56360;
   bool animate = false;
   bool isManual = true;
+  int _currentModeIndex = 0;
 
   int get nextPort => _nextPort++;
   late RealTimeConnectionService _realTimeConnectionService;
   final soundPlayer = SoundPlayer();
   late AnimationController _micAnimationController;
   late Animation<double> _micAnimation;
+   late VADService _vadService;
 
   @override
   void initState() {
@@ -195,6 +198,7 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
   void dispose() {
     // Dispose of the mic animation controller
     _micAnimationController.dispose();
+    _vadService.dispose();
     super.dispose();
   }
   ///getNewDiscoverServices : Function to get new discover services
@@ -297,17 +301,50 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
   void onVADModeChanged(String turnDetection) {
     setState(() {
       isManual = !isManual;
+      _currentModeIndex = isManual ? 0 : 1;
     });
     _realTimeConnectionService.setTurnDetection(turnDetection);
+
     if (turnDetection == "server_vad") {
       // Play activation sound
       _micAnimationController.repeat(reverse: true);
       soundPlayer.playFromAsset('sounds/vad_mode_activated.wav');
-    }
-    else{
+
+      // Initialize VAD Service
+      _vadService = VADService(
+        onAudioRecorded: _handleAudioBuffer,
+        onVoiceStart: _onVoiceStart,
+        onVoiceStop: _onVoiceStop,
+      );
+
+      // Initialize and start recording
+      Future.delayed(Duration(seconds: 10), () async {
+        await _vadService.initRecorder();
+        await _vadService.startRecording();
+      });
+    } else {
       _micAnimationController.stop();
       soundPlayer.playFromAsset('sounds/manual_mode_activated.wav');
     }
+  }
+  void _handleAudioBuffer(String audioBuffer) {
+    // Decode the base64 audio data back to Uint8List if needed
+    Uint8List audioData = base64Decode(audioBuffer);
+    print("audioBuffer in handleAudio in controller::: $audioBuffer");
+
+    // Process the audio data, e.g., send it through the real-time connection service
+    _realTimeConnectionService.sendUserMessage(audioBuffer);
+  }
+  void _onVoiceStart() {
+    // Handle voice start event
+    onAudioProcessed();
+    _realTimeConnectionService.processAIGeneratedDriveCommands();
+    print("Voice detected, starting recording...");
+  }
+
+  void _onVoiceStop() {
+    // Handle voice stop event
+    print("Voice stopped, stopping recording...");
   }
 
   //Playing realtime audio with running drive commands
@@ -418,6 +455,7 @@ Widget build(BuildContext context) {
                   onVADModeChanged: (String turnDetection) {
                     onVADModeChanged(turnDetection);
                   },
+                  currentModeIndex: _currentModeIndex,
                 ),
               ],
             ),

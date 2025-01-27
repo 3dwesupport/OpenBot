@@ -8,9 +8,10 @@ class SettingsDrawer extends StatefulWidget {
   final List<Service> networkServices;
   final Function(bool, bool) onSettingsChanged;
   final Function onVADModeChanged;
+  final int currentModeIndex;
 
   SettingsDrawer(this.networkServices, this.onSettingsChanged,
-      {required this.onVADModeChanged, super.key});
+      {required this.onVADModeChanged, super.key, required this.currentModeIndex});
 
   @override
   _SettingsDrawerState createState() => _SettingsDrawerState();
@@ -89,6 +90,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    _currentIndex = widget.currentModeIndex;
     return Drawer(
       backgroundColor: const Color(0xFF202020),
       child: ListView(
@@ -224,7 +226,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
                 const Text(
                   'Voice Pilot',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF0071C5),
                   ),
