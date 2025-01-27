@@ -17,14 +17,9 @@ class VADService {
   bool _isRecording = false;
   bool _isVoiceActive = false;
 
-  // Stream subscription for recording progress
   StreamSubscription<RecordingDisposition>? _recordingProgressSubscription;
 
-  // Timer for silence detection
   Timer? _silenceTimer;
-
-  // Timer for stopping recording after 5 seconds
-  Timer? _recordingTimer;
 
   // Constructor
   VADService({
@@ -139,12 +134,8 @@ class VADService {
       _isRecording = false;
       print("[VADService] Recording stopped");
 
-      // Cancel the progress subscription
       _recordingProgressSubscription?.cancel();
-      _recordingProgressSubscription = null;
 
-      // Cancel the recording timer
-      _recordingTimer?.cancel();
 
       // Read the recorded file and convert it to a base64 string
       if (filePath != null) {
@@ -172,15 +163,12 @@ class VADService {
     }
   }
 
-  // Dispose resources
   Future<void> dispose() async {
     try {
       print("[VADService] Disposing recorder...");
-      await stopRecording();
-      await _recorder.closeRecorder();
+      await _recorder.stopRecorder();
       _recordingProgressSubscription?.cancel();
       _silenceTimer?.cancel();
-      _recordingTimer?.cancel();
       print("[VADService] Recorder disposed");
     } catch (e) {
       print("[VADService] Error disposing recorder: $e");

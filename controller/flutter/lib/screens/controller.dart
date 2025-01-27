@@ -49,7 +49,7 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
   final soundPlayer = SoundPlayer();
   late AnimationController _micAnimationController;
   late Animation<double> _micAnimation;
-   late VADService _vadService;
+   VADService? _vadService;
 
   @override
   void initState() {
@@ -198,7 +198,7 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
   void dispose() {
     // Dispose of the mic animation controller
     _micAnimationController.dispose();
-    _vadService.dispose();
+    _vadService?.dispose();
     super.dispose();
   }
   ///getNewDiscoverServices : Function to get new discover services
@@ -297,6 +297,13 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
 
     await unregister(registration);
   }
+  void stopAndDisposeVADService() async {
+    if (_vadService != null) {
+      await _vadService!.dispose();
+      _vadService = null;
+      print("[Controller] VADService disposed");
+    }
+  }
 
   void onVADModeChanged(String turnDetection) {
     setState(() {
@@ -318,11 +325,13 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
       );
 
       // Initialize and start recording
-      Future.delayed(Duration(seconds: 10), () async {
-        await _vadService.initRecorder();
-        await _vadService.startRecording();
+      Future.delayed(Duration(seconds: 2), () async {
+        await _vadService!.initRecorder();
+        await _vadService!.startRecording();
       });
     } else {
+      // Stop and dispose of VAD Service when switching back to manual mode
+      stopAndDisposeVADService();
       _micAnimationController.stop();
       soundPlayer.playFromAsset('sounds/manual_mode_activated.wav');
     }
