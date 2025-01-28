@@ -6,13 +6,11 @@ import 'dart:io';
 import 'dart:convert';
 
 class VADService {
-  // Callbacks for voice activity events
-  final Function(String)? onAudioRecorded; // Called when audio is recorded
-  final Function? onVoiceStart; // Called when voice activity starts
-  final Function? onVoiceStop; // Called when voice activity stops
-  final Function(String)? sendAudioBuffer; // Optional: Send audio buffer to server
+  final Function(String)? onAudioRecorded;
+  final Function? onVoiceStart;
+  final Function? onVoiceStop;
+  final Function(String)? sendAudioBuffer;
 
-  // Flutter Sound recorder
   late FlutterSoundRecorder _recorder;
   bool _isRecording = false;
   bool _isVoiceActive = false;
@@ -20,8 +18,17 @@ class VADService {
   StreamSubscription<RecordingDisposition>? _recordingProgressSubscription;
 
   Timer? _silenceTimer;
+  Timer? _noiseCalibrationTimer;
 
-  // Constructor
+  // Noise floor and voice detection parameters
+  double _noiseFloor = 40.0;
+  bool _isCalibrated = false;
+  final List<double> _decibelHistory = [];
+  final int _historySize = 20; // Larger history for better smoothing
+  final double _voiceThreshold = 10.0; // dB above noise floor to detect voice
+  final Duration _silenceDuration =
+      const Duration(seconds: 2); // Silence duration to stop recording
+
   VADService({
     this.onAudioRecorded,
     this.onVoiceStart,
@@ -31,19 +38,18 @@ class VADService {
     _recorder = FlutterSoundRecorder();
   }
 
-  // Initialize the recorder
   Future<void> initRecorder() async {
     try {
       print("[VADService] Initializing recorder...");
       await _recorder.openRecorder();
-      await _recorder.setSubscriptionDuration(const Duration(milliseconds: 100));
+      await _recorder
+          .setSubscriptionDuration(const Duration(milliseconds: 100));
       print("[VADService] Recorder initialized successfully");
     } catch (e) {
       print("[VADService] Error initializing recorder: $e");
     }
   }
 
-  // Start recording
   Future<void> startRecording() async {
     if (_isRecording) {
       print("[VADService] Recording is already in progress");
@@ -64,47 +70,40 @@ class VADService {
       _isRecording = true;
       print("[VADService] Recording started");
 
-      // Variables for VAD improvements
-      double _noiseFloor = 40;
-      bool _isCalibrated = false;
-      Timer? _voiceActivityTimer;
-      final List<double> _decibelHistory = [];
-      final int _historySize = 10; // Increased history size for better smoothing
-
       // Calibrate noise floor during the first few seconds
-      Timer(const Duration(seconds: 2), () {
-        if (!_isCalibrated) {
-          _noiseFloor = _decibelHistory.reduce((a, b) => a + b) / _decibelHistory.length;
+      _noiseCalibrationTimer = Timer(const Duration(seconds: 2), () {
+        if (!_isCalibrated && _decibelHistory.isNotEmpty) {
+          _noiseFloor =
+              _decibelHistory.reduce((a, b) => a + b) / _decibelHistory.length;
           _isCalibrated = true;
           print("[VADService] Noise floor calibrated: $_noiseFloor");
         }
       });
 
       // Listen to recording progress for VAD
-      _recordingProgressSubscription = _recorder.onProgress?.listen((disposition) async {
-        final decibels = disposition.decibels;
-        print("[VADService] Current decibels: $decibels");
+      _recordingProgressSubscription =
+          _recorder.onProgress?.listen((disposition) async {
+        final decibels = disposition.decibels ?? _noiseFloor;
 
         // Smooth decibel values using a moving average
-        _decibelHistory.add(decibels ?? 40);
+        _decibelHistory.add(decibels);
         if (_decibelHistory.length > _historySize) {
           _decibelHistory.removeAt(0);
         }
-        final double averageDecibels = _decibelHistory.reduce((a, b) => a + b) / _decibelHistory.length;
+        final double averageDecibels =
+            _decibelHistory.reduce((a, b) => a + b) / _decibelHistory.length;
 
         // Voice detection logic
-        if (averageDecibels > (_noiseFloor + 10)) {
+        if (averageDecibels > (_noiseFloor + _voiceThreshold)) {
           if (!_isVoiceActive) {
-            _voiceActivityTimer = Timer(const Duration(milliseconds: 200), () {
-              _isVoiceActive = true;
-              print("[VADService] Voice detected. Starting recording...");
-              onVoiceStart?.call();
-            });
+            _isVoiceActive = true;
+            print("[VADService] Voice detected. Starting recording...");
+            onVoiceStart?.call();
           }
 
           // Reset the silence timer
           _silenceTimer?.cancel();
-          _silenceTimer = Timer(const Duration(seconds: 2), () {
+          _silenceTimer = Timer(_silenceDuration, () {
             if (_isVoiceActive) {
               _isVoiceActive = false;
               print("[VADService] Silence detected. Stopping recording...");
@@ -112,8 +111,6 @@ class VADService {
               stopRecording();
             }
           });
-        } else {
-          _voiceActivityTimer?.cancel();
         }
       });
     } catch (e) {
@@ -121,7 +118,6 @@ class VADService {
     }
   }
 
-  // Stop recording
   Future<void> stopRecording() async {
     if (!_isRecording) {
       print("[VADService] No recording in progress to stop");
@@ -135,9 +131,9 @@ class VADService {
       print("[VADService] Recording stopped");
 
       _recordingProgressSubscription?.cancel();
+      _noiseCalibrationTimer?.cancel();
+      _silenceTimer?.cancel();
 
-
-      // Read the recorded file and convert it to a base64 string
       if (filePath != null) {
         final file = File(filePath);
         final audioData = await file.readAsBytes();
@@ -146,17 +142,13 @@ class VADService {
         final base64Audio = base64Encode(audioData);
         print("[VADService] Audio encoded to base64: $base64Audio");
 
-        // Trigger callbacks
-        print("[VADService] Sending audio to server...");
         onAudioRecorded?.call(base64Audio);
         sendAudioBuffer?.call(base64Audio);
 
-        // Delete the temporary file
         await file.delete();
         initRecorder();
         startRecording();
         print("[VADService] Temporary audio file deleted");
-
       }
     } catch (e) {
       print("[VADService] Error stopping recording: $e");
@@ -169,6 +161,7 @@ class VADService {
       await _recorder.stopRecorder();
       _recordingProgressSubscription?.cancel();
       _silenceTimer?.cancel();
+      _noiseCalibrationTimer?.cancel();
       print("[VADService] Recorder disposed");
     } catch (e) {
       print("[VADService] Error disposing recorder: $e");

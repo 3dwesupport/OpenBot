@@ -337,18 +337,14 @@ class ControllerState extends State<Controller> with SingleTickerProviderStateMi
     }
   }
   void _handleAudioBuffer(String audioBuffer) {
-    // Decode the base64 audio data back to Uint8List if needed
-    Uint8List audioData = base64Decode(audioBuffer);
-    print("audioBuffer in handleAudio in controller::: $audioBuffer");
 
     // Process the audio data, e.g., send it through the real-time connection service
     _realTimeConnectionService.sendUserMessage(audioBuffer);
   }
   void _onVoiceStart() {
     // Handle voice start event
-    onAudioProcessed();
-    _realTimeConnectionService.processAIGeneratedDriveCommands();
     print("Voice detected, starting recording...");
+    onAudioProcessed();
   }
 
   void _onVoiceStop() {
