@@ -9,14 +9,25 @@ import styles from "./serialButton.module.css";
  */
 export function SerialCommunicationButton() {
     // Function to handle serial communication
-    const startSerialCommunication = () => {
-        console.log("Serial Communication Started");
-        // Implement the Web Serial API logic here
+    const startSerialCommunication = async () => {
+        if (!navigator.serial) {
+            console.error("Web Serial API is not supported in this browser.");
+            return;
+        }
+
+        try {
+            const port = await navigator.serial.requestPort();
+            await port.open({baudRate: 115200});
+
+            console.log("Serial Port Connected Successfully!");
+        } catch (error) {
+            console.error("Failed to connect to the serial port:", error);
+        }
     };
 
     return (
         <button className={styles.serialButton} onClick={startSerialCommunication}>
-            Start Serial Communication
+            Connect Serial Port
         </button>
     );
 }
