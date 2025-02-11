@@ -24,3 +24,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 ./node_modules
+esp32dev/.pio/
+esp32dev/.vscode/
+esp32dev/libdeps/
+esp32dev/test
