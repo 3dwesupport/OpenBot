@@ -53,8 +53,8 @@ export const FlashFirmwareButton = () => {
     const navigate = useNavigate();
 
     return (
-        <button onClick={() => navigate("/firmware")}>
-            Flash Firmware
+        <button className={styles.flashButton} onClick={() => navigate("/firmware")}>
+            Flashing Firmware
         </button>
     );
 };

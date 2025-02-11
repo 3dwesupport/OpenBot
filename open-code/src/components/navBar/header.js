@@ -141,7 +141,6 @@ export function Header() {
             <div className={styles.navbarDiv}>
                 {/*logo*/}
                 <LogoSection/>
-                <FlashFirmwareButton/>
 
                 {/*project name on center when screen is playground*/}
                 <ProjectNameSection anchorEl={anchorEl} setProjectName={setProjectName}
@@ -150,6 +149,7 @@ export function Header() {
                                     setDeleteProject={setDeleteProject} theme={theme}/>
 
                 <div className={styles.navbarIconDiv}>
+                    <FlashFirmwareButton/>
                     <RightSection setIsHelpCenterModal={setIsHelpCenterModal} toggleTheme={toggleTheme}
                                   location={location} isOnline={isOnline} isAutoSync={isAutoSync}
                                   setIsAutoSync={setIsAutoSync}
