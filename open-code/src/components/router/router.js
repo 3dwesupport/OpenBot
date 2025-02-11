@@ -5,6 +5,7 @@ import {PathName} from "../../utils/constants";
 import {useContext} from "react";
 import {ThemeContext} from "../../App";
 import {Box, Container, Grid, Typography} from "@mui/material";
+import {SerialCommunicationButton} from "../serialCommmunication/serialButton";
 
 /**
  * Router to maintain different paths of the application
@@ -17,6 +18,7 @@ export const RouterComponent = () => {
             <Route path={PathName.home} element={<Outlet/>}>
                 <Route index element={<Home/>}/>
                 <Route path={PathName.playGround} element={<Playground/>}/>
+                <Route path="/firmware" element={<SerialCommunicationButton />} />
                 <Route path="*" element={<NotFound/>}/>
             </Route>
         </Routes>

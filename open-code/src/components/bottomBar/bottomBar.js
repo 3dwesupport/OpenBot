@@ -21,7 +21,6 @@ import BlueText from "../fonts/blueText";
 import {ModelUploadingComponent} from "./modelUploadingComponent";
 import SubscriptionModel from "../subscription/subscriptionModel";
 import {setProjectDetails} from "../../apis/projects";
-import {SerialCommunicationButton} from "../serialCommmunication/serialButton";
 
 /**
  * Bottom Bar contains generate code, upload on drive icon , zoom in-out and undo redo functionality.
@@ -343,7 +342,6 @@ export const BottomBar = () => {
                                                  setIsSubscriptionExpire={setIsSubscriptionExpire}
                                                  setIsAIModelComponent={setIsAIModelComponent} file={file}/>
                     }
-                    <SerialCommunicationButton></SerialCommunicationButton>
 
                     <div className={styles.operationsDiv}>
                         {/*undo redo*/}
