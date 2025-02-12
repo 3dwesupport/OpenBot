@@ -3,7 +3,7 @@ import styles from "./serialButton.module.css";
 
 /**
  * Serial Communication Button Component
- * Allows the user to upload a firmware file and flash it to the ESP32.
+ * Allows the user to upload a firmware file (.ino, .cpp, or .bin) and flash it to the ESP32.
  * @returns {JSX.Element}
  */
 export function SerialCommunicationButton() {
@@ -13,7 +13,12 @@ export function SerialCommunicationButton() {
 
     // Handle file selection
     const handleFileChange = (event) => {
-        setFile(event.target.files[0]);
+        const selectedFile = event.target.files[0];
+        if (selectedFile && (selectedFile.name.endsWith(".ino") || selectedFile.name.endsWith(".cpp") || selectedFile.name.endsWith(".bin"))) {
+            setFile(selectedFile);
+        } else {
+            alert("Only .ino, .cpp, and .bin files are allowed!");
+        }
     };
 
     // Connect to the serial port
@@ -40,28 +45,28 @@ export function SerialCommunicationButton() {
             setStatus("Please select a file");
             return;
         }
-    
+
         if (port) {
             try {
-                await port.close();  
+                await port.close();
                 setPort(null);
                 console.log("Serial port closed to allow flashing.");
             } catch (error) {
                 console.error("Failed to close the serial port:", error);
             }
         }
-    
+
         const formData = new FormData();
         formData.append("firmware", file);
-    
+
         setStatus("Flashing...");
-    
+
         try {
             const response = await fetch("http://localhost:8000/flash", {
                 method: "POST",
                 body: formData,
             });
-    
+
             const data = await response.json();
             setStatus(data.error ? `Error: ${data.error}` : "Flashing Complete! 🎉");
         } catch (error) {
@@ -69,21 +74,17 @@ export function SerialCommunicationButton() {
             setStatus("Flashing failed!");
         }
     };
-    
-
 
     return (
         <div className={styles.container}>
-            <input type="file" accept=".bin" onChange={handleFileChange} className={styles.fileInput} />
+            <input type="file" accept=".ino,.cpp,.bin" onChange={handleFileChange} className={styles.fileInput} />
             <button className={styles.serialButton} onClick={connectToSerial}>
                 Connect to ESP32
             </button>
-            <button className={styles.flashButton} onClick={flashFirmware} disabled={!file || !port}>
+            <button className={styles.flashButton} onClick={flashFirmware} disabled={!file}>
                 Flash Firmware
             </button>
             <p className={styles.status}>{status}</p>
         </div>
     );
 }
-
-
