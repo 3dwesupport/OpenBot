@@ -1,54 +1,91 @@
 .container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.description {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.fileDropArea {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
-}
-
-.fileInput {
-    padding: 5px;
-    font-size: 14px;
-}
-
-/* Keeping the existing style for the connect button */
-.serialButton {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 14px;
+    justify-content: center;
+    padding: 2rem;
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    background: #f9f9f9;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.serialButton:hover {
-    background-color: #004494;
+.fileDropArea:hover {
+    background: #e6f3ff;
+    border-color: #0056b3;
 }
 
-/* New style for the flash button */
+.fileDropArea span {
+    font-size: 1rem;
+    color: #007bff;
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.fileInfo {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
 .flashButton {
-    background-color: #28a745;
-    color: white;
+    margin-top: 1.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background: #007bff;
     border: none;
-    padding: 10px 20px;
-    font-size: 14px;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.flashButton:hover {
-    background-color: #1e7e34;
+    transition: background 0.3s ease;
 }
 
 .flashButton:disabled {
-    background-color: #ccc;
+    background: #ccc;
     cursor: not-allowed;
 }
 
+.flashButton:hover:not(:disabled) {
+    background: #0056b3;
+}
+
 .status {
-    font-size: 14px;
-    color: #333;
-    margin-top: 5px;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.success {
+    color: #28a745;
+}
+
+.error {
+    color: #dc3545;
 }

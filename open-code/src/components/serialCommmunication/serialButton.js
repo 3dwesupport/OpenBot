@@ -1,90 +1,77 @@
 import React, { useState } from "react";
 import styles from "./serialButton.module.css";
 
-/**
- * Serial Communication Button Component
- * Allows the user to upload a firmware file (.ino, .cpp, or .bin) and flash it to the ESP32.
- * @returns {JSX.Element}
- */
 export function SerialCommunicationButton() {
     const [file, setFile] = useState(null);
-    const [port, setPort] = useState(null);
     const [status, setStatus] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    // Handle file selection
     const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
-        if (selectedFile && (selectedFile.name.endsWith(".ino") || selectedFile.name.endsWith(".cpp") || selectedFile.name.endsWith(".bin"))) {
+        if (selectedFile && selectedFile.name.endsWith(".uf2")) {
             setFile(selectedFile);
+            setStatus(`Selected file: ${selectedFile.name}`);
         } else {
-            alert("Only .ino, .cpp, and .bin files are allowed!");
-        }
-    };
-
-    // Connect to the serial port
-    const connectToSerial = async () => {
-        if (!navigator.serial) {
-            console.error("Web Serial API is not supported in this browser.");
-            setStatus("Web Serial API not supported");
-            return;
-        }
-
-        try {
-            const serialPort = await navigator.serial.requestPort();
-            await serialPort.open({ baudRate: 115200 });
-            setPort(serialPort);
-            setStatus("Connected to ESP32");
-        } catch (error) {
-            console.error("Failed to connect to the serial port:", error);
-            setStatus("Connection failed!");
+            alert("Only .uf2 files are allowed!");
+            setFile(null);
+            setStatus("Please select a valid .uf2 file.");
         }
     };
 
     const flashFirmware = async () => {
         if (!file) {
-            setStatus("Please select a file");
+            setStatus("Please select a .uf2 file first.");
             return;
         }
 
-        if (port) {
-            try {
-                await port.close();
-                setPort(null);
-                console.log("Serial port closed to allow flashing.");
-            } catch (error) {
-                console.error("Failed to close the serial port:", error);
-            }
-        }
-
-        const formData = new FormData();
-        formData.append("firmware", file);
-
-        setStatus("Flashing...");
-
         try {
-            const response = await fetch("http://localhost:8000/flash", {
-                method: "POST",
-                body: formData,
-            });
+            if (!window.showDirectoryPicker) {
+                throw new Error("Directory Picker API is not supported in this browser.");
+            }
 
-            const data = await response.json();
-            setStatus(data.error ? `Error: ${data.error}` : "Flashing Complete! 🎉");
+            const dirHandle = await window.showDirectoryPicker();
+            setStatus("Pico storage detected. Uploading...");
+            setLoading(true);
+
+            const fileHandle = await dirHandle.getFileHandle(file.name, { create: true });
+            const writable = await fileHandle.createWritable();
+            const fileData = await file.arrayBuffer();
+            await writable.write(fileData);
+            await writable.close();
+
+            setLoading(false);
+            setStatus("✅ Firmware uploaded successfully!");
         } catch (error) {
-            console.error("Flashing failed:", error);
-            setStatus("Flashing failed!");
+            setLoading(false);
+            setStatus(`❌ Flashing failed: ${error.message}`);
         }
     };
 
     return (
         <div className={styles.container}>
-            <input type="file" accept=".ino,.cpp,.bin" onChange={handleFileChange} className={styles.fileInput} />
-            <button className={styles.serialButton} onClick={connectToSerial}>
-                Connect to ESP32
+            <h1 className={styles.title}>Raspberry Pi Pico Firmware Uploader</h1>
+            <p className={styles.description}>
+                Drag and drop your .uf2 file below to upload it to your Raspberry Pi Pico.
+            </p>
+
+            <label className={styles.fileDropArea}>
+                <span>📂 Drag & drop a .uf2 file or click to select</span>
+                <input type="file" accept=".uf2" onChange={handleFileChange} className={styles.hiddenInput} />
+            </label>
+
+            {file && (
+                <div className={styles.fileInfo}>
+                    <span>{file.name}</span>
+                </div>
+            )}
+
+            <button className={styles.flashButton} onClick={flashFirmware} disabled={!file || loading}>
+                {loading ? "Uploading..." : "Upload to Pico"}
             </button>
-            <button className={styles.flashButton} onClick={flashFirmware} disabled={!file}>
-                Flash Firmware
-            </button>
-            <p className={styles.status}>{status}</p>
+
+            <p className={`${styles.status} ${status.includes("✅") ? styles.success : styles.error}`}>
+                {status}
+            </p>
         </div>
     );
 }
