@@ -10,7 +10,7 @@ import {EditProfileModal} from "../homeComponents/header/editProfileModal";
 import {PopUpModal} from "../homeComponents/header/logOutAndDeleteModal";
 import {ProfileOptionModal} from "../homeComponents/header/profileOptionModal";
 import {Constants, errorToast, localStorageKeys, PathName} from "../../utils/constants";
-import {LogoSection, ProfileSignIn, ProjectName, ProjectNamePopUp} from "../homeComponents/header/headerComponents";
+import {LogoSection, ProfileSignIn, ProjectName, ProjectNamePopUp, FlashFirmwareButton} from "../homeComponents/header/headerComponents";
 import {Backdrop, CircularProgress, useTheme} from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {autoSync, deleteProjectFromStorage} from "../../services/workspace";
@@ -149,6 +149,7 @@ export function Header() {
                                     setDeleteProject={setDeleteProject} theme={theme}/>
 
                 <div className={styles.navbarIconDiv}>
+                    <FlashFirmwareButton/>
                     <RightSection setIsHelpCenterModal={setIsHelpCenterModal} toggleTheme={toggleTheme}
                                   location={location} isOnline={isOnline} isAutoSync={isAutoSync}
                                   setIsAutoSync={setIsAutoSync}
