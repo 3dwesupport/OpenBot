@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './espmodal.module.css';
 import styles from "../navBar/navbar.module.css";
 
 /**
