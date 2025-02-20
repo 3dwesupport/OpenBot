@@ -10,13 +10,14 @@ import {EditProfileModal} from "../homeComponents/header/editProfileModal";
 import {PopUpModal} from "../homeComponents/header/logOutAndDeleteModal";
 import {ProfileOptionModal} from "../homeComponents/header/profileOptionModal";
 import {Constants, errorToast, localStorageKeys, PathName} from "../../utils/constants";
-import {LogoSection, ProfileSignIn, ProjectName, ProjectNamePopUp, FlashFirmwareButton} from "../homeComponents/header/headerComponents";
+import {LogoSection, ProfileSignIn, ProjectName, ProjectNamePopUp} from "../homeComponents/header/headerComponents";
 import {Backdrop, CircularProgress, useTheme} from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {autoSync, deleteProjectFromStorage} from "../../services/workspace";
 import {colors} from "../../utils/color";
 import {signOut} from "firebase/auth";
 import configData from "../../config.json";
+import {FlashFirmwareButton} from "../espWebFlasher/flashFirmware";
 
 /**
  * Open-code's header which contains logo, project name on playground screen and help button, profile signIn

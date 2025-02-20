@@ -46,18 +46,6 @@ export function LogoSection() {
 }
 
 /**
- * Flash Firmware Navigation Button
- * Navigates to the Serial Communication page when clicked.
- */
-export const FlashFirmwareButton = () => {
-    return (
-        <button className={styles.flashButton}>
-            Flashing Firmware
-        </button>
-    );
-};
-
-/**
  * Project Name with Arrow
  * @param params
  * @returns {JSX.Element}
