@@ -3,6 +3,7 @@ import logoutIcon from "../assets/images/icon/log-out.png"
 import userIcon from "../assets/images/icon/user.png"
 import editProfileIcon from "../assets/images/icon/edit-profile-icon.png"
 import crossIcon from "../assets/images/icon/cross-icon.png"
+import profileImage from "../assets/images/icon/profile-image.png"
 import line from "../assets/images/line.png"
 import laptop from "../assets/images/laptop.png"
 import darkUserIcon from "../../src/assets/images/icon/darkUser-icon.png"
@@ -18,7 +19,7 @@ import dragDropWhite from "../../src/assets/images/drag_drop_white.gif";
 import dragDropDark from "../../src/assets/images/drag_drop_dark.gif";
 import cloud from "../assets/images/icon/cloud.png"
 import lightThemeIcon from "../assets/images/icon/light-theme-icon.png"
-import darkThemeIcon from "../assets/images/icon/white-mode-icon.png"
+import darkThemeIcon from "../assets/images/icon/whiteMode/white-mode-icon.png"
 import dots from "../assets/images/threedots.png";
 import darkDots from "../assets/images/darkdoticon.png";
 import avatar from "../assets/images/icon/Avatars.png";
@@ -35,7 +36,7 @@ import redoIcon from "../assets/images/icon/redo.png";
 import uploadIcon from "../assets/images/icon/upload-cloud.png";
 import rightSlider from "../assets/images/icon/right-slider.png";
 import rightSliderDark from "../assets/images/icon/right-slider-dark.png";
-import upArrowIcon from "../assets/images/icon/up-arrow.png";
+import UpArrowIcon from "../assets/images/icon/up-arrow.png";
 import downArrowIcon from "../assets/images/icon/down-arrow.png";
 import jsIconDarkTheme from "../assets/images/icon/js-icon-dark-theme.png";
 import jsIconLightTheme from "../assets/images/icon/js-con-light-theme.png";
@@ -53,54 +54,55 @@ import subscriptionExpire from "../assets/images/subscription-expire.png"
  * @type {{lightThemeIcon: *, darkPencilIcon: *, line: *, undoIcon: *, pencilIcon: *, profileImage: *, laptop: *, lightCrossIcon: *, login: *, gameIcon: *, joystickIcon: *, gamepadIcon: *, cloud: *, infoLight: *, logo: *, blueTheme: *, crossIcon: *, darkDots: *, phoneIcon: *, logoutIcon: *, Carousal2Dark: *, dots: *, uploadIcon: *, redoIcon: *, Carousal3Dark: *, avatar: *, darkThemeIcon: *, errorEmojiIcon: *, editProfileIcon: *, darkUserIcon: *, darkLogoutIcon: *, dualDriveIcon: *, dragDropWhite: *, dragDropDark: *, userIcon: *, darkCrossIcon: *, successfulEmojiIcon: *, helpIcon: *, Carousal3: *, Carousal2: *}}
  */
 export const Images = {
-    rightSlider: rightSlider,
-    rightSliderDark: rightSliderDark,
-    helpIcon: helpIcon,
-    logoutIcon: logoutIcon,
-    userIcon: userIcon,
-    editProfileIcon: editProfileIcon,
-    crossIcon: crossIcon,
-    line: line,
-    laptop: laptop,
-    darkUserIcon: darkUserIcon,
-    darkLogoutIcon: darkLogoutIcon,
-    darkCrossIcon: darkCrossIcon,
-    lightCrossIcon: lightCrossIcon,
-    successfulEmojiIcon: successfulEmojiIcon,
-    errorEmojiIcon: errorEmojiIcon,
-    pencilIcon: pencilIcon,
-    darkPencilIcon: darkPencilIcon,
-    logo: logo,
-    dragDropDark: dragDropDark,
-    dragDropWhite: dragDropWhite,
-    cloud: cloud,
-    lightThemeIcon: lightThemeIcon,
-    darkThemeIcon: darkThemeIcon,
-    dots: dots,
-    darkDots: darkDots,
-    avatar: avatar,
-    infoLight: infoLight,
-    blueTheme: blueTheme,
-    login: login,
-    gameIcon: gameIcon,
-    joystickIcon: joystickIcon,
-    dualDriveIcon: dualDriveIcon,
-    gamepadIcon: gamepadIcon,
-    phoneIcon: phoneIcon,
-    undoIcon: undoIcon,
-    redoIcon: redoIcon,
-    uploadIcon: uploadIcon,
-    upArrowIcon: upArrowIcon,
-    downArrowIcon: downArrowIcon,
-    jsIconDarkTheme: jsIconDarkTheme,
-    jsIconLightTheme: jsIconLightTheme,
-    pyIconDarkTheme: pyIconDarkTheme,
-    pyIconLightTheme: pyIconLightTheme,
-    leftSlider: leftSlider,
-    leftSliderDark: leftSliderDark,
-    darkSyncIcon: darkSyncIcon,
-    lightSyncIcon: lightSyncIcon,
-    darkPlusIcon: darkPlusIcon,
-    lightPlusIcon: lightPlusIcon,
-    subscriptionExpire:subscriptionExpire
+ rightSlider: rightSlider,
+ rightSliderDark: rightSliderDark,
+ helpIcon: helpIcon,
+ logoutIcon: logoutIcon,
+ userIcon: userIcon,
+ editProfileIcon: editProfileIcon,
+ crossIcon: crossIcon,
+ profileImage: profileImage,
+ line: line,
+ laptop: laptop,
+ darkUserIcon: darkUserIcon,
+ darkLogoutIcon: darkLogoutIcon,
+ darkCrossIcon: darkCrossIcon,
+ lightCrossIcon: lightCrossIcon,
+ successfulEmojiIcon: successfulEmojiIcon,
+ errorEmojiIcon: errorEmojiIcon,
+ pencilIcon: pencilIcon,
+ darkPencilIcon: darkPencilIcon,
+ logo: logo,
+ dragDropDark: dragDropDark,
+ dragDropWhite: dragDropWhite,
+ cloud: cloud,
+ lightThemeIcon: lightThemeIcon,
+ darkThemeIcon: darkThemeIcon,
+ dots: dots,
+ darkDots: darkDots,
+ avatar: avatar,
+ infoLight: infoLight,
+ blueTheme: blueTheme,
+ login: login,
+ gameIcon: gameIcon,
+ joystickIcon: joystickIcon,
+ dualDriveIcon: dualDriveIcon,
+ gamepadIcon: gamepadIcon,
+ phoneIcon: phoneIcon,
+ undoIcon: undoIcon,
+ redoIcon: redoIcon,
+ uploadIcon: uploadIcon,
+ UpArrowIcon: UpArrowIcon,
+ downArrowIcon: downArrowIcon,
+ jsIconDarkTheme: jsIconDarkTheme,
+ jsIconLightTheme: jsIconLightTheme,
+ pyIconDarkTheme: pyIconDarkTheme,
+ pyIconLightTheme: pyIconLightTheme,
+ leftSlider: leftSlider,
+ leftSliderDark: leftSliderDark,
+ darkSyncIcon: darkSyncIcon,
+ lightSyncIcon: lightSyncIcon,
+ darkPlusIcon: darkPlusIcon,
+ lightPlusIcon: lightPlusIcon,
+ subscriptionExpire:subscriptionExpire
 }

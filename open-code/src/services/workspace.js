@@ -9,7 +9,7 @@ import {
 } from "./googleDrive";
 import configData from "../config.json"
 import {renameAllProjects, sumUploadCode} from "../apis/projects";
-import {getModelsCount} from "../apis/models";
+
 
 /**
  * get project from drive when user signedIn
@@ -348,22 +348,21 @@ function getConfigData() {
 /**
  * function to filter and set models in blocks
  * @param modelType
+ * @param assetType
  * @returns {unknown[]|undefined|null}
  */
 function filterModels(modelType, assetType) {
     filterLabels()
     let modelsArray = []
     let updatedData = localStorage.getItem(localStorageKeys.configData)
-    console.log(updatedData);
     if (updatedData !== " " || null) {
-        let data = JSON.parse(updatedData)?.filter(obj => (modelType.includes(obj.type) && obj.pathType === "FILE") || (obj.pathType === "ASSET" && obj.type === assetType))
+        let data = JSON.parse(updatedData)?.filter(obj => (obj.type === modelType && obj.pathType === "FILE") || (obj.pathType === "ASSET" && obj.type === assetType))
         if (data?.length === 0) {
             return null
         } else if (data?.length > 0) {
             data?.forEach((item) => {
                 modelsArray.push(item.name.replace(/\.[^/.]+$/, ""))
             })
-            // console.log(modelsArray);
             return modelsArray?.map((type) => [type, type])
         }
     } else {
@@ -415,15 +414,53 @@ function handleChildBlockInWorkspace(array, child) {
  */
 export async function handleUserRestriction(type) {
     if (type === Constants.projects) {
-        return sumUploadCode().then((res) => {
-            return res < 15;
-        })
+        try {
+            const res = await sumUploadCode();
+            console.log("results:::",res);
+            if (new Date().getTime() >= new Date(res?.planEndDate).getTime()) return false;
+            switch (res?.planType) { // restrict the user to click number of times
+                case Constants.free:
+                    console.log(res.count);
+                    return res.count < 10;
+                case Constants.standard:
+                    return res.count < 200;
+                case Constants.premium:
+                    return res.count < 1500;
+
+                default:
+                    return true;
+            }
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            return false; // Handle error case appropriately
+        }
     } else {
-        return getModelsCount().then((res) => {
-            return res < 5;
-        })
+        return true;
     }
 }
+
+
+/**
+ * function to get cookie from storage
+ * @param cname
+ * @returns {string}
+ */
+export function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let splitParams = decodedCookie.split(';');
+    for (let i = 0; i < splitParams.length; i++) {
+        let cookieName = splitParams[i];
+        while (cookieName.charAt(0) === ' ') {
+            cookieName = cookieName.substring(1);
+        }
+        if (cookieName.indexOf(name) === 0) {
+            return cookieName.substring(name.length, cookieName.length);
+        }
+    }
+    return "";
+}
+
 
 export {
     autoSync,
