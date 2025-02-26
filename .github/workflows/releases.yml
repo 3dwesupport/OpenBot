@@ -56,3 +56,4 @@ jobs:
           asset_path: ${{ steps.asset_paths.outputs.controller_apk_path }}
           asset_name: ${{ steps.asset_names.outputs.controller_name }}
           asset_content_type: application/vnd.android.package-archive
+
