@@ -1,0 +1,70 @@
+.headSuccessContainer {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.childDiv {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 40%;
+    gap: 60px;
+}
+
+/*.paraDiv{*/
+/*    gap:10px;*/
+/*}*/
+
+
+.successButton {
+    background-color: #0071c5;
+    border: 1px solid;
+    border-radius: 0.5rem;
+    color: #fff;
+    cursor: pointer;
+    font-family: Gilroy-Medium, sans-serif;
+    font-size: 1rem;
+    height: 45px;
+    width: 100%;
+}
+
+.SuccessImg {
+    height: 160px;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.infoText {
+    /*color: black;*/
+    font-family: Gilroy-Medium, sans-serif;
+    font-size: 30px;
+    text-align: center;
+}
+
+.text {
+    /*color: black;*/
+    font-family: Gilroy-Medium, sans-serif;
+    justify-content: center;
+    text-align: center;
+}
+
+@media only screen and (max-width: 767px) {
+    .SuccessImg{
+        height:140px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .childDiv{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        width: 90%;
+        gap: 60px;
+    }
+}

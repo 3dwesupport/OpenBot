@@ -1,0 +1,113 @@
+.navbar_navbarDiv {
+    align-items: center;
+    background-color: #0071c5;
+    display: flex;
+    height: 65px;
+    justify-content: space-between;
+}
+
+.navbar_mainIcon {
+    cursor: pointer;
+    height: 25px;
+    width: 26px;
+}
+
+.navbarTitleDiv {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin-left: 70px;
+}
+
+.navbar_headDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.mainTitle {
+    color: #fff;
+    cursor: pointer;
+    font-family: Gilroy-Medium, sans-serif;
+    font-size: 18px;
+}
+
+.navbar_rightSectionDiv {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-right: 80px;
+}
+
+.light_themeIcon {
+    height: 22px;
+    width: 22px;
+}
+.light_themeIcon:hover{
+    cursor: pointer;
+    height: 28px;
+    width: 28px;
+}
+.dark_themeIcon{
+    height: 23px;
+    width: 23px;
+}
+.dark_themeIcon:hover{
+    cursor: pointer;
+    height: 28px;
+    width: 28px;
+}
+
+.navbar_lineIcon {
+    height: 30px;
+}
+
+.navbar_buttonIcon {
+    background-color: #0071c5;
+    border: 1px solid #fffefe;
+    border-radius: 0.5rem;
+    color: #fff;
+    cursor: pointer;
+    font-family: Gilroy-Medium, sans-serif;
+    font-size: 1rem;
+    height: 2rem;
+    width: 5rem;
+    margin: 10px;
+}
+@media only screen and (max-width: 768px) {
+    .navbar_navbarDiv{
+        height: 50px;
+    }
+    .navbarTitleDiv{
+margin-left: 22px;
+    }
+    .navbar_mainIcon {
+        height: 21px;
+        width: 20px;
+    }
+    .mainTitle{
+        font-size: 14px;
+    }
+    .light_themeIcon{
+        height: 16px;
+        width: 16px;
+    }
+    .light_themeIcon:hover{
+        cursor: pointer;
+        height: 22px;
+        width: 22px;
+    }
+    .navbar_lineIcon{
+        height: 25px;
+    }
+    .navbar_rightSectionDiv{
+        margin-right: 20px;
+        gap:10px;
+    }
+    .buttonText{
+        font-size: 12px;
+    }
+
+
+}
