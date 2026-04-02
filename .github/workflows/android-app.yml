@@ -1,0 +1,55 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-apk:
+    name: Build & Upload APK Artifact
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: android
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+
+      - name: Decode Release Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+
+      - name: Assemble Release APK
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=release.keystore \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload OpenBot APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenBot-APK
+          path: android/robot/build/outputs/apk/release/robot-release.apk
+
+      - name: Upload Controller APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Controller-APK
+          path: android/controller/build/outputs/apk/release/controller-release.apk
