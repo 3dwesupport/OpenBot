@@ -35,7 +35,7 @@ jobs:
       - name: Assemble Release APK
         run: |
           ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=release.keystore \
+            -Pandroid.injected.signing.store.file=$PWD/release.keystore \
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
