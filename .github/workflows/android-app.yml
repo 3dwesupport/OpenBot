@@ -25,10 +25,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-
-      - name: Decode Release Keystore
+      - name: Decode Release Keystore for all modules
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+          mkdir -p controller
+          mkdir -p robot
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > controller/release.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > robot/release.keystore
 
       - name: Assemble Release APK
         run: |
