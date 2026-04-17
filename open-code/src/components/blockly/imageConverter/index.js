@@ -1,4 +1,4 @@
-import Blockly from "blockly/core";
+import * as Blockly from "blockly/core";
 
 /**
  * addBlocksToWorkspace function extracts XML data from a given message and adds it to a Blockly workspace.
