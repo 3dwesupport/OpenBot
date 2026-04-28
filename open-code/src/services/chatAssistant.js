@@ -11,12 +11,8 @@ let conversationHistory = [];
  */
 export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMessage) => {
     const apiBaseUrl = process.env.REACT_APP_CHAT_API_BASE_URL;
-    // const url = apiBaseUrl
-    //     ? `${String(apiBaseUrl).replace(/\/$/, "")}/api/chatAssistant`
-    //     : "/api/chatAssistant";
 
-    const  url = `http://localhost:8080/api/chatAssistant`;
-
+    const  url = `${apiBaseUrl}api/chatAssistant`;
 
     try {
         const response = await fetch(url, {
