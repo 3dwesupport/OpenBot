@@ -4,8 +4,6 @@ function buildChatAssistantPayload(payload) {
     const {userPrompt, persona, currentXML, conversationHistory} = payload || {};
     const safeHistory = Array.isArray(conversationHistory) ? conversationHistory : [];
 
-    console.log("inside buildChatAssistantPayload@@@",currentXML)
-
     return {
         messages: [
             {role: "system", content: persona ? personaFinalPrompt(persona) : blocklyFinalPrompt + "\nInput XML : " + currentXML},

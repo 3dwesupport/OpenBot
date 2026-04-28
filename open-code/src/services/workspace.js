@@ -362,7 +362,6 @@ function filterModels(modelType, assetType) {
             data?.forEach((item) => {
                 modelsArray.push(item.name.replace(/\.[^/.]+$/, ""))
             })
-            // console.log(modelsArray);
             return modelsArray?.map((type) => [type, type])
         }
     } else {

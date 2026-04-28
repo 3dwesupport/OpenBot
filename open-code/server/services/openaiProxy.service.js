@@ -18,8 +18,6 @@ async function proxyChatCompletions(payload) {
   try {
     const requestPayload = buildChatAssistantPayload(payload);
 
-    console.log("requestPayload::::", requestPayload);
-
     return await openAIClient.chat.completions.create({
       ...requestPayload,
     });

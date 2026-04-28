@@ -15,10 +15,8 @@ router.get("/health", (req, res) => {
 
 router.post("/api/chatAssistant", async (req, res, next) => {
   try {
-    console.log("in routes@@@")
     const upstream = await proxyChatCompletions(req.body);
 
-    console.log("upstream--------->", upstream);
     await pipeUpstreamToClient(upstream, res);
   } catch (error) {
     next(error);

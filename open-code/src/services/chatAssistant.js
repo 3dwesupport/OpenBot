@@ -19,8 +19,6 @@ export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMe
 
 
     try {
-        console.log("conversationHistory:::",conversationHistory)
-
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -35,8 +33,6 @@ export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMe
             }),
             signal
         });
-
-        console.log("response:::", response);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -140,9 +136,6 @@ export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMe
                     conversationHistory = conversationHistory.slice(-8);
                 }
 
-                console.log("AI result length:", resultText.length);
-                console.log("AI result tail:", resultText.slice(-300));
-
                 console.log("all result text-------:", resultText);
 
                 return resultText;
@@ -155,8 +148,6 @@ export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMe
             resultText = rawFallbackText;
         }
 
-        console.log("AI result length:", resultText.length);
-        console.log("AI result tail:", resultText.slice(-300));
         return resultText;
 
     } catch (error) {
