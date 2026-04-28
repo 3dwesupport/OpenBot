@@ -1,5 +1,17 @@
 //Function that hide the xml and provide complete formatted response on ui after response is completed
 export const handler = (message) => {
+    const decodeJSONString = (raw = "") => {
+        try {
+            return JSON.parse(`"${raw}"`);
+        } catch (e) {
+            return raw
+                .replace(/\\"/g, '"')
+                .replace(/\\n/g, "\n")
+                .replace(/\\t/g, "\t")
+                .replace(/\\\\/g, "\\");
+        }
+    };
+
     try {
         const parsedMessage = JSON.parse(message);
         let content = parsedMessage?.$$CONTENT$$;
@@ -13,7 +25,27 @@ export const handler = (message) => {
         }
         return content ?? undefined;
     } catch (error) {
-        console.error('JSON parsing error:', error);
+        // Fallback 1: parse any JSON object fragment in a noisy response.
+        const jsonObjectMatch = typeof message === "string" ? message.match(/\{[\s\S]*\}/) : null;
+        if (jsonObjectMatch?.[0]) {
+            try {
+                const parsedMessage = JSON.parse(jsonObjectMatch[0]);
+                return parsedMessage?.$$CONTENT$$ ?? undefined;
+            } catch (e) {
+                // Continue to regex fallback.
+            }
+        }
+
+        // Fallback 2: extract $$CONTENT$$ even if JSON is incomplete.
+        const contentMatch = typeof message === "string"
+            ? message.match(/"\$\$CONTENT\$\$"\s*:\s*"((?:\\.|[^"\\])*)"/)
+            : null;
+        if (contentMatch?.[1]) {
+            return decodeJSONString(contentMatch[1]);
+        }
+
+        // Keep chat stable without console spam for transient stream fragments.
+        return undefined;
     }
 };
 

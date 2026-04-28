@@ -4,7 +4,7 @@ function buildChatAssistantPayload(payload) {
     const {userPrompt, persona, currentXML, conversationHistory} = payload || {};
     const safeHistory = Array.isArray(conversationHistory) ? conversationHistory : [];
 
-    console.log("inside buildChatAssistantPayload@@@")
+    console.log("inside buildChatAssistantPayload@@@",currentXML)
 
     return {
         messages: [

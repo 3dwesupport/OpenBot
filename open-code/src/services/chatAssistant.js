@@ -1,5 +1,3 @@
-import { blocklyFinalPrompt, personaFinalPrompt } from "../utils/prompt";
-
 let conversationHistory = [];
 
 /**
@@ -12,108 +10,153 @@ let conversationHistory = [];
  * @returns {Promise<string>}
  */
 export const getAIMessage = async (userPrompt, persona, currentXML, signal, onMessage) => {
-    const url = `https://api.openai.com/v1/chat/completions`;
+    const apiBaseUrl = process.env.REACT_APP_CHAT_API_BASE_URL;
+    // const url = apiBaseUrl
+    //     ? `${String(apiBaseUrl).replace(/\/$/, "")}/api/chatAssistant`
+    //     : "/api/chatAssistant";
 
-    conversationHistory.push({ role: 'user', content: userPrompt });
+    const  url = `http://localhost:8080/api/chatAssistant`;
 
-    const messages = [
-        {
-            role: 'system',
-            content: persona ? personaFinalPrompt(persona) : blocklyFinalPrompt + "\nInput XML : " + currentXML
-        },
-        ...conversationHistory
-    ];
 
     try {
+        console.log("conversationHistory:::",conversationHistory)
+
         const response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
             },
 
             body: JSON.stringify({
-                messages,
-                model: "gpt-4o-mini-2024-07-18",
-                stream: true,
-                response_format: {
-                    type: "json_schema",
-                    json_schema: {
-                        name: "blockly_chat_assistant",
-                        description: `Response structure should follow the given json schema structure:
-                        $$CONTENT$$ key  does not have any xml but  $$RESPONSE$$ key have only xml code in it.
-                       `,
-                        schema: {
-                            type: "object",
-                            strict: true,
-                            properties: {
-                                $$CONTENT$$: {
-                                    type: "string",
-                                    description: `Make sure you Provide only an explanation in clear, simple text. This section should describe the purpose and usage of the Blockly blocks. Do not include any XML code or technical details in this part—just the explanation`
-                                },
-                                $$RESPONSE$$: {
-                                    type: "string",
-                                    description: `Ensure you Provide only valid XML code for the Blockly blocks. Do not include any explanations in this section—only XML code.`
-                                },
-                            },
-                            required: ["$$CONTENT$$", "$$RESPONSE$$"],
-                            additionalProperties: false
-                        },
-                    }
-                }
+                userPrompt,
+                persona,
+                currentXML,
+                conversationHistory,
             }),
             signal
         });
 
+        console.log("response:::", response);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("AI request failed:", errorText);
+            return "Error occurred while processing your request.";
+        }
+
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let resultText = '';
+        let sseBuffer = '';
+        let requestFinished = false;
+        let rawFallbackText = '';
+
+        const extractContentFromParsedChunk = (parsed) => {
+            const directDelta = parsed?.choices?.[0]?.delta?.content;
+            if (typeof directDelta === "string" && directDelta.length > 0) {
+                return directDelta;
+            }
+
+            // Some providers can emit content as arrays of typed parts.
+            const arrayDelta = parsed?.choices?.[0]?.delta?.content?.[0]?.text;
+            if (typeof arrayDelta === "string" && arrayDelta.length > 0) {
+                return arrayDelta;
+            }
+
+            const finalMessage = parsed?.choices?.[0]?.message?.content;
+            if (typeof finalMessage === "string" && finalMessage.length > 0) {
+                return finalMessage;
+            }
+
+            if (typeof parsed?.content === "string" && parsed.content.length > 0) {
+                return parsed.content;
+            }
+
+            return "";
+        };
+
+        const processSSELine = (rawLine) => {
+            const line = rawLine.trim();
+            if (!line) {
+                return;
+            }
+
+            const dataLine = line.startsWith("data:") ? line.replace(/^data:\s*/, "") : line;
+            if (!dataLine || dataLine === "[DONE]") {
+                return;
+            }
+
+            let parsed;
+            try {
+                parsed = JSON.parse(dataLine);
+            } catch (e) {
+                // If chunk is non-JSON, keep it as raw fallback text.
+                rawFallbackText += dataLine;
+                return;
+            }
+
+            const content = extractContentFromParsedChunk(parsed);
+            if (content) {
+                onMessage(content);
+                resultText += content;
+            }
+
+            if (parsed?.choices?.[0]?.finish_reason === "stop") {
+                requestFinished = true;
+            }
+        };
 
         while (true) {
             const {done, value} = await reader.read();
-            if (done) break;
+            if (done) {
+                // flush any remaining buffered payload on stream close
+                sseBuffer += decoder.decode();
+            } else {
+                sseBuffer += decoder.decode(value, {stream: true});
+            }
 
-            // Decode the stream chunk
-            const chunk = decoder.decode(value, {stream: true});
             // Stop if the request was aborted
             if (signal.aborted) {
                 return "Request was cancelled.";
 
             }
-            const parsedChunk = chunk
-                .split("\n")
-                .filter(line => line.trim()) // Filter out empty lines
-                .map(line => line.replace(/^data: /, "")) // Remove "data: " prefix
-                .map(line => {
-                    try {
-                        return JSON.parse(line);
-                    } catch (e) {
-                        console.error("JSON parse error:", e);
-                        return null;
-                    }
-                })
-                .filter(parsed => parsed !== null);
 
-            for (const parsed of parsedChunk) {
-                const content = parsed?.choices[0]?.delta?.content;
-                if (content) {
-                    onMessage(content);
-                    resultText += content;
-                }
-                if (parsed?.choices[0]?.finish_reason === "stop") {
-                    onMessage("Done");
-
-                    conversationHistory.push({ role: 'assistant', content: resultText });
-
-                    if (conversationHistory.length > 7) {
-                        conversationHistory = conversationHistory.slice(-7);
-                    }
-
-                    return resultText;
-                }
+            const streamLines = sseBuffer.split(/\r?\n/);
+            if (done) {
+                sseBuffer = "";
+            } else {
+                sseBuffer = streamLines.pop() || "";
             }
+
+            for (const rawLine of streamLines) {
+                processSSELine(rawLine);
+            }
+
+            if (requestFinished) {
+                conversationHistory.push({ role: "user", content: userPrompt });
+                conversationHistory.push({ role: "assistant", content: resultText });
+
+                if (conversationHistory.length > 8) {
+                    conversationHistory = conversationHistory.slice(-8);
+                }
+
+                console.log("AI result length:", resultText.length);
+                console.log("AI result tail:", resultText.slice(-300));
+
+                console.log("all result text-------:", resultText);
+
+                return resultText;
+            }
+
+            if (done) break;
         }
 
+        if (!resultText && rawFallbackText) {
+            resultText = rawFallbackText;
+        }
+
+        console.log("AI result length:", resultText.length);
+        console.log("AI result tail:", resultText.slice(-300));
         return resultText;
 
     } catch (error) {
