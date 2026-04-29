@@ -10,7 +10,7 @@ function buildChatAssistantPayload(payload) {
             ...safeHistory,
             {role: "user", content: userPrompt || ""},
         ],
-        model: "gpt-4o-mini-2024-07-18",
+        model: "gpt-5.4-nano",
         stream: true,
         response_format: {
             type: "json_schema",
@@ -21,7 +21,6 @@ function buildChatAssistantPayload(payload) {
                        `,
                 schema: {
                     type: "object",
-                    strict: true,
                     properties: {
                         $$CONTENT$$: {
                             type: "string",
@@ -35,6 +34,7 @@ function buildChatAssistantPayload(payload) {
                     required: ["$$CONTENT$$", "$$RESPONSE$$"],
                     additionalProperties: false,
                 },
+                strict: true,
             },
         },
     };
