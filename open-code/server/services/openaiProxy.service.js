@@ -6,7 +6,7 @@ const { buildChatAssistantPayload } = require("./chatAssistantPayload.service");
 async function proxyChatCompletions(payload) {
   const openAIClient = getOpenAIClient();
   if (!openAIClient) {
-    throw new HttpError(500, "OPENAI_API_KEY is missing on the backend server.");
+    throw new HttpError(500, "OpenAI Client Connection Error");
   }
   if (!payload || typeof payload !== "object") {
     throw new HttpError(400, "Request payload is required.");
@@ -22,9 +22,8 @@ async function proxyChatCompletions(payload) {
       ...requestPayload,
     });
   } catch (error) {
-    const statusCode = Number(error?.status) || 500;
-    const message = error?.message || "Failed to call OpenAI.";
-    throw new HttpError(statusCode, message);
+    console.log("error in openai-->", Number(error?.status), error?.message);
+    throw new HttpError(500 , "Failed to call OpenAI");
   }
 }
 
