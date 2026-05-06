@@ -29,6 +29,10 @@ const config = {
         level: process.env.LOG_LEVEL || 'info',
         dir: process.env.LOG_DIR || './logs',
     },
+
+    openai: {
+        apiKey: process.env.OPENAI_API_KEY || '',
+    },
 };
 
 module.exports = config;

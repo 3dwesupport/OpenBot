@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -7,6 +8,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
+import 'package:openbot_controller/screens/component/mic_button.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
 import '../utils/constants.dart';
@@ -34,6 +36,8 @@ class ControllerState extends State<Controller> {
   bool isSettings = false;
   bool isTiltingPhoneMode = false;
   bool isScreenMode = false;
+  String? _modeMessage;
+  Timer? _modeTimer;
   String fragmentType = "";
   var _nextPort = 56360;
 
@@ -208,24 +212,32 @@ class ControllerState extends State<Controller> {
               log("error in parsing msg: $e");
             }
           },
+          onError: (e) {
+            socket.destroy();
+            clientSocket?.destroy();
+            clientSocket = null;
+            if (mounted) setState(() { videoView = false; });
+          },
           onDone: () {
-            if (kDebugMode) {
-              print('client left');
-            }
-            setState(() {
-              videoView = false;
-            });
             socket.destroy();
             socket.close();
             clientSocket?.destroy();
             clientSocket = null;
-            setState(() {});
+            if (mounted) setState(() { videoView = false; });
           },
         );
       }
     });
     setState(() {
       registrations.add(registration);
+    });
+  }
+
+  void _showModeMessage(String msg) {
+    _modeTimer?.cancel();
+    setState(() => _modeMessage = msg);
+    _modeTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _modeMessage = null);
     });
   }
 
@@ -265,9 +277,8 @@ class ControllerState extends State<Controller> {
                 services, _peerConnection, isTiltingPhoneMode, isScreenMode,fragmentType),
             Positioned(
               left: isTiltingPhoneMode ? 45 : 110,
-              top: 16.0, // Adjust the top margin as needed
+              top: 16.0,
               child: Container(
-                // padding: EdgeInsets.only(left: ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(45),
                   color: Colors.transparent,
@@ -282,6 +293,29 @@ class ControllerState extends State<Controller> {
                     child: const Icon(Icons.menu)),
               ),
             ),
+            Positioned(
+              right: isTiltingPhoneMode ? 45 : 45,
+              top: 16,
+              child: const MicButton(),
+            ),
+            // Mode switch message — centred on screen, plain white text, no background
+            if (_modeMessage != null)
+              Positioned.fill(
+                child: Center(
+                  child: Text(
+                    _modeMessage!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.none,
+                      shadows: [
+                        Shadow(blurRadius: 6, color: Colors.black54),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             if (isSettings)
               Stack(
                 children: [
@@ -302,6 +336,11 @@ class ControllerState extends State<Controller> {
                         isTiltingPhoneMode = newTiltingMode;
                         isScreenMode = newScreenMode;
                       });
+                      if (newTiltingMode) {
+                        _showModeMessage('Switching to Tilting Mode');
+                      } else {
+                        _showModeMessage('Switching to Gamepad Mode');
+                      }
                     },
                   ),
                 ],

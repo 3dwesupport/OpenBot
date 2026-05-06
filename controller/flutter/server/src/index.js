@@ -19,7 +19,7 @@ async function bootstrap() {
 
     logger.info('Server listening', {
         url: `http://${config.server.host}:${config.server.port}`,
-        ws:  `ws://${config.server.host}:${config.server.port}/ws`,
+        ws:  `ws://${config.server.host}:${config.server.port}/ws/realtime`,
         env: config.env,
     });
 
