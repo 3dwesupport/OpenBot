@@ -7,14 +7,14 @@ const config = {
     isProduction: process.env.NODE_ENV === 'production',
 
     server: {
-        port: parseInt(process.env.PORT, 10) || 8080,
+        port: parseInt(process.env.PORT, 10) || 8000,
         host: process.env.HOST || '0.0.0.0',
     },
 
     security: {
         corsOrigins: process.env.CORS_ORIGINS
             ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-            : ['http://localhost:3000'],
+            : ['http://localhost:8000'],
         rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000,
         rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100,
     },

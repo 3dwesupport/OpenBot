@@ -9,8 +9,7 @@ const rateLimit  = require('express-rate-limit');
 const config          = require('./config');
 const requestLogger   = require('./middleware/requestLogger');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
-const healthRouter    = require('./routes/health');
-const messagesRouter  = require('./routes/messages');
+const routes = require('./routes');
 
 function createApp() {
     const app = express();
@@ -19,12 +18,12 @@ function createApp() {
 
     app.use(helmet());
 
-    app.use(cors({
-        origin:         config.security.corsOrigins,
-        methods:        ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials:    true,
-    }));
+    // app.use(cors({
+    //     origin:         config.security.corsOrigins,
+    //     methods:        ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    //     allowedHeaders: ['Content-Type', 'Authorization'],
+    //     credentials:    true,
+    // }));
 
     app.use(compression());
     app.use(express.json({ limit: '512kb' }));
@@ -39,8 +38,7 @@ function createApp() {
         message: { status: 'error', code: 'RATE_LIMITED', message: 'Too many requests' },
     }));
 
-    app.use('/',              healthRouter);
-    app.use('/api/messages',  messagesRouter);
+    app.use(routes);
 
     app.use(notFoundHandler);
     app.use(errorHandler);

@@ -69,6 +69,7 @@ function createWebSocketServer(httpServer) {
     wss.on('connection', (clientWs, req) => {
         const clientId = uuidv4();
         logger.info('Flutter client connected', { clientId, ip: req.socket.remoteAddress });
+        console.log(`[WS] Client connected: ${clientId} (${req.socket.remoteAddress})`);
 
         if (!config.openai.apiKey) {
             logger.error('OPENAI_API_KEY not set — closing client');
@@ -95,11 +96,13 @@ function createWebSocketServer(httpServer) {
 
         // Flutter → OpenAI: translate clean Flutter protocol to OpenAI format
         clientWs.on('message', (raw) => {
+            console.log(`[WS] Data from client ${clientId}: ${raw.toString().slice(0, 300)}`);
             let msg;
             try { msg = JSON.parse(raw); } catch { return; }
 
             if (msg.type === 'audio') {
                 const openaiMsg = JSON.stringify({ type: 'input_audio_buffer.append', audio: msg.data });
+                console.log("openaiMsg:::",openaiMsg);
                 if (openaiReady) openaiWs.send(openaiMsg);
                 else pendingAudio.push(openaiMsg);
             } else if (msg.type === 'commit') {
@@ -112,6 +115,7 @@ function createWebSocketServer(httpServer) {
         openaiWs.on('open', () => {
             openaiReady = true;
             logger.info('OpenAI upstream connected', { clientId });
+            console.log(`[WS] OpenAI upstream connected for client: ${clientId}`);
             openaiWs.send(JSON.stringify(SESSION_CONFIG));
             for (const msg of pendingAudio) openaiWs.send(msg);
             pendingAudio.length = 0;
@@ -163,11 +167,13 @@ function createWebSocketServer(httpServer) {
 
         openaiWs.on('close', (code) => {
             logger.info('OpenAI upstream closed', { clientId, code });
+            console.log(`[WS] OpenAI upstream disconnected for client ${clientId}. code=${code}`);
             if (clientWs.readyState === WebSocket.OPEN) clientWs.close(code);
         });
 
         clientWs.on('close', (code) => {
             logger.info('Flutter client disconnected', { clientId, code });
+            console.log(`[WS] Client disconnected: ${clientId}. code=${code}`);
             if (openaiWs.readyState !== WebSocket.CLOSED) openaiWs.terminate();
         });
 
@@ -181,4 +187,24 @@ function createWebSocketServer(httpServer) {
     return wss;
 }
 
-module.exports = { createWebSocketServer };
+function setupWebSocketServer(httpServer) {
+    const wss = createWebSocketServer(httpServer);
+
+    const shutdown = (signal) => {
+        logger.info(`${signal} received – shutting down gracefully`);
+        httpServer.close(() => logger.info('HTTP server closed'));
+        if (wss.clients) wss.clients.forEach((ws) => ws.terminate());
+        wss.close(() => {
+            logger.info('WebSocket server closed');
+            process.exit(0);
+        });
+        setTimeout(() => { logger.error('Forced exit'); process.exit(1); }, 10_000).unref();
+    };
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT',  () => shutdown('SIGINT'));
+
+    return wss;
+}
+
+module.exports = { createWebSocketServer, setupWebSocketServer };

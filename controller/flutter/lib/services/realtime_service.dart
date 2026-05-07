@@ -12,10 +12,11 @@ class RealtimeService {
   RealtimeService._();
   static final RealtimeService instance = RealtimeService._();
 
-  static const _wsUrl = String.fromEnvironment(
-    'BACKEND_WS_URL',
-    defaultValue: 'ws://192.168.1.44:8080/ws/realtime',
-  );
+  static const _wsUrl = 'ws://192.168.1.44:8000/ws/realtime';
+  // String.fromEnvironment(
+  //   'BACKEND_WS_URL',
+  //   defaultValue: 'ws://localhost:8000/ws/realtime',
+  // );
 
   WebSocket? _ws;
   StreamSubscription? _wsSub;
@@ -40,23 +41,30 @@ class RealtimeService {
   bool get isListening => _state == RealtimeState.listening;
   bool get isProcessing => _state == RealtimeState.processing;
 
+  void print(String message) {
+    if (kDebugMode) debugPrint('[RealtimeService] $message');
+  }
+
   void _setState(RealtimeState s) {
     _state = s;
     onStateChange?.call();
   }
 
-  // Opens mic immediately, connects WS in background — button goes blue right away.
+  // Opens mic only. Backend websocket is connected separately via
+  // connectBackend()/disconnectBackend() (driven by device status).
   Future<bool> start() async {
     if (!isIdle) return false;
     _stopping = false;
+    print('start requested');
     try {
       await _ensureRecorderOpen();
       await _startMic();
       _setState(RealtimeState.listening);
-      _connectWs(); // fire-and-forget
+      _connectWs(); // fire-and-forget if not already connected
+      print('mic started, connecting websocket to $_wsUrl');
       return true;
     } catch (e) {
-      if (kDebugMode) debugPrint('Start error: $e');
+      print('start failed: $e');
       await _stopMic();
       _setState(RealtimeState.idle);
       return false;
@@ -64,41 +72,62 @@ class RealtimeService {
   }
 
   Future<void> _connectWs() async {
+    if (_ws != null) {
+      print('websocket already connected');
+      return;
+    }
+    print('websocket connect attempt');
     try {
       final ws = await WebSocket.connect(_wsUrl)
           .timeout(const Duration(seconds: 5));
-      if (_stopping || isIdle) { await ws.close(); return; }
+      print('websocket after attempt@@@@@@');
+
+      if (_stopping) {
+        print('websocket opened while stopping, closing');
+        await ws.close();
+        return;
+      }
       _ws = ws;
+      print('websocket connected');
       _wsSub = _ws!.listen(
         _onMessage,
-        onError: (_) { if (!isIdle) _closeWs(); },
-        onDone: () { if (!isIdle) _closeWs(); },
+        onError: (err) {
+          print('websocket error: $err');
+          _closeWs('stream error');
+        },
+        onDone: () {
+          print('websocket stream done');
+          _closeWs('stream done');
+        },
       );
       if (_commitPending) {
+        print('sending queued commit after websocket connect');
         _commitPending = false;
         commit();
       }
     } catch (e) {
-      if (kDebugMode) debugPrint('WS connect error (mic still running): $e');
+      print('websocket connect error: $e');
     }
   }
 
-  void _closeWs() {
+  void _closeWs([String reason = 'manual']) {
+    print('closing websocket ($reason)');
     _wsSub?.cancel();
     _wsSub = null;
     _ws?.close();
     _ws = null;
+    print('websocket closed');
   }
 
   // PTT release: stop mic immediately (UI goes idle), send commit to WS if connected.
   Future<void> commitAndStop() async {
     if (isIdle) return;
+    print('commitAndStop requested');
     _commitPending = false;
     _send({'type': 'commit'}); // send before stopping mic
     await _stopMic();
     _setState(RealtimeState.idle);
-    // Keep WS open briefly so backend can respond, then clean up
-    Future.delayed(const Duration(seconds: 8), _closeWs);
+    // Keep WS connection alive; backend connect/disconnect is managed by device status.
   }
 
   void commit() {
@@ -110,21 +139,39 @@ class RealtimeService {
     }
   }
 
-  Future<void> stop() async {
+  Future<void> stop({bool disconnectBackend = false}) async {
     if (isIdle) return;
-    _stopping = true;
+    print('stop requested');
+    _stopping = disconnectBackend;
     _commitPending = false;
-    _closeWs();
+    if (disconnectBackend) _closeWs('stop');
     await _stopMic();
     _driveTimer?.cancel();
     _setState(RealtimeState.idle);
+  }
+
+  Future<void> connectBackend() async {
+    print('connectBackend requested');
+    _stopping = false;
+    await _connectWs();
+  }
+
+  Future<void> disconnectBackend() async {
+    print('disconnectBackend requested');
+    _stopping = true;
+    _commitPending = false;
+    _closeWs('device disconnected');
   }
 
   void _onMessage(dynamic raw) {
     if (raw is! String) return;
     try {
       final msg = jsonDecode(raw) as Map<String, dynamic>;
-      switch (msg['type'] as String? ?? '') {
+      print(' websocket message@@@@@@: $msg');
+
+      final type = msg['type'] as String? ?? '';
+      print('incoming websocket message: $type');
+      switch (type) {
         case 'robot_command':
           _executeCommand(msg);
           break;
@@ -134,7 +181,7 @@ class RealtimeService {
           break;
       }
     } catch (e) {
-      if (kDebugMode) debugPrint('Message error: $e');
+      print('message parse/handle error: $e');
     }
   }
 
@@ -169,7 +216,13 @@ class RealtimeService {
   }
 
   void _send(Map<String, dynamic> msg) {
-    try { _ws?.add(jsonEncode(msg)); } catch (_) {}
+    try {
+      final type = msg['type'] ?? 'unknown';
+      print('sending websocket message: $type');
+      _ws?.add(jsonEncode(msg));
+    } catch (e) {
+      print('send failed: $e');
+    }
   }
 
   Future<void> _ensureRecorderOpen() async {
@@ -227,7 +280,7 @@ class RealtimeService {
   }
 
   Future<void> dispose() async {
-    await stop();
+    await stop(disconnectBackend: true);
     if (_recorderOpened) {
       await _recorder.closeRecorder();
       _recorderOpened = false;

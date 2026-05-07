@@ -8,6 +8,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
+import 'package:openbot_controller/services/realtime_service.dart';
 import 'package:openbot_controller/screens/component/mic_button.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
@@ -246,10 +247,12 @@ class ControllerState extends State<Controller> {
       setState(() {
         videoView = true;
       });
+      RealtimeService.instance.connectBackend();
     } else if (status == "false") {
       setState(() {
         videoView = false;
       });
+      RealtimeService.instance.disconnectBackend();
     }
   }
 
