@@ -4,12 +4,14 @@ const { WebSocketServer, WebSocket } = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const logger = require('../utils/logger');
 const config = require('../config');
+const { INSTRUCTIONS } = require('../config/instructions');
 
 const OPENAI_WS_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview';
 
 const SESSION_CONFIG = {
     type: 'session.update',
     session: {
+        instructions: INSTRUCTIONS,
         modalities: ['text'],
         input_audio_format: 'pcm16',
         input_audio_transcription: { model: 'whisper-1' },
@@ -19,7 +21,7 @@ const SESSION_CONFIG = {
             prefix_padding_ms: 300,
             silence_duration_ms: 600,
         },
-        tool_choice: 'required',
+        tool_choice: 'auto',
         tools: [
             {
                 type: 'function',
@@ -88,6 +90,7 @@ function createWebSocketServer(httpServer) {
         const pendingAudio = [];
         let pendingFnName = '';
         let pendingFnArgs = '';
+        let pendingFnCallId = '';
 
         function sendToFlutter(obj) {
             if (clientWs.readyState === WebSocket.OPEN)
@@ -102,7 +105,6 @@ function createWebSocketServer(httpServer) {
 
             if (msg.type === 'audio') {
                 const openaiMsg = JSON.stringify({ type: 'input_audio_buffer.append', audio: msg.data });
-                console.log("openaiMsg:::",openaiMsg);
                 if (openaiReady) openaiWs.send(openaiMsg);
                 else pendingAudio.push(openaiMsg);
             } else if (msg.type === 'commit') {
@@ -130,6 +132,7 @@ function createWebSocketServer(httpServer) {
                 case 'response.output_item.added':
                     if (event.item?.type === 'function_call') {
                         pendingFnName = event.item.name || '';
+                        pendingFnCallId = event.item.call_id || '';
                         pendingFnArgs = '';
                     }
                     break;
@@ -143,10 +146,22 @@ function createWebSocketServer(httpServer) {
                         let args = {};
                         try { args = pendingFnArgs ? JSON.parse(pendingFnArgs) : {}; } catch {}
                         logger.info('Robot command', { clientId, fn: pendingFnName, args });
-                        // Send a clean robot_command — no OpenAI internals exposed
                         sendToFlutter({ type: 'robot_command', action: pendingFnName, ...args });
+                        // Tell OpenAI the tool was executed so it's ready for the next command
+                        if (pendingFnCallId) {
+                            openaiWs.send(JSON.stringify({
+                                type: 'conversation.item.create',
+                                item: {
+                                    type: 'function_call_output',
+                                    call_id: pendingFnCallId,
+                                    output: 'Command executed successfully.',
+                                },
+                            }));
+                            openaiWs.send(JSON.stringify({ type: 'response.create' }));
+                        }
                         pendingFnName = '';
                         pendingFnArgs = '';
+                        pendingFnCallId = '';
                     }
                     break;
 
