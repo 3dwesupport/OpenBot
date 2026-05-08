@@ -12,11 +12,8 @@ class RealtimeService {
   RealtimeService._();
   static final RealtimeService instance = RealtimeService._();
 
+  // Backend WebSocket URL — Node.js server on the local network
   static const _wsUrl = 'ws://192.168.1.44:8000/ws/realtime';
-  // String.fromEnvironment(
-  //   'BACKEND_WS_URL',
-  //   defaultValue: 'ws://localhost:8000/ws/realtime',
-  // );
 
   WebSocket? _ws;
   StreamSubscription? _wsSub;
@@ -27,10 +24,12 @@ class RealtimeService {
   StreamSubscription? _audioSub;
   final List<Uint8List> _audioBatch = [];
   Timer? _batchTimer;
-  Timer? _driveTimer;
+  Timer? _driveTimer;               // auto-stops robot after drive(seconds: N)
 
   bool _commitPending = false;
   bool _stopping = false;
+  bool _routineCancelled = false;   // set to true by stop() to abort an active routine mid-sequence
+
   RealtimeState _state = RealtimeState.idle;
 
   VoidCallback? onStateChange;
@@ -60,7 +59,7 @@ class RealtimeService {
       await _ensureRecorderOpen();
       await _startMic();
       _setState(RealtimeState.listening);
-      _connectWs(); // fire-and-forget if not already connected
+      _connectWs();
       print('mic started, connecting websocket to $_wsUrl');
       return true;
     } catch (e) {
@@ -119,15 +118,13 @@ class RealtimeService {
     print('websocket closed');
   }
 
-  // PTT release: stop mic immediately (UI goes idle), send commit to WS if connected.
   Future<void> commitAndStop() async {
     if (isIdle) return;
     print('commitAndStop requested');
     _commitPending = false;
-    _send({'type': 'commit'}); // send before stopping mic
+    _send({'type': 'commit'});
     await _stopMic();
     _setState(RealtimeState.idle);
-    // Keep WS connection alive; backend connect/disconnect is managed by device status.
   }
 
   void commit() {
@@ -187,6 +184,9 @@ class RealtimeService {
 
   void _executeCommand(Map<String, dynamic> cmd) {
     switch (cmd['action'] as String? ?? '') {
+
+      // Drives the robot — r/l range -1.0 (reverse) to 1.0 (forward)
+      // Optional seconds: auto-stops motors after the given duration
       case 'drive':
         final r = ((cmd['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
         final l = ((cmd['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
@@ -199,26 +199,83 @@ class RealtimeService {
           });
         }
         break;
+
+      // Halts motors immediately and cancels any running routine
       case 'stop':
         _driveTimer?.cancel();
+        _routineCancelled = true;
         clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
         break;
+
+      // Controls the robot's turn signal LEDs
+      // Optional seconds: auto-stops indicator after N seconds
       case 'indicator':
         final side = cmd['side'] as String? ?? 'stop';
-        if (side == 'left') clientSocket?.writeln('{command: INDICATOR_LEFT}');
+        final indicatorSecs = (cmd['seconds'] as num?)?.toInt();
+        if (side == 'left')       clientSocket?.writeln('{command: INDICATOR_LEFT}');
         else if (side == 'right') clientSocket?.writeln('{command: INDICATOR_RIGHT}');
-        else clientSocket?.writeln('{command: INDICATOR_STOP}');
+        else                      clientSocket?.writeln('{command: INDICATOR_STOP}');
+        if (indicatorSecs != null && side != 'stop') {
+          Timer(Duration(seconds: indicatorSecs), () {
+            print("indicator stopped@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            clientSocket?.writeln('{command: INDICATOR_STOP}');
+          });
+        }
         break;
+
+      // Toggles between front and rear camera
       case 'camera':
         clientSocket?.writeln('{command: SWITCH_CAMERA}');
         break;
+
+      // Runs a multi-step timed sequence — steps execute one after another with delays
+      // Example: forward 15s → stop 3s → backward 5s
+      case 'routine':
+        final rawSteps = cmd['steps'];
+        if (rawSteps is List) {
+          _routineCancelled = false;
+          _runRoutine(rawSteps.cast<Map<String, dynamic>>());
+        }
+        break;
+    }
+  }
+
+  // Executes routine steps sequentially. Checks _routineCancelled before each step
+  // so a "stop" voice command exits the sequence immediately.
+  Future<void> _runRoutine(List<Map<String, dynamic>> steps) async {
+    _driveTimer?.cancel();
+
+    for (final step in steps) {
+      if (_routineCancelled) break;
+
+      final action = step['action'] as String? ?? 'stop';
+      final secs   = ((step['seconds'] as num?) ?? 0).toDouble();
+
+      if (action == 'drive') {
+        final r = ((step['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
+        final l = ((step['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
+        clientSocket?.writeln('{driveCmd: {r:${r.toStringAsFixed(2)}, l:${l.toStringAsFixed(2)}}}');
+      } else if (action == 'indicator') {
+        final side = step['side'] as String? ?? 'stop';
+        if (side == 'left')       clientSocket?.writeln('{command: INDICATOR_LEFT}');
+        else if (side == 'right') clientSocket?.writeln('{command: INDICATOR_RIGHT}');
+        else                      clientSocket?.writeln('{command: INDICATOR_STOP}');
+      } else {
+        clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
+      }
+
+      if (secs > 0) await Future.delayed(Duration(milliseconds: (secs * 1000).toInt()));
+    }
+
+    // Ensure actuators are left in a safe idle state after the sequence completes.
+    if (!_routineCancelled) {
+      clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
+      clientSocket?.writeln('{command: INDICATOR_STOP}');
     }
   }
 
   void _send(Map<String, dynamic> msg) {
     try {
-      final type = msg['type'] ?? 'unknown';
-      print('sending websocket message: $type');
       _ws?.add(jsonEncode(msg));
     } catch (e) {
       print('send failed: $e');
@@ -244,11 +301,12 @@ class RealtimeService {
     _audioSub = _audioCtrl!.stream.listen((bytes) {
       if (bytes.isNotEmpty) _audioBatch.add(bytes);
     });
+    // Every 100ms merge buffered audio chunks and send as a single batch
     _batchTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (_audioBatch.isEmpty || _ws == null) { _audioBatch.clear(); return; }
-      final total = _audioBatch.fold<int>(0, (s, b) => s + b.length);
+      final total  = _audioBatch.fold<int>(0, (s, b) => s + b.length);
       final merged = Uint8List(total);
-      var offset = 0;
+      var offset   = 0;
       for (final chunk in _audioBatch) {
         merged.setRange(offset, offset + chunk.length, chunk);
         offset += chunk.length;

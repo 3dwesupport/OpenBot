@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:openbot_controller/services/realtime_service.dart';
 
 class MicButton extends StatefulWidget {
@@ -85,6 +86,7 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
       // Long press threshold reached → PTT
       if (_pointerDown && !_alwaysOn && _rt.isIdle) {
         _pttActive = true;
+        HapticFeedback.lightImpact(); // haptic only when PTT activates
         await _rt.start();
         if (mounted) setState(() {});
       }
@@ -117,11 +119,13 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
 
   Future<void> _onTap() async {
     if (_isOn) {
+      HapticFeedback.lightImpact();
       setState(() => _alwaysOn = false);
       _pulseCtrl.stop(); _pulseCtrl.reset();
       _waveCtrl.stop(); _waveCtrl.reset();
       await _rt.stop();
     } else {
+      HapticFeedback.lightImpact(); // haptic only when turning ON
       setState(() => _alwaysOn = true);
       final ok = await _rt.start();
       if (!ok && mounted) setState(() => _alwaysOn = false);
