@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:openbot_controller/globals.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 enum RealtimeState { idle, listening, processing }
 
@@ -49,6 +51,23 @@ class RealtimeService {
     onStateChange?.call();
   }
 
+  /// Android 6+ / iOS require runtime consent; without it AudioRecord fails
+  /// (e.g. IAudioFlinger createRecord -1, native init status -20).
+  Future<bool> _ensureMicPermission() async {
+    if (!Platform.isAndroid && !Platform.isIOS) return true;
+    var status = await Permission.microphone.status;
+    if (status.isGranted) return true;
+    status = await Permission.microphone.request();
+    if (status.isGranted) return true;
+    print('microphone permission denied: $status');
+    Fluttertoast.showToast(
+      msg: status.isPermanentlyDenied
+          ? 'Microphone blocked. Enable it in Settings -> Apps -> OpenBot Controller.'
+          : 'Microphone permission is required for voice control.',
+    );
+    return false;
+  }
+
   // Opens mic only. Backend websocket is connected separately via
   // connectBackend()/disconnectBackend() (driven by device status).
   Future<bool> start() async {
@@ -56,6 +75,7 @@ class RealtimeService {
     _stopping = false;
     print('start requested');
     try {
+      if (!await _ensureMicPermission()) return false;
       await _ensureRecorderOpen();
       await _startMic();
       _setState(RealtimeState.listening);

@@ -25,7 +25,6 @@ function createWebSocketServer(httpServer) {
         const openaiWs = new WebSocket(OPENAI_WS_URL, {
             headers: {
                 'Authorization': `Bearer ${config.openai.apiKey}`,
-                'OpenAI-Beta': 'realtime=v1',
             },
         });
 

@@ -5,15 +5,20 @@ const { INSTRUCTIONS } = require('./instructions');
 const SESSION_CONFIG = {
     type: 'session.update',
     session: {
+        type: 'realtime',
         instructions: INSTRUCTIONS,       // robot control prompt loaded from instructions.js
-        modalities: ['text'],
-        input_audio_format: 'pcm16',
-        input_audio_transcription: { model: 'whisper-1' },
-        turn_detection: {
-            type: 'server_vad',
-            threshold: 0.5,
-            prefix_padding_ms: 300,
-            silence_duration_ms: 600,
+        output_modalities: ['text'],
+        audio: {
+            input: {
+                format: { type: 'audio/pcm', rate: 24000 },
+                transcription: { model: 'whisper-1' },
+                turn_detection: {
+                    type: 'server_vad',
+                    threshold: 0.5,
+                    prefix_padding_ms: 300,
+                    silence_duration_ms: 600,
+                },
+            },
         },
         tool_choice: 'required',          // model must always call a tool, never reply with text
         tools: [
