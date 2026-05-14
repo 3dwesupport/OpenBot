@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -15,7 +14,7 @@ class RealtimeService {
   static final RealtimeService instance = RealtimeService._();
 
   // Backend WebSocket URL — Node.js server on the local network
-  static const _wsUrl = 'ws://192.168.1.44:8000/ws/realtime';
+  static const _wsUrl = 'ws://192.168.1.34:8000/ws/realtime';
 
   WebSocket? _ws;
   StreamSubscription? _wsSub;
@@ -51,8 +50,6 @@ class RealtimeService {
     onStateChange?.call();
   }
 
-  /// Android 6+ / iOS require runtime consent; without it AudioRecord fails
-  /// (e.g. IAudioFlinger createRecord -1, native init status -20).
   Future<bool> _ensureMicPermission() async {
     if (!Platform.isAndroid && !Platform.isIOS) return true;
     var status = await Permission.microphone.status;
@@ -212,10 +209,10 @@ class RealtimeService {
         final l = ((cmd['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
         final secs = (cmd['seconds'] as num?)?.toInt();
         _driveTimer?.cancel();
-        clientSocket?.writeln('{driveCmd: {r:${r.toStringAsFixed(2)}, l:${l.toStringAsFixed(2)}}}');
+        _sendDriveJsonToRobot(r, l, multiplier: cmd['multiplier']);
         if (secs != null) {
           _driveTimer = Timer(Duration(seconds: secs), () {
-            clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
+            _sendDriveJsonToRobot(0, 0);
           });
         }
         break;
@@ -224,32 +221,31 @@ class RealtimeService {
       case 'stop':
         _driveTimer?.cancel();
         _routineCancelled = true;
-        clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
+        _sendDriveJsonToRobot(0, 0);
         break;
 
       // Controls the robot's turn signal LEDs
-      // Optional seconds: auto-stops indicator after N seconds
       case 'indicator':
         final side = cmd['side'] as String? ?? 'stop';
         final indicatorSecs = (cmd['seconds'] as num?)?.toInt();
-        if (side == 'left')       clientSocket?.writeln('{command: INDICATOR_LEFT}');
-        else if (side == 'right') clientSocket?.writeln('{command: INDICATOR_RIGHT}');
-        else                      clientSocket?.writeln('{command: INDICATOR_STOP}');
+        if (side == 'left') {
+          clientSocket?.writeln('{command: INDICATOR_LEFT}');
+        } else if (side == 'right') {
+          clientSocket?.writeln('{command: INDICATOR_RIGHT}');
+        } else {
+          clientSocket?.writeln('{command: INDICATOR_STOP}');
+        }
         if (indicatorSecs != null && side != 'stop') {
           Timer(Duration(seconds: indicatorSecs), () {
-            print("indicator stopped@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             clientSocket?.writeln('{command: INDICATOR_STOP}');
           });
         }
         break;
 
-      // Toggles between front and rear camera
       case 'camera':
         clientSocket?.writeln('{command: SWITCH_CAMERA}');
         break;
 
-      // Runs a multi-step timed sequence — steps execute one after another with delays
-      // Example: forward 15s → stop 3s → backward 5s
       case 'routine':
         final rawSteps = cmd['steps'];
         if (rawSteps is List) {
@@ -274,14 +270,18 @@ class RealtimeService {
       if (action == 'drive') {
         final r = ((step['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
         final l = ((step['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
-        clientSocket?.writeln('{driveCmd: {r:${r.toStringAsFixed(2)}, l:${l.toStringAsFixed(2)}}}');
+        _sendDriveJsonToRobot(r, l, multiplier: step['multiplier']);
       } else if (action == 'indicator') {
         final side = step['side'] as String? ?? 'stop';
-        if (side == 'left')       clientSocket?.writeln('{command: INDICATOR_LEFT}');
-        else if (side == 'right') clientSocket?.writeln('{command: INDICATOR_RIGHT}');
-        else                      clientSocket?.writeln('{command: INDICATOR_STOP}');
+        if (side == 'left') {
+          clientSocket?.writeln('{command: INDICATOR_LEFT}');
+        } else if (side == 'right') {
+          clientSocket?.writeln('{command: INDICATOR_RIGHT}');
+        } else {
+          clientSocket?.writeln('{command: INDICATOR_STOP}');
+        }
       } else {
-        clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
+        _sendDriveJsonToRobot(0, 0);
       }
 
       if (secs > 0) await Future.delayed(Duration(milliseconds: (secs * 1000).toInt()));
@@ -289,9 +289,22 @@ class RealtimeService {
 
     // Ensure actuators are left in a safe idle state after the sequence completes.
     if (!_routineCancelled) {
-      clientSocket?.writeln('{driveCmd: {r:0.00, l:0.00}}');
+      _sendDriveJsonToRobot(0, 0);
       clientSocket?.writeln('{command: INDICATOR_STOP}');
     }
+  }
+
+  void _sendDriveJsonToRobot(double r, double l, {dynamic multiplier}) {
+    final driveCmd = <String, dynamic>{
+      'r': double.parse(r.toStringAsFixed(2)),
+      'l': double.parse(l.toStringAsFixed(2)),
+    };
+    final payload = <String, dynamic>{'driveCmd': driveCmd};
+    final m = multiplier?.toString().trim();
+    if (m == 'S' || m == 'M' || m == 'F') {
+      payload['multiplier'] = m;
+    }
+    clientSocket?.writeln(jsonEncode(payload));
   }
 
   void _send(Map<String, dynamic> msg) {

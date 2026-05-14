@@ -517,7 +517,12 @@ public class AutopilotFragment extends CameraFragment {
         }
     }
 
-    private void setSpeedMode(Enums.SpeedMode speedMode) {
+    @Override
+    protected void applyRemoteSpeedMode(Enums.SpeedMode mode) {
+        setSpeedMode(mode);
+    }
+
+    protected void setSpeedMode(Enums.SpeedMode speedMode) {
         if (speedMode != null && !binding.autoSwitch.isChecked()) {
             switch (speedMode) {
                 case SLOW:

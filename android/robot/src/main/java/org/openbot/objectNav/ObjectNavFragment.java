@@ -596,7 +596,12 @@ public class ObjectNavFragment extends CameraFragment {
     return requireActivity().getFilesDir().list((dir1, name) -> name.endsWith(".tflite"));
   }
 
-  private void setSpeedMode(Enums.SpeedMode speedMode) {
+  @Override
+  protected void applyRemoteSpeedMode(Enums.SpeedMode mode) {
+    setSpeedMode(mode);
+  }
+
+  protected void setSpeedMode(Enums.SpeedMode speedMode) {
     if (speedMode != null) {
       switch (speedMode) {
         case SLOW:

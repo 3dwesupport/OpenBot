@@ -79,6 +79,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.OpenBotApplication;
 import org.openbot.R;
@@ -90,6 +91,7 @@ import org.openbot.env.ImageUtils;
 import org.openbot.env.Logger;
 import org.openbot.env.PhoneController;
 import org.openbot.env.SharedPreferencesManager;
+import org.openbot.common.ControlsFragment;
 import org.openbot.logging.LogDataUtils;
 import org.openbot.logging.SensorService;
 import org.openbot.server.ServerCommunication;
@@ -1309,10 +1311,23 @@ public abstract class CameraActivity extends AppCompatActivity
           }
           switch (commandType) {
             case "DRIVE_CMD":
-              JSONObject driveValue = commandJsn.getJSONObject("driveCmd");
-              controllerHandler.handleDriveCommand(
-                  Float.valueOf(driveValue.getString("l")),
-                  Float.valueOf(driveValue.getString("r")));
+              runOnUiThread(
+                  () -> {
+                    try {
+                      JSONObject driveValue = commandJsn.getJSONObject("driveCmd");
+                      if (commandJsn.has("multiplier")) {
+                        SpeedMode tier =
+                            ControlsFragment.speedModeFromMultiplierString(
+                                commandJsn.optString("multiplier", ""));
+                        if (tier != null) setSpeedMode(tier);
+                      }
+                      controllerHandler.handleDriveCommand(
+                          ControlsFragment.parseMotorJsonField(driveValue, "l"),
+                          ControlsFragment.parseMotorJsonField(driveValue, "r"));
+                    } catch (JSONException e) {
+                      Timber.e(e, "driveCmd parse");
+                    }
+                  });
               break;
 
             case "LOGS":

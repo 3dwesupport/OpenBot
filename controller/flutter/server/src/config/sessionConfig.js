@@ -32,8 +32,13 @@ const SESSION_CONFIG = {
                         r:       { type: 'number', description: 'Right motor -1.0 to 1.0' },
                         l:       { type: 'number', description: 'Left motor -1.0 to 1.0' },
                         seconds: { type: 'number', description: 'Auto-stop after N seconds. Omit for continuous.' },
+                        multiplier: {
+                            type: 'string',
+                            enum: ['S', 'M', 'F'],
+                            description: 'Speed tier only: S=slow(128), M=medium(192), F=fast(255). Required every drive(). Use M when user does not mention speed.',
+                        },
                     },
-                    required: ['r', 'l'],
+                    required: ['r', 'l', 'multiplier'],
                 },
             },
             {
@@ -76,6 +81,7 @@ const SESSION_CONFIG = {
                                     action:  { type: 'string', enum: ['drive', 'stop', 'indicator'] },
                                     r:       { type: 'number', description: 'Right motor -1.0 to 1.0' },
                                     l:       { type: 'number', description: 'Left motor -1.0 to 1.0' },
+                                    multiplier: { type: 'string', enum: ['S', 'M', 'F'] },
                                     side:    { type: 'string', enum: ['left', 'right', 'stop'] },
                                     seconds: { type: 'number' },
                                 },

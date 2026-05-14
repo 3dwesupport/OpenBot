@@ -198,7 +198,12 @@ public class FreeRoamFragment extends ControlsFragment {
     binding.driveGear.setText(vehicle.getDriveGear());
   }
 
-  private void setSpeedMode(SpeedMode speedMode) {
+  @Override
+  protected void applyRemoteSpeedMode(Enums.SpeedMode mode) {
+    setSpeedMode(mode);
+  }
+
+  protected void setSpeedMode(SpeedMode speedMode) {
     if (speedMode != null) {
       switch (speedMode) {
         case SLOW:

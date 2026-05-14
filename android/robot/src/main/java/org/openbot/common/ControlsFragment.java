@@ -19,10 +19,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.openbot.R;
 import org.openbot.env.AudioPlayer;
@@ -233,6 +235,45 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
     }
   }
 
+  public static float parseMotorJsonField(JSONObject driveValue, String key)
+      throws JSONException {
+    if (!driveValue.has(key)) return 0f;
+    Object v = driveValue.get(key);
+    if (v instanceof Number) return ((Number) v).floatValue();
+    return Float.parseFloat(String.valueOf(v));
+  }
+
+  public static Enums.SpeedMode speedModeFromMultiplierString(String multiplier) {
+    if (multiplier == null) return null;
+    switch (multiplier.trim().toUpperCase(Locale.US)) {
+      case "S":
+        return Enums.SpeedMode.SLOW;
+      case "M":
+        return Enums.SpeedMode.NORMAL;
+      case "F":
+        return Enums.SpeedMode.FAST;
+      default:
+        return null;
+    }
+  }
+
+  protected void applyRemoteSpeedMode(Enums.SpeedMode mode) {}
+
+  private void applyDriveCommandFromController(JSONObject event) {
+    try {
+      if (event.has("multiplier")) {
+        Enums.SpeedMode tier = speedModeFromMultiplierString(event.optString("multiplier", ""));
+        if (tier != null) applyRemoteSpeedMode(tier);
+      }
+      JSONObject driveValue = event.getJSONObject("driveCmd");
+      vehicle.setControl(
+          new Control(
+              parseMotorJsonField(driveValue, "l"), parseMotorJsonField(driveValue, "r")));
+    } catch (JSONException e) {
+      Timber.e(e, "driveCmd parse");
+    }
+  }
+
   private void handlePhoneControllerEvents() {
     ControllerToBotEventBus.subscribe(
         this.getClass().getSimpleName(),
@@ -252,45 +293,45 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
             }
           }
 
-          switch (commandType) {
-            case Constants.CMD_DRIVE:
-              JSONObject driveValue = event.getJSONObject("driveCmd");
+          if (Constants.CMD_DRIVE.equals(commandType)) {
+            requireActivity()
+                .runOnUiThread(
+                    () -> {
+                      applyDriveCommandFromController(event);
+                      processControllerKeyData(Constants.CMD_DRIVE);
+                    });
+          } else {
+            switch (commandType) {
+              case Constants.CMD_INDICATOR_LEFT:
+                toggleIndicatorEvent(Enums.VehicleIndicator.LEFT.getValue());
+                break;
 
-              vehicle.setControl(
-                  new Control(
-                      Float.parseFloat(driveValue.getString("l")),
-                      Float.parseFloat(driveValue.getString("r"))));
-              break;
+              case Constants.CMD_INDICATOR_RIGHT:
+                toggleIndicatorEvent(Enums.VehicleIndicator.RIGHT.getValue());
+                break;
 
-            case Constants.CMD_INDICATOR_LEFT:
-              toggleIndicatorEvent(Enums.VehicleIndicator.LEFT.getValue());
-              break;
+              case Constants.CMD_INDICATOR_STOP:
+                toggleIndicatorEvent(Enums.VehicleIndicator.STOP.getValue());
+                break;
 
-            case Constants.CMD_INDICATOR_RIGHT:
-              toggleIndicatorEvent(Enums.VehicleIndicator.RIGHT.getValue());
-              break;
+                // We re connected to the controller, send back status info
+              case Constants.CMD_CONNECTED:
+                // PhoneController class will receive this event and resent it to the
+                // controller.
+                // Other controllers can subscribe to this event as well.
+                // That is why we are not calling phoneController.send() here directly.
+                BotToControllerEventBus.emitEvent(
+                    ConnectionUtils.getStatus(
+                        false, false, false, currentDriveMode.toString(), vehicle.getIndicator()));
+                break;
 
-            case Constants.CMD_INDICATOR_STOP:
-              toggleIndicatorEvent(Enums.VehicleIndicator.STOP.getValue());
-              break;
+              case Constants.CMD_DISCONNECTED:
+                vehicle.setControl(0, 0);
+                break;
+            }
 
-              // We re connected to the controller, send back status info
-            case Constants.CMD_CONNECTED:
-              // PhoneController class will receive this event and resent it to the
-              // controller.
-              // Other controllers can subscribe to this event as well.
-              // That is why we are not calling phoneController.send() here directly.
-              BotToControllerEventBus.emitEvent(
-                  ConnectionUtils.getStatus(
-                      false, false, false, currentDriveMode.toString(), vehicle.getIndicator()));
-              break;
-
-            case Constants.CMD_DISCONNECTED:
-              vehicle.setControl(0, 0);
-              break;
+            processControllerKeyData(commandType);
           }
-
-          processControllerKeyData(commandType);
         },
         error -> {
           Log.d(null, "Error occurred in ControllerToBotEventBus: " + error);
