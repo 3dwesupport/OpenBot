@@ -199,53 +199,85 @@ class RealtimeService {
     }
   }
 
+  /// Parses r/l from [m], sends drive JSON. When [manageAutoStopTimer] is true
+  /// (standalone websocket commands), clears any prior drive timer and optional
+  /// `seconds` starts a timer to send neutral throttle. Routines pass false so
+  /// `seconds` on a step only gates delay between steps.
+  void _driveFromMap(Map<String, dynamic> m, {required bool manageAutoStopTimer}) {
+    final r = ((m['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
+    final l = ((m['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
+    if (manageAutoStopTimer) _driveTimer?.cancel();
+    _sendDriveJsonToRobot(r, l, multiplier: m['multiplier']);
+    if (manageAutoStopTimer) {
+      final secs = (m['seconds'] as num?)?.toInt();
+      if (secs != null) {
+        _driveTimer = Timer(Duration(seconds: secs), () {
+          _sendDriveJsonToRobot(0, 0);
+        });
+      }
+    }
+  }
+
+  void _sendIndicatorSide(String side) {
+    if (side == 'left') {
+      clientSocket?.writeln('{command: INDICATOR_LEFT}');
+    } else if (side == 'right') {
+      clientSocket?.writeln('{command: INDICATOR_RIGHT}');
+    } else {
+      clientSocket?.writeln('{command: INDICATOR_STOP}');
+    }
+  }
+
+  /// When [scheduleAutoStop] is true, optional `seconds` schedules INDICATOR_STOP.
+  /// Routines use false so indicator timing is driven only by step delays.
+  void _indicatorFromMap(Map<String, dynamic> m, {required bool scheduleAutoStop}) {
+    final side = m['side'] as String? ?? 'stop';
+    _sendIndicatorSide(side);
+    if (scheduleAutoStop) {
+      final indicatorSecs = (m['seconds'] as num?)?.toInt();
+      if (indicatorSecs != null && side != 'stop') {
+        Timer(Duration(seconds: indicatorSecs), () {
+          clientSocket?.writeln('{command: INDICATOR_STOP}');
+        });
+      }
+    }
+  }
+
+  /// Stops motors; [cancelRoutine] is true for explicit `stop` websocket commands.
+  void _haltMotors({required bool cancelRoutine}) {
+    _driveTimer?.cancel();
+    if (cancelRoutine) _routineCancelled = true;
+    _sendDriveJsonToRobot(0, 0);
+  }
+
+  void _applyRoutineStep(Map<String, dynamic> step) {
+    switch (step['action'] as String? ?? 'stop') {
+      case 'drive':
+        _driveFromMap(step, manageAutoStopTimer: false);
+        break;
+      case 'indicator':
+        _indicatorFromMap(step, scheduleAutoStop: false);
+        break;
+      default:
+        _haltMotors(cancelRoutine: false);
+        break;
+    }
+  }
+
   void _executeCommand(Map<String, dynamic> cmd) {
     switch (cmd['action'] as String? ?? '') {
-
-      // Drives the robot — r/l range -1.0 (reverse) to 1.0 (forward)
-      // Optional seconds: auto-stops motors after the given duration
       case 'drive':
-        final r = ((cmd['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
-        final l = ((cmd['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
-        final secs = (cmd['seconds'] as num?)?.toInt();
-        _driveTimer?.cancel();
-        _sendDriveJsonToRobot(r, l, multiplier: cmd['multiplier']);
-        if (secs != null) {
-          _driveTimer = Timer(Duration(seconds: secs), () {
-            _sendDriveJsonToRobot(0, 0);
-          });
-        }
+        _driveFromMap(cmd, manageAutoStopTimer: true);
         break;
-
-      // Halts motors immediately and cancels any running routine
       case 'stop':
-        _driveTimer?.cancel();
-        _routineCancelled = true;
-        _sendDriveJsonToRobot(0, 0);
+        _haltMotors(cancelRoutine: true);
         break;
-
-      // Controls the robot's turn signal LEDs
       case 'indicator':
-        final side = cmd['side'] as String? ?? 'stop';
-        final indicatorSecs = (cmd['seconds'] as num?)?.toInt();
-        if (side == 'left') {
-          clientSocket?.writeln('{command: INDICATOR_LEFT}');
-        } else if (side == 'right') {
-          clientSocket?.writeln('{command: INDICATOR_RIGHT}');
-        } else {
-          clientSocket?.writeln('{command: INDICATOR_STOP}');
-        }
-        if (indicatorSecs != null && side != 'stop') {
-          Timer(Duration(seconds: indicatorSecs), () {
-            clientSocket?.writeln('{command: INDICATOR_STOP}');
-          });
-        }
+        _indicatorFromMap(cmd, scheduleAutoStop: true);
         break;
-
       case 'camera':
         clientSocket?.writeln('{command: SWITCH_CAMERA}');
         break;
-
       case 'routine':
         final rawSteps = cmd['steps'];
         if (rawSteps is List) {
@@ -263,31 +295,13 @@ class RealtimeService {
 
     for (final step in steps) {
       if (_routineCancelled) break;
-
-      final action = step['action'] as String? ?? 'stop';
-      final secs   = ((step['seconds'] as num?) ?? 0).toDouble();
-
-      if (action == 'drive') {
-        final r = ((step['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
-        final l = ((step['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
-        _sendDriveJsonToRobot(r, l, multiplier: step['multiplier']);
-      } else if (action == 'indicator') {
-        final side = step['side'] as String? ?? 'stop';
-        if (side == 'left') {
-          clientSocket?.writeln('{command: INDICATOR_LEFT}');
-        } else if (side == 'right') {
-          clientSocket?.writeln('{command: INDICATOR_RIGHT}');
-        } else {
-          clientSocket?.writeln('{command: INDICATOR_STOP}');
-        }
-      } else {
-        _sendDriveJsonToRobot(0, 0);
+      final secs = ((step['seconds'] as num?) ?? 0).toDouble();
+      _applyRoutineStep(step);
+      if (secs > 0) {
+        await Future.delayed(Duration(milliseconds: (secs * 1000).toInt()));
       }
-
-      if (secs > 0) await Future.delayed(Duration(milliseconds: (secs * 1000).toInt()));
     }
 
-    // Ensure actuators are left in a safe idle state after the sequence completes.
     if (!_routineCancelled) {
       _sendDriveJsonToRobot(0, 0);
       clientSocket?.writeln('{command: INDICATOR_STOP}');
