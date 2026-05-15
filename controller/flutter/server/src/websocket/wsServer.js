@@ -6,7 +6,7 @@ const logger = require('../utils/logger');
 const config = require('../config');
 const { SESSION_CONFIG } = require('../config/sessionConfig');
 
-const OPENAI_WS_URL = 'wss://api.openai.com/v1/realtime?model=gpt-4o-mini-realtime-preview';
+const OPENAI_WS_URL = 'wss://api.openai.com/v1/realtime?model=gpt-realtime-mini';
 
 function createWebSocketServer(httpServer) {
     const wss = new WebSocketServer({ server: httpServer, path: '/ws/realtime' });
