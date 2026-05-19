@@ -31,6 +31,10 @@ class RealtimeService {
   bool _stopping = false;
   bool _routineCancelled = false;   // set to true by stop() to abort an active routine mid-sequence
 
+  // PCM sent since last response_done (~100ms @ 24kHz mono 16-bit minimum to commit on PTT release)
+  static const int _minCommitBytes = 4800;
+  int _audioBytesSinceResponse = 0;
+
   RealtimeState _state = RealtimeState.idle;
 
   VoidCallback? onStateChange;
@@ -70,6 +74,7 @@ class RealtimeService {
   Future<bool> start() async {
     if (!isIdle) return false;
     _stopping = false;
+    _audioBytesSinceResponse = 0;
     print('start requested');
     try {
       if (!await _ensureMicPermission()) return false;
@@ -137,9 +142,16 @@ class RealtimeService {
 
   Future<void> commitAndStop() async {
     if (isIdle) return;
-    print('commitAndStop requested');
+    print('commitAndStop requested (audio since last response: $_audioBytesSinceResponse bytes)');
     _commitPending = false;
-    _send({'type': 'commit'});
+    // Server VAD may already have handled speech during the hold; avoid a second
+    // commit on release with only silence — that often repeats the last drive().
+    if (_audioBytesSinceResponse >= _minCommitBytes) {
+      _send({'type': 'commit'});
+    } else {
+      print('skip commit on release — no new speech after last response');
+      _send({'type': 'clear'});
+    }
     await _stopMic();
     _setState(RealtimeState.idle);
   }
@@ -187,9 +199,12 @@ class RealtimeService {
       print('incoming websocket message: $type');
       switch (type) {
         case 'robot_command':
+          // New audio after this point counts toward the next PTT release commit
+          _audioBytesSinceResponse = 0;
           _executeCommand(msg);
           break;
         case 'response_done':
+          _audioBytesSinceResponse = 0;
           if (isProcessing) _setState(RealtimeState.listening);
           onResponseDone?.call();
           break;
@@ -359,6 +374,7 @@ class RealtimeService {
         offset += chunk.length;
       }
       _audioBatch.clear();
+      _audioBytesSinceResponse += merged.length;
       _send({'type': 'audio', 'data': base64Encode(merged)});
     });
     await _recorder.startRecorder(

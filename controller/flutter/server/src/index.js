@@ -9,6 +9,7 @@ const { setupWebSocketServer } = require('./websocket/wsServer');
 
 const app = createApp();
 const httpServer = http.createServer(app);
+// Realtime voice: /ws/realtime (see websocket/wsServer.js)
 setupWebSocketServer(httpServer);
 
 httpServer.once('error', (err) => {

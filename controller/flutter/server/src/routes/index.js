@@ -1,11 +1,10 @@
 'use strict';
 
 const router = require('express').Router();
-
 const healthRouter = require('./health');
-const messagesRouter = require('./messages');
+
+// HTTP only; realtime voice uses WebSocket /ws/realtime
 
 router.use('/', healthRouter);
-router.use('/api/messages', messagesRouter);
 
 module.exports = router;

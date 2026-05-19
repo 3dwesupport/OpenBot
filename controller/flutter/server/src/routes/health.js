@@ -1,8 +1,7 @@
 'use strict';
 
-const router    = require('express').Router();
-const registry  = require('../services/clientRegistry');
-const startedAt = new Date();
+// Liveness / readiness for deploy (Render, etc.) — no auth
+const router = require('express').Router();
 
 router.get('/', (_req, res) => {
     res.json({
@@ -11,8 +10,8 @@ router.get('/', (_req, res) => {
         version: '1.0.0',
         uptime: process.uptime(),
         endpoints: {
-            health:    'GET /health',
-            ready:     'GET /ready',
+            health: 'GET /health',
+            ready: 'GET /ready',
         },
     });
 });
@@ -24,7 +23,5 @@ router.get('/health', (_req, res) => {
 router.get('/ready', (_req, res) => {
     res.json({ status: 'ready' });
 });
-
-const mb = (bytes) => `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 
 module.exports = router;

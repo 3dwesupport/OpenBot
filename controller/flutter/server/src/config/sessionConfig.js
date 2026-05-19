@@ -2,6 +2,7 @@
 
 const { INSTRUCTIONS } = require('./instructions');
 
+/* Sent to OpenAI on upstream connect — tools map to robot_command on the app */
 const SESSION_CONFIG = {
     type: 'session.update',
     session: {

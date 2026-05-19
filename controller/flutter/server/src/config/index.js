@@ -32,6 +32,14 @@ const config = {
 
     openai: {
         apiKey: process.env.OPENAI_API_KEY || '',
+        realtimeModel: process.env.REALTIME_MODEL || 'gpt-realtime-mini',
+        connectTimeoutMs: parseInt(process.env.OPENAI_CONNECT_TIMEOUT_MS, 10) || 15_000,
+        maxPendingAudioChunks: parseInt(process.env.MAX_PENDING_AUDIO_CHUNKS, 10) || 200,
+        maxPendingAudioBytes: parseInt(process.env.MAX_PENDING_AUDIO_BYTES, 10) || 2_000_000,
+        /* Built from realtimeModel; used by wsServer when opening upstream WebSocket */
+        get realtimeUrl() {
+            return `wss://api.openai.com/v1/realtime?model=${this.realtimeModel}`;
+        },
     },
 };
 
