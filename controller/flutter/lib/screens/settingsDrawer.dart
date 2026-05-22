@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
 
+/// Side menu — drive mode, noise, network server pick.
 class SettingsDrawer extends StatefulWidget {
   final List<Service> networkServices;
   final Function(bool, bool) onSettingsChanged;
@@ -19,7 +20,7 @@ class _SettingsDrawerState extends State<SettingsDrawer> {
   bool isNoise = false;
   bool isNetwork = false;
 
-  // Function to generate DropdownMenuItem widgets
+  /// NSD services for the network dropdown.
   List<DropdownMenuItem<String>> buildDropdownMenuItems() {
     items = [
       DropdownMenuItem(

@@ -4,15 +4,24 @@ import 'package:openbot_controller/buttonCommands/buttonCommands.dart';
 import 'package:openbot_controller/screens/component/blinkingButton.dart';
 import 'package:openbot_controller/globals.dart';
 
+/// Bottom row: mirror, speaker, camera, indicators, logs, network, lights.
 class OnScreenIcon extends StatefulWidget {
   final dynamic updateMirrorView;
   final bool indicatorLeft;
   final bool indicatorRight;
+  final bool lightsActive;
+  final VoidCallback onLightsTap;
   final RTCPeerConnection? peerConnection;
   final String fragmentType;
 
-  const OnScreenIcon(this.updateMirrorView, this.indicatorLeft,
-      this.indicatorRight, this.peerConnection, this.fragmentType,
+  const OnScreenIcon(
+      this.updateMirrorView,
+      this.indicatorLeft,
+      this.indicatorRight,
+      this.lightsActive,
+      this.onLightsTap,
+      this.peerConnection,
+      this.fragmentType,
       {super.key});
 
   @override
@@ -29,22 +38,34 @@ class OnScreenIconState extends State<OnScreenIcon> {
   String typeOfFragment = "";
 
   @override
+  void initState() {
+    super.initState();
+    leftIndicator = widget.indicatorLeft;
+    rightIndicator = widget.indicatorRight;
+    typeOfFragment = widget.fragmentType;
+  }
+
+  @override
   void didUpdateWidget(covariant OnScreenIcon oldWidget) {
-    // TODO: implement didUpdateWidget
-    setState(() {
-      leftIndicator = widget.indicatorLeft;
-      rightIndicator = widget.indicatorRight;
-      typeOfFragment = widget.fragmentType;
-    });
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.indicatorLeft != widget.indicatorLeft ||
+        oldWidget.indicatorRight != widget.indicatorRight ||
+        oldWidget.fragmentType != widget.fragmentType) {
+      setState(() {
+        leftIndicator = widget.indicatorLeft;
+        rightIndicator = widget.indicatorRight;
+        typeOfFragment = widget.fragmentType;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    /// SD logs only in data-collection mode.
     final bool isLogsEnabled = typeOfFragment == "DataCollection";
+    /// Network picker only in autopilot / object-detection modes.
     final bool isNetworkEnabled =
         typeOfFragment == "Autopilot" || typeOfFragment == "ObjectDetection";
-
     return SizedBox(
       child: Row(
         children: [
@@ -54,7 +75,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                   mirrorView = !mirrorView;
                   widget.updateMirrorView.call();
                 });
-              }, // Image tapped
+              },
               child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
@@ -91,10 +112,8 @@ class OnScreenIconState extends State<OnScreenIcon> {
                     }
                   }
                 }
-              }, // Image tapped
+              },
               child: Container(
-                // height: 50,
-                // width: 50,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(45),
@@ -117,7 +136,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
               borderRadius: const BorderRadius.all(Radius.circular(45)),
               onTap: () {
                 ButtonCommands.toSwitchCamera();
-              }, // Image tapped
+              },
               child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
@@ -145,7 +164,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                     ButtonCommands.toLeftIndicator();
                   }
                 }
-              }, // Image tapped
+              },
               child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
@@ -155,7 +174,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                       : Colors.white.withOpacity(0.5),
                 ),
                 child: leftIndicator
-                    ? const MyBlinkingButton("LEFT")
+                    ? const MyBlinkingButton(isLeft: true)
                     : Image.asset(
                         "images/left_indicator_icon_blue.png",
                         height: 23,
@@ -177,7 +196,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                     ButtonCommands.toRightIndicator();
                   }
                 }
-              }, // Image tapped
+              },
               child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
@@ -187,7 +206,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                       : Colors.white.withOpacity(0.5),
                 ),
                 child: rightIndicator
-                    ? const MyBlinkingButton("RIGHT")
+                    ? const MyBlinkingButton(isLeft: false)
                     : Image.asset(
                         "images/right_indicator_icon_blue.png",
                         height: 23,
@@ -207,7 +226,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                     ? () {
                         clientSocket?.writeln("{command: LOGS}");
                       }
-                    : null, // Image tapped
+                    : null,
                 child: Ink(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -235,7 +254,7 @@ class OnScreenIconState extends State<OnScreenIcon> {
                     ? () {
                         clientSocket?.writeln("{command: NETWORK}");
                       }
-                    : null, // Image tapped
+                    : null,
                 child: Ink(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -248,6 +267,25 @@ class OnScreenIconState extends State<OnScreenIcon> {
                       color: isNetworkEnabled
                           ? Colors.white
                           : Colors.blue),
+                ),
+              )),
+          const SizedBox(width: 15),
+          GestureDetector(
+              onTap: widget.onLightsTap,
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(45),
+                  color: widget.lightsActive
+                      ? const Color(0xFF0071C5).withOpacity(0.5)
+                      : Colors.white.withOpacity(0.5),
+                ),
+                child: Icon(
+                  widget.lightsActive
+                      ? Icons.flashlight_on
+                      : Icons.flashlight_on_outlined,
+                  size: 23,
+                  color: widget.lightsActive ? Colors.white : Colors.blue,
                 ),
               )),
         ],

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+/// Forward/reverse level for tilt mode pedals (-1 to 1).
 class ForwardSpeed {
   static const max = 1.0;
   static const min = 0.0;
@@ -30,6 +31,7 @@ class ForwardSpeed {
     }
   }
 
+  /// Back to stop after pedal release.
   static void reset() {
     value = 0;
   }

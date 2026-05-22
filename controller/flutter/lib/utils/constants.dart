@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
-import '../screens/Controller.dart';
+final utf8encoder = Utf8Encoder();
 
+/// WebRTC and NSD registration defaults.
 class Constants {
   static Map<String, Uint8List?> textAttribute = <String, Uint8List?>{
     'a-string': utf8encoder.convert('κόσμε'),

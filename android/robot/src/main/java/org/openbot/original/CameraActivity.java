@@ -85,6 +85,7 @@ import org.openbot.OpenBotApplication;
 import org.openbot.R;
 import org.openbot.env.AudioPlayer;
 import org.openbot.env.BotToControllerEventBus;
+import org.openbot.env.LightCommands;
 import org.openbot.env.ControllerToBotEventBus;
 import org.openbot.env.GameController;
 import org.openbot.env.ImageUtils;
@@ -1308,6 +1309,9 @@ public abstract class CameraActivity extends AppCompatActivity
             commandType = commandJsn.getString("command");
           } else if (commandJsn.has("driveCmd")) {
             commandType = "DRIVE_CMD";
+          } else if (commandJsn.has("ledCmd")) {
+            runOnUiThread(() -> applyLedCommandFromController(commandJsn));
+            return;
           }
           switch (commandType) {
             case "DRIVE_CMD":
@@ -1350,6 +1354,26 @@ public abstract class CameraActivity extends AppCompatActivity
               controllerHandler.handleIndicatorStop();
               break;
 
+            case Constants.CMD_LED_ON:
+              runOnUiThread(
+                  () -> {
+                    vehicle.sendLightIntensity(1f, 1f);
+                    LightCommands.broadcastBrightnessToController(100);
+                  });
+              break;
+
+            case Constants.CMD_LED_OFF:
+              runOnUiThread(
+                  () -> {
+                    vehicle.sendLightIntensity(0f, 0f);
+                    LightCommands.broadcastBrightnessToController(0);
+                  });
+              break;
+
+            case Constants.CMD_LED_BRIGHTNESS:
+              runOnUiThread(() -> applyLedBrightnessFromController(commandJsn));
+              break;
+
             case "NETWORK":
               controllerHandler.handleNetwork();
               break;
@@ -1371,6 +1395,8 @@ public abstract class CameraActivity extends AppCompatActivity
                       networkEnabled,
                       driveMode.toString(),
                       vehicle.getIndicator()));
+              LightCommands.broadcastBrightnessToController(
+                  vehicle.getLedBrightnessPercent());
 
               break;
 
@@ -1383,8 +1409,37 @@ public abstract class CameraActivity extends AppCompatActivity
         error -> {
           Log.d(null, "Error occurred in ControllerToBotEventBus: " + error);
         },
-        event -> event.has("command") || event.has("driveCmd") // filter everything else
+        event ->
+            event.has("command") || event.has("driveCmd") || event.has("ledCmd")
         );
+  }
+
+  private void applyLedCommandFromController(JSONObject commandJsn) {
+    try {
+      JSONObject ledValue = commandJsn.getJSONObject("ledCmd");
+      float front = ControlsFragment.parseMotorJsonField(ledValue, "f");
+      float back = ControlsFragment.parseMotorJsonField(ledValue, "b");
+      int percent =
+          (front > 1f || back > 1f)
+              ? Math.round((front + back) / 2f)
+              : Math.round(((front + back) / 2f) * 100f);
+      LightCommands.applyPercentSliderValue(vehicle, percent);
+    } catch (JSONException e) {
+      Timber.e(e, "ledCmd parse");
+    }
+  }
+
+  private void applyLedBrightnessFromController(JSONObject commandJsn) {
+    if (!commandJsn.has("value")) {
+      return;
+    }
+    int percent;
+    try {
+      percent = (int) Math.round(commandJsn.getDouble("value"));
+    } catch (JSONException e) {
+      percent = commandJsn.optInt("value", 0);
+    }
+    LightCommands.applyPercentSliderValue(vehicle, percent);
   }
 
   private void sendIndicatorStatus(Integer status) {

@@ -39,6 +39,10 @@ public class Constants {
   public static final String CMD_INDICATOR_LEFT = "INDICATOR_LEFT";
   public static final String CMD_INDICATOR_RIGHT = "INDICATOR_RIGHT";
   public static final String CMD_INDICATOR_STOP = "INDICATOR_STOP";
+  public static final String CMD_LED_ON = "LED_ON";
+  public static final String CMD_LED_OFF = "LED_OFF";
+  public static final String CMD_LED_BRIGHTNESS = "LED_BRIGHTNESS";
+  public static final String STATUS_LED_BRIGHTNESS = "LED_BRIGHTNESS";
   public static final String CMD_NETWORK = "NETWORK";
   public static final String CMD_DRIVE_MODE = "DRIVE_MODE";
   public static final String CMD_CONNECTED = "CONNECTED";

@@ -30,6 +30,7 @@ import org.openbot.R;
 import org.openbot.env.AudioPlayer;
 import org.openbot.env.BotToControllerEventBus;
 import org.openbot.env.ControllerToBotEventBus;
+import org.openbot.env.LightCommands;
 import org.openbot.env.PhoneController;
 import org.openbot.env.SharedPreferencesManager;
 import org.openbot.main.MainViewModel;
@@ -274,6 +275,34 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
     }
   }
 
+  private void applyLedCommandFromController(JSONObject event) {
+    try {
+      JSONObject ledValue = event.getJSONObject("ledCmd");
+      float front = parseMotorJsonField(ledValue, "f");
+      float back = parseMotorJsonField(ledValue, "b");
+      int percent =
+          (front > 1f || back > 1f)
+              ? Math.round((front + back) / 2f)
+              : Math.round(((front + back) / 2f) * 100f);
+      LightCommands.applyPercentSliderValue(vehicle, percent);
+    } catch (JSONException e) {
+      Timber.e(e, "ledCmd parse");
+    }
+  }
+
+  private void applyLedBrightnessFromController(JSONObject event) {
+    if (!event.has("value")) {
+      return;
+    }
+    int percent;
+    try {
+      percent = (int) Math.round(event.getDouble("value"));
+    } catch (JSONException e) {
+      percent = event.optInt("value", 0);
+    }
+    LightCommands.applyPercentSliderValue(vehicle, percent);
+  }
+
   private void handlePhoneControllerEvents() {
     ControllerToBotEventBus.subscribe(
         this.getClass().getSimpleName(),
@@ -283,6 +312,9 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
             commandType = event.getString("command");
           } else if (event.has("driveCmd")) {
             commandType = Constants.CMD_DRIVE;
+          } else if (event.has("ledCmd")) {
+            requireActivity().runOnUiThread(() -> applyLedCommandFromController(event));
+            return;
           } else if (event.has("server")) {
             for (int i = 0; i < serverSpinner.getAdapter().getCount(); i++) {
               if(event.getString("server").equals("noServerFound")){
@@ -314,6 +346,18 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
                 toggleIndicatorEvent(Enums.VehicleIndicator.STOP.getValue());
                 break;
 
+              case Constants.CMD_LED_ON:
+                LightCommands.applyPercentSliderValue(vehicle, 100);
+                break;
+
+              case Constants.CMD_LED_OFF:
+                LightCommands.applyPercentSliderValue(vehicle, 0);
+                break;
+
+              case Constants.CMD_LED_BRIGHTNESS:
+                applyLedBrightnessFromController(event);
+                break;
+
                 // We re connected to the controller, send back status info
               case Constants.CMD_CONNECTED:
                 // PhoneController class will receive this event and resent it to the
@@ -323,6 +367,7 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
                 BotToControllerEventBus.emitEvent(
                     ConnectionUtils.getStatus(
                         false, false, false, currentDriveMode.toString(), vehicle.getIndicator()));
+                LightCommands.broadcastBrightnessToController(vehicle.getLedBrightnessPercent());
                 break;
 
               case Constants.CMD_DISCONNECTED:
@@ -336,7 +381,8 @@ public abstract class ControlsFragment extends Fragment implements ServerListene
         error -> {
           Log.d(null, "Error occurred in ControllerToBotEventBus: " + error);
         },
-        event -> event.has("command") || event.has("driveCmd") || event.has("server") // filter out everything else
+        event ->
+            event.has("command") || event.has("driveCmd") || event.has("ledCmd") || event.has("server")
         );
   }
 

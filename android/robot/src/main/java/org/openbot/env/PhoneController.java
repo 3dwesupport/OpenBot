@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openbot.OpenBotApplication;
 import org.openbot.R;
 import org.openbot.customview.AutoFitSurfaceGlView;
 import org.openbot.customview.WebRTCSurfaceView;
@@ -52,6 +53,10 @@ public class PhoneController {
   class DataReceived implements IDataReceived {
     @Override
     public void dataReceived(String commandStr) {
+      if (OpenBotApplication.vehicle != null
+          && LightCommands.setVehicleBrightness(commandStr, OpenBotApplication.vehicle)) {
+        return;
+      }
       ControllerToBotEventBus.emitEvent(commandStr);
     }
   }

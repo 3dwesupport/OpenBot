@@ -4,17 +4,18 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:openbot_controller/buttonCommands/buttonCommands.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 enum RealtimeState { idle, listening, processing }
 
+/// Mic → websocket → AI drives the robot from voice.
 class RealtimeService {
   RealtimeService._();
   static final RealtimeService instance = RealtimeService._();
 
-  // Backend WebSocket URL — Node.js server on the local network
-  static const _wsUrl = 'ws://192.168.1.34:8000/ws/realtime';
+  static const _wsUrl = 'ws://192.168.1.19:8000/ws/realtime';
 
   WebSocket? _ws;
   StreamSubscription? _wsSub;
@@ -26,12 +27,12 @@ class RealtimeService {
   final List<Uint8List> _audioBatch = [];
   Timer? _batchTimer;
   Timer? _driveTimer;               // auto-stops robot after drive(seconds: N)
+  Timer? _lightsTimer;              // auto-dims lights after lights(seconds: N)
 
   bool _commitPending = false;
   bool _stopping = false;
-  bool _routineCancelled = false;   // set to true by stop() to abort an active routine mid-sequence
+  bool _routineCancelled = false;
 
-  // PCM sent since last response_done (~100ms @ 24kHz mono 16-bit minimum to commit on PTT release)
   static const int _minCommitBytes = 4800;
   int _audioBytesSinceResponse = 0;
 
@@ -39,6 +40,8 @@ class RealtimeService {
 
   VoidCallback? onStateChange;
   VoidCallback? onResponseDone;
+  /// Called with brightness 0–100 so the torch button stays in sync.
+  void Function(int percent)? onLightsChanged;
 
   RealtimeState get state => _state;
   bool get isIdle => _state == RealtimeState.idle;
@@ -58,19 +61,38 @@ class RealtimeService {
     if (!Platform.isAndroid && !Platform.isIOS) return true;
     var status = await Permission.microphone.status;
     if (status.isGranted) return true;
+
+    if (status.isPermanentlyDenied || status.isRestricted) {
+      print('microphone permission denied: $status');
+      Fluttertoast.showToast(
+        msg: Platform.isIOS
+            ? 'Microphone blocked. Open Settings → Openbot Controller → Microphone.'
+            : 'Microphone blocked. Enable it in Settings → Apps → OpenBot Controller.',
+      );
+      await openAppSettings();
+      return false;
+    }
+
     status = await Permission.microphone.request();
     if (status.isGranted) return true;
+
     print('microphone permission denied: $status');
-    Fluttertoast.showToast(
-      msg: status.isPermanentlyDenied
-          ? 'Microphone blocked. Enable it in Settings -> Apps -> OpenBot Controller.'
-          : 'Microphone permission is required for voice control.',
-    );
+    if (status.isPermanentlyDenied || status.isRestricted) {
+      Fluttertoast.showToast(
+        msg: Platform.isIOS
+            ? 'Microphone blocked. Open Settings → Openbot Controller → Microphone.'
+            : 'Microphone blocked. Enable it in Settings → Apps → OpenBot Controller.',
+      );
+      await openAppSettings();
+    } else {
+      Fluttertoast.showToast(
+        msg: 'Microphone permission is required for voice control.',
+      );
+    }
     return false;
   }
 
-  // Opens mic only. Backend websocket is connected separately via
-  // connectBackend()/disconnectBackend() (driven by device status).
+  /// Open mic and start streaming (PTT or always-on).
   Future<bool> start() async {
     if (!isIdle) return false;
     _stopping = false;
@@ -140,12 +162,11 @@ class RealtimeService {
     print('websocket closed');
   }
 
+  /// PTT released — send audio and wait for reply.
   Future<void> commitAndStop() async {
     if (isIdle) return;
     print('commitAndStop requested (audio since last response: $_audioBytesSinceResponse bytes)');
     _commitPending = false;
-    // Server VAD may already have handled speech during the hold; avoid a second
-    // commit on release with only silence — that often repeats the last drive().
     if (_audioBytesSinceResponse >= _minCommitBytes) {
       _send({'type': 'commit'});
     } else {
@@ -156,6 +177,7 @@ class RealtimeService {
     _setState(RealtimeState.idle);
   }
 
+  /// Send commit to the voice backend (queued if websocket not ready).
   void commit() {
     if (isListening) {
       _setState(RealtimeState.processing);
@@ -165,6 +187,7 @@ class RealtimeService {
     }
   }
 
+  /// Stop mic; optional full backend teardown.
   Future<void> stop({bool disconnectBackend = false}) async {
     if (isIdle) return;
     print('stop requested');
@@ -173,15 +196,18 @@ class RealtimeService {
     if (disconnectBackend) _closeWs('stop');
     await _stopMic();
     _driveTimer?.cancel();
+    _lightsTimer?.cancel();
     _setState(RealtimeState.idle);
   }
 
+  /// Connect websocket when video session is live.
   Future<void> connectBackend() async {
     print('connectBackend requested');
     _stopping = false;
     await _connectWs();
   }
 
+  /// Drop websocket when robot disconnects.
   Future<void> disconnectBackend() async {
     print('disconnectBackend requested');
     _stopping = true;
@@ -199,7 +225,6 @@ class RealtimeService {
       print('incoming websocket message: $type');
       switch (type) {
         case 'robot_command':
-          // New audio after this point counts toward the next PTT release commit
           _audioBytesSinceResponse = 0;
           _executeCommand(msg);
           break;
@@ -214,10 +239,7 @@ class RealtimeService {
     }
   }
 
-  /// Parses r/l from [m], sends drive JSON. When [manageAutoStopTimer] is true
-  /// (standalone websocket commands), clears any prior drive timer and optional
-  /// `seconds` starts a timer to send neutral throttle. Routines pass false so
-  /// `seconds` on a step only gates delay between steps.
+  /// Parses r/l from [m], sends drive JSON.
   void _driveFromMap(Map<String, dynamic> m, {required bool manageAutoStopTimer}) {
     final r = ((m['r'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
     final l = ((m['l'] as num?) ?? 0).toDouble().clamp(-1.0, 1.0);
@@ -243,8 +265,28 @@ class RealtimeService {
     }
   }
 
-  /// When [scheduleAutoStop] is true, optional `seconds` schedules INDICATOR_STOP.
-  /// Routines use false so indicator timing is driven only by step delays.
+  void _applyLightsLevel(int percent) {
+    final level = percent.clamp(0, 100);
+    ButtonCommands.setLedBrightness(level);
+    onLightsChanged?.call(level);
+  }
+
+  /// Sends LIGHT:percent; optional `seconds` turns off after N seconds.
+  void _lightsFromMap(Map<String, dynamic> m, {required bool scheduleAutoStop}) {
+    final percent = ((m['percent'] as num?) ?? 0).round().clamp(0, 100);
+    _lightsTimer?.cancel();
+    _applyLightsLevel(percent);
+    if (scheduleAutoStop) {
+      final lightSecs = (m['seconds'] as num?)?.toInt();
+      if (lightSecs != null && lightSecs > 0 && percent > 0) {
+        _lightsTimer = Timer(Duration(seconds: lightSecs), () {
+          _applyLightsLevel(0);
+        });
+      }
+    }
+  }
+
+  /// Optional `seconds` schedules INDICATOR_STOP when [scheduleAutoStop] is true.
   void _indicatorFromMap(Map<String, dynamic> m, {required bool scheduleAutoStop}) {
     final side = m['side'] as String? ?? 'stop';
     _sendIndicatorSide(side);
@@ -258,9 +300,10 @@ class RealtimeService {
     }
   }
 
-  /// Stops motors; [cancelRoutine] is true for explicit `stop` websocket commands.
+  /// Stops motors; [cancelRoutine] aborts a running voice routine.
   void _haltMotors({required bool cancelRoutine}) {
     _driveTimer?.cancel();
+    _lightsTimer?.cancel();
     if (cancelRoutine) _routineCancelled = true;
     _sendDriveJsonToRobot(0, 0);
   }
@@ -273,12 +316,16 @@ class RealtimeService {
       case 'indicator':
         _indicatorFromMap(step, scheduleAutoStop: false);
         break;
+      case 'lights':
+        _lightsFromMap(step, scheduleAutoStop: false);
+        break;
       default:
         _haltMotors(cancelRoutine: false);
         break;
     }
   }
 
+  /// Handle drive / stop / indicator / lights / camera / routine from voice AI.
   void _executeCommand(Map<String, dynamic> cmd) {
     switch (cmd['action'] as String? ?? '') {
       case 'drive':
@@ -289,6 +336,9 @@ class RealtimeService {
         break;
       case 'indicator':
         _indicatorFromMap(cmd, scheduleAutoStop: true);
+        break;
+      case 'lights':
+        _lightsFromMap(cmd, scheduleAutoStop: true);
         break;
       case 'camera':
         clientSocket?.writeln('{command: SWITCH_CAMERA}');
@@ -303,10 +353,10 @@ class RealtimeService {
     }
   }
 
-  // Executes routine steps sequentially. Checks _routineCancelled before each step
-  // so a "stop" voice command exits the sequence immediately.
+  /// Runs routine steps; stops early if voice says stop.
   Future<void> _runRoutine(List<Map<String, dynamic>> steps) async {
     _driveTimer?.cancel();
+    _lightsTimer?.cancel();
 
     for (final step in steps) {
       if (_routineCancelled) break;
@@ -320,6 +370,7 @@ class RealtimeService {
     if (!_routineCancelled) {
       _sendDriveJsonToRobot(0, 0);
       clientSocket?.writeln('{command: INDICATOR_STOP}');
+      _applyLightsLevel(0);
     }
   }
 
@@ -363,7 +414,6 @@ class RealtimeService {
     _audioSub = _audioCtrl!.stream.listen((bytes) {
       if (bytes.isNotEmpty) _audioBatch.add(bytes);
     });
-    // Every 100ms merge buffered audio chunks and send as a single batch
     _batchTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (_audioBatch.isEmpty || _ws == null) { _audioBatch.clear(); return; }
       final total  = _audioBatch.fold<int>(0, (s, b) => s + b.length);
@@ -396,10 +446,12 @@ class RealtimeService {
     _audioCtrl = null;
   }
 
+  /// Open the recorder early so the first PTT tap is faster.
   Future<void> preWarm() async {
     try { await _ensureRecorderOpen(); } catch (_) {}
   }
 
+  /// Release mic and websocket when the controller screen goes away.
   Future<void> dispose() async {
     await stop(disconnectBackend: true);
     if (_recorderOpened) {

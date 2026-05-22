@@ -5,12 +5,21 @@ import 'package:openbot_controller/utils/forwardSpeed.dart';
 import 'package:openbot_controller/utils/phoneSensorToDualDriveConverter.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:openbot_controller/globals.dart';
+import 'package:openbot_controller/screens/component/lights.dart';
 import 'driveCommandReducer.dart';
 
+/// Drive by tilting the phone — gas/brake pedals + bottom icons.
 class TiltingPhoneMode extends StatefulWidget {
   final String fragmentType;
+  final bool lightsActive;
+  final VoidCallback onLightsTap;
 
-  const TiltingPhoneMode({required this.fragmentType, super.key});
+  const TiltingPhoneMode({
+    required this.fragmentType,
+    required this.lightsActive,
+    required this.onLightsTap,
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -43,21 +52,23 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
       leftSpeedValue = sliderValues.left;
       rightSpeedValue = sliderValues.right;
     });
+    typeOfFragment = widget.fragmentType;
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant TiltingPhoneMode oldWidget) {
-    // TODO: implement didUpdateWidget
-    setState(() {
-      typeOfFragment = widget.fragmentType;
-    });
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.fragmentType != widget.fragmentType) {
+      setState(() => typeOfFragment = widget.fragmentType);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    /// SD logs only in data-collection mode.
     final bool isLogsEnabled = typeOfFragment == "DataCollection";
+    /// Network picker only in autopilot / object-detection modes.
     final bool isNetworkEnabled =
         typeOfFragment == "Autopilot" || typeOfFragment == "ObjectDetection";
 
@@ -111,10 +122,8 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                         backwardSpeedTimer!.cancel();
                       }
                     },
-                    // Image tapped
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(40, 0, 0, 20),
-                      // padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         color: reverse
@@ -141,7 +150,7 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                                 ? () {
                                     clientSocket?.writeln("{command: LOGS}");
                                   }
-                                : null, // Image tapped
+                                : null,
                             child: Ink(
                               padding: const EdgeInsets.all(15),
                               decoration: BoxDecoration(
@@ -169,7 +178,7 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                                 ? () {
                                     clientSocket?.writeln("{command: NETWORK}");
                                   }
-                                : null, // Image tapped
+                                : null,
                             child: Ink(
                               padding: const EdgeInsets.all(15),
                               decoration: BoxDecoration(
@@ -186,6 +195,11 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                               ),
                             ),
                           )),
+                      const SizedBox(width: 15),
+                      LightsBarButton(
+                        active: widget.lightsActive,
+                        onTap: widget.onLightsTap,
+                      ),
                     ])),
                 GestureDetector(
                     onTapDown: (details) {
@@ -223,10 +237,8 @@ class TiltingPhoneModeState extends State<TiltingPhoneMode> {
                         forwardSpeedTimer!.cancel();
                       }
                     },
-                    // Image tapped
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 40, 20),
-                      // padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         color: forward

@@ -4,9 +4,8 @@ const { WebSocket } = require('ws');
 const logger = require('../utils/logger');
 const { SESSION_CONFIG } = require('../config/sessionConfig');
 
-/*
- * Wires the upstream OpenAI Realtime WebSocket for one client session.
- * Handles session setup, tool-call streaming, robot_command dispatch, and lifecycle.
+/**
+ * Handling OpenAI realtime connection through websocket
  */
 function attachOpenaiRealtime(openaiWs, ctx) {
     const { clientId, clientWs, pendingAudio, sendToClient } = ctx;

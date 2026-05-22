@@ -3,7 +3,7 @@
 const { WebSocket } = require('ws');
 const logger = require('../utils/logger');
 
-/*
+/**
  * Validates JSON from the controller app.
  * Expected types: "audio" (base64 PCM) and "commit" (end of utterance).
  */
@@ -28,8 +28,8 @@ function parseClientMessage(raw) {
     return { ok: true, msg };
 }
 
-/*
- * Routes client messages to OpenAI Realtime.
+/**
+ * Send client messages to OpenAI Realtime.
  * audio  → input_audio_buffer.append (buffered until upstream is ready)
  * commit → input_audio_buffer.commit + response.create
  */

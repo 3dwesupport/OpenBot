@@ -1,11 +1,13 @@
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/utils/forwardSpeed.dart';
 
+/// Sends left/right drive only when values change enough (less spam on the socket).
 class DriveCommandReducer {
   static double lastRight = 0;
   static double lastLeft = 0;
   static double withinRange = .02;
 
+  /// Build driveCmd and write if different from last send.
   static void filter(double rightValue, double leftValue) {
     if (isDifferent(rightValue, leftValue)) {
       lastLeft = leftValue;

@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:nsd/nsd.dart';
 import 'package:openbot_controller/globals.dart';
 import 'package:openbot_controller/services/realtime_service.dart';
+import 'package:openbot_controller/screens/component/lights.dart';
 import 'package:openbot_controller/screens/component/mic_button.dart';
 import 'package:openbot_controller/screens/controlSelector.dart';
 import 'package:openbot_controller/screens/settingsDrawer.dart';
@@ -16,8 +17,12 @@ import '../utils/constants.dart';
 import 'discoveringDevices.dart';
 
 const String serviceTypeRegister = '_openbot._tcp';
-const utf8encoder = Utf8Encoder();
 
+/// Top menu + mic inset from screen edge (gamepad vs tilt).
+double _topBarHorizontalInset(bool isTiltingPhoneMode) =>
+    isTiltingPhoneMode ? 45.0 : 110.0;
+
+/// Main screen — find robot, socket, video, drive UI.
 class Controller extends StatefulWidget {
   const Controller({Key? key}) : super(key: key);
 
@@ -34,6 +39,8 @@ class ControllerState extends State<Controller> {
   bool mirroredVideo = false;
   bool indicatorLeft = false;
   bool indicatorRight = false;
+  /// Vehicle lights — torch button + top slider.
+  final LightsSession _lights = LightsSession();
   bool isSettings = false;
   bool isTiltingPhoneMode = false;
   bool isScreenMode = false;
@@ -44,15 +51,24 @@ class ControllerState extends State<Controller> {
 
   int get nextPort => _nextPort++;
 
+  /// Flip video mirror for the user.
   setMirrorVideo() {
     setState(() {
       mirroredVideo = !mirroredVideo;
     });
   }
 
+  /// Bottom bar torch tap.
+  void onLightsIconTap() => setState(_lights.toggle);
+
+  /// Top slider moved.
+  void onLightsSliderChanged(int percent) =>
+      setState(() => _lights.setBrightness(percent));
+
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
 
+  /// Set up WebRTC renderer and peer connection.
   Future<void> videoConnection() async {
     initRenderers();
     _createPeerConnection().then((pc) {
@@ -64,6 +80,7 @@ class ControllerState extends State<Controller> {
     await _remoteVideoRenderer.initialize();
   }
 
+  /// Offer or ICE candidate from the robot over the status socket.
   void handleWebRtcEvent(type, sdp, id, label, candidate) async {
     var description = {
       "type": type,
@@ -131,6 +148,7 @@ class ControllerState extends State<Controller> {
     return pc;
   }
 
+  /// SDP answer after we accept the robot's WebRTC offer.
   void createAnswer() async {
     final Map<String, dynamic> offerSdpConstraints =
         Constants.offerSdpConstraints;
@@ -144,6 +162,7 @@ class ControllerState extends State<Controller> {
     sendMessage(data);
   }
 
+  /// Wrap [message] as webrtc_event on the command socket.
   void sendMessage(message) async {
     var newMessage = jsonEncode(message);
     clientSocket?.writeln({"webrtc_event": newMessage});
@@ -156,11 +175,21 @@ class ControllerState extends State<Controller> {
   @override
   void initState() {
     super.initState();
+    RealtimeService.instance.onLightsChanged = (percent) {
+      if (mounted) setState(() => _lights.applyLevel(percent));
+    };
     registerNewService();
     videoConnection();
     getNewDiscoverServices();
   }
 
+  @override
+  void dispose() {
+    RealtimeService.instance.onLightsChanged = null;
+    super.dispose();
+  }
+
+  /// Find _openbot-server services for the settings network list.
   Future<void> getNewDiscoverServices() async {
     final discovery = await startDiscovery('_openbot-server._tcp.');
     discovery.addServiceListener((service, status) {
@@ -170,6 +199,7 @@ class ControllerState extends State<Controller> {
     });
   }
 
+  /// Listen for the bot and hold the command socket.
   Future<void> registerNewService() async {
     var port = nextPort;
     final service = Service(
@@ -234,6 +264,7 @@ class ControllerState extends State<Controller> {
     });
   }
 
+  /// Center overlay when switching tilt vs gamepad (clears after 3s).
   void _showModeMessage(String msg) {
     _modeTimer?.cancel();
     setState(() => _modeMessage = msg);
@@ -242,6 +273,7 @@ class ControllerState extends State<Controller> {
     });
   }
 
+  /// Bot said we're connected — show video + voice backend.
   setDeviceConnected(status) {
     if (status == "true") {
       setState(() {
@@ -256,9 +288,9 @@ class ControllerState extends State<Controller> {
     }
   }
 
+  /// Remove registration entry without waiting on dismiss animation.
   Future<void> dismissRegistration(Registration registration) async {
     setState(() {
-      /// remove fast, without confirmation, to avoid "onDismissed" error.
       registrations.remove(registration);
     });
 
@@ -276,32 +308,60 @@ class ControllerState extends State<Controller> {
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               mirror: mirroredVideo,
             ),
-            ControlSelector(setMirrorVideo, indicatorLeft, indicatorRight,
-                services, _peerConnection, isTiltingPhoneMode, isScreenMode,fragmentType),
+            ControlSelector(
+                setMirrorVideo,
+                indicatorLeft,
+                indicatorRight,
+                _lights.active,
+                onLightsIconTap,
+                services,
+                _peerConnection,
+                isTiltingPhoneMode,
+                isScreenMode,
+                fragmentType),
             Positioned(
-              left: isTiltingPhoneMode ? 45 : 110,
-              top: 16.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(45),
-                  color: Colors.transparent,
+              top: 36,
+              left: 72,
+              right: 72,
+              child: Center(
+                child: LightsSlider(
+                  visible: _lights.showSlider,
+                  level: _lights.brightness,
+                  onDismissed: () => setState(_lights.hideSlider),
+                  onLevelChanged: onLightsSliderChanged,
                 ),
-                child: FloatingActionButton(
-                    backgroundColor: Colors.white.withOpacity(0.5),
-                    onPressed: () {
-                      setState(() {
-                        isSettings = true;
-                      });
-                    },
-                    child: const Icon(Icons.menu)),
               ),
             ),
             Positioned(
-              right: isTiltingPhoneMode ? 45 : 45,
               top: 16,
-              child: const MicButton(),
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: _topBarHorizontalInset(isTiltingPhoneMode),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.white.withOpacity(0.5),
+                        onPressed: () {
+                          setState(() {
+                            isSettings = true;
+                          });
+                        },
+                        child: const Icon(Icons.menu),
+                      ),
+                    ),
+                    const MicButton(),
+                  ],
+                ),
+              ),
             ),
-            // Mode switch message — centred on screen, plain white text, no background
             if (_modeMessage != null)
               Positioned.fill(
                 child: Center(
@@ -360,6 +420,7 @@ class ControllerState extends State<Controller> {
     }
   }
 
+  /// Status JSON from the robot (indicators, lights, webrtc, etc).
   void processMessageFromBot(items) {
     String sdp = "";
     String type = "";
@@ -405,6 +466,14 @@ class ControllerState extends State<Controller> {
         setState(() {
           indicatorRight = false;
         });
+      }
+    }
+
+    if (items["LED_BRIGHTNESS"] != null) {
+      final parsed = int.tryParse(items["LED_BRIGHTNESS"].toString());
+      if (parsed != null) {
+        final value = parsed.clamp(0, 100);
+        setState(() => _lights.applyLevel(value));
       }
     }
 

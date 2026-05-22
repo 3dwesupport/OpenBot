@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openbot_controller/services/realtime_service.dart';
 
+/// Voice control — hold to talk or tap for always-on.
 class MicButton extends StatefulWidget {
   const MicButton({super.key});
   @override
@@ -12,8 +13,9 @@ class MicButton extends StatefulWidget {
 class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
   final _rt = RealtimeService.instance;
 
-  // true = tap-on mode (always-on), false = tap started PTT or off
+  /// Tap-on keeps listening; otherwise hold for push-to-talk.
   bool _alwaysOn = false;
+  /// "Tap On/Off • Hold to talk" — auto-hides after 5 seconds.
   bool _showTooltip = true;
   Timer? _tooltipTimer;
 
@@ -52,7 +54,7 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  // Single source of truth: button is "on" if alwaysOn OR service is active.
+  /// On while always-on mode or the realtime session is active.
   bool get _isOn => _alwaysOn || !_rt.isIdle;
 
   void _onStateChange() {
@@ -69,24 +71,24 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
     }
   }
 
+  /// Always-on: refresh UI when AI finishes so listening can resume.
   void _onResponseDone() {
-    // Always-on mode: restart listening after AI responds.
     if (_alwaysOn && mounted) setState(() {});
   }
 
-  // Raw pointer tracking for reliable PTT — immune to drag/gesture-arena issues.
+  /// Raw pointers — reliable PTT without gesture-arena cancel.
   bool _pointerDown = false;
   bool _pttActive = false;
   Timer? _longPressTimer;
 
+  /// Short tap toggles always-on; hold 350ms starts push-to-talk.
   void _onPointerDown(PointerDownEvent _) {
     _pointerDown = true;
     _longPressTimer?.cancel();
     _longPressTimer = Timer(const Duration(milliseconds: 350), () async {
-      // Long press threshold reached → PTT
       if (_pointerDown && !_alwaysOn && _rt.isIdle) {
         _pttActive = true;
-        HapticFeedback.lightImpact(); // haptic only when PTT activates
+        HapticFeedback.lightImpact();
         await _rt.start();
         if (mounted) setState(() {});
       }
@@ -125,7 +127,7 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
       _waveCtrl.stop(); _waveCtrl.reset();
       await _rt.stop();
     } else {
-      HapticFeedback.lightImpact(); // haptic only when turning ON
+      HapticFeedback.lightImpact();
       setState(() => _alwaysOn = true);
       final ok = await _rt.start();
       if (!ok && mounted) setState(() => _alwaysOn = false);
@@ -137,14 +139,13 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
-            // Wave rings expand outside the 56px button using negative Positioned
             if (_isOn)
               Positioned(
                 left: -22, right: -22, top: -22, bottom: -22,
@@ -189,7 +190,6 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
                   ),
                   child: Center(
                     child: _isOn
-                        // Square = recording indicator
                         ? Container(
                             width: 18,
                             height: 18,
@@ -205,7 +205,6 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
             ),
           ],
         ),
-        // Hint tooltip fades after 5s
         AnimatedOpacity(
           opacity: _showTooltip ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 600),
@@ -216,12 +215,14 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
             child: Container(
               margin: const EdgeInsets.only(top: 6),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              constraints: const BoxConstraints(maxWidth: 160),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.55),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text(
                 'Tap On/Off  •  Hold to talk',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 9,
@@ -236,6 +237,7 @@ class _MicButtonState extends State<MicButton> with TickerProviderStateMixin {
   }
 }
 
+/// Pulsing rings around the mic while recording.
 class _WaveRingPainter extends CustomPainter {
   final double progress;
   static const _blue = Color(0xFF0071C5);

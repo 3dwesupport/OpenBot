@@ -1,8 +1,10 @@
 import 'package:openbot_controller/utils/forwardSpeed.dart';
 
+/// Tilt phone pitch → left/right wheel speeds.
 class PhoneSensorToDualDriveConverter {
   static double g = 9.81;
 
+  /// Mix forward pedal speed with pitch for steering.
   DualDriveValues convert(double azimuth, double pitch, double roll) {
     double leftSpeed = 0;
     double rightSpeed = 0;

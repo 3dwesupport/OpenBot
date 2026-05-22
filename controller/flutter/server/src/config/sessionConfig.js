@@ -63,6 +63,25 @@ const SESSION_CONFIG = {
             },
             {
                 type: 'function',
+                name: 'lights',
+                description: 'Control vehicle headlights (front/back LED brightness).',
+                parameters: {
+                    type: 'object',
+                    properties: {
+                        percent: {
+                            type: 'number',
+                            description: 'Brightness 0–100. Use 0 to turn off. Default 50 when user says on without a level.',
+                        },
+                        seconds: {
+                            type: 'number',
+                            description: 'Auto turn off after N seconds. Omit to leave on until changed.',
+                        },
+                    },
+                    required: ['percent'],
+                },
+            },
+            {
+                type: 'function',
                 name: 'camera',
                 description: 'Switch between front and rear camera.',
                 parameters: { type: 'object', properties: {} },
@@ -79,11 +98,12 @@ const SESSION_CONFIG = {
                             items: {
                                 type: 'object',
                                 properties: {
-                                    action:  { type: 'string', enum: ['drive', 'stop', 'indicator'] },
+                                    action:  { type: 'string', enum: ['drive', 'stop', 'indicator', 'lights'] },
                                     r:       { type: 'number', description: 'Right motor -1.0 to 1.0' },
                                     l:       { type: 'number', description: 'Left motor -1.0 to 1.0' },
                                     multiplier: { type: 'string', enum: ['S', 'M', 'F'] },
                                     side:    { type: 'string', enum: ['left', 'right', 'stop'] },
+                                    percent: { type: 'number', description: 'Headlight brightness 0–100' },
                                     seconds: { type: 'number' },
                                 },
                                 required: ['action'],

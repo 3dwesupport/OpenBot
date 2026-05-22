@@ -5,15 +5,24 @@ import 'package:openbot_controller/utils/forwardSpeed.dart';
 
 import 'component/onScreenIcon.dart';
 
+/// Gamepad layout — side sliders and bottom icon row.
 class OnScreenMode extends StatefulWidget {
   final dynamic updateMirrorView;
   final bool indicatorLeft;
   final bool indicatorRight;
+  final bool lightsActive;
+  final VoidCallback onLightsTap;
   final RTCPeerConnection? peerConnection;
   final String fragmentType;
 
-  const OnScreenMode(this.updateMirrorView, this.indicatorLeft,
-      this.indicatorRight, this.peerConnection, this.fragmentType,
+  const OnScreenMode(
+      this.updateMirrorView,
+      this.indicatorLeft,
+      this.indicatorRight,
+      this.lightsActive,
+      this.onLightsTap,
+      this.peerConnection,
+      this.fragmentType,
       {super.key});
 
   @override
@@ -66,8 +75,14 @@ class OnScreenModeState extends State<OnScreenMode> {
           Container(
             alignment: AlignmentDirectional.bottomEnd,
             margin: const EdgeInsets.only(bottom: 20),
-            child: OnScreenIcon(widget.updateMirrorView, widget.indicatorLeft,
-                widget.indicatorRight, widget.peerConnection,widget.fragmentType),
+            child: OnScreenIcon(
+                widget.updateMirrorView,
+                widget.indicatorLeft,
+                widget.indicatorRight,
+                widget.lightsActive,
+                widget.onLightsTap,
+                widget.peerConnection,
+                widget.fragmentType),
           ),
           Container(
               margin: const EdgeInsets.only(right: 50),
@@ -104,6 +119,7 @@ class OnScreenModeState extends State<OnScreenMode> {
   }
 }
 
+/// Vertical drive slider thumb (blue rectangle).
 class SquareSliderComponentShape extends SliderComponentShape {
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) {

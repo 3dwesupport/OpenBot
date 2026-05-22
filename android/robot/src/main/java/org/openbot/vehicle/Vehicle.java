@@ -53,6 +53,13 @@ public class Vehicle {
   SharedPreferences sharedPreferences;
   public String connectionType;
 
+  private int ledBrightnessPercent = 0;
+  private OnLedBrightnessChangedListener ledBrightnessChangedListener;
+
+  public interface OnLedBrightnessChangedListener {
+    void onLedBrightnessChanged(int percent0To100);
+  }
+
   public float getMinMotorVoltage() {
     return minMotorVoltage;
   }
@@ -406,10 +413,23 @@ public class Vehicle {
     return control.getRight() * speedMultiplier;
   }
 
+  public int getLedBrightnessPercent() {
+    return ledBrightnessPercent;
+  }
+
+  public void setOnLedBrightnessChangedListener(OnLedBrightnessChangedListener listener) {
+    this.ledBrightnessChangedListener = listener;
+  }
+
   public void sendLightIntensity(float frontPercent, float backPercent) {
     int front = (int) (frontPercent * 255.f);
     int back = (int) (backPercent * 255.f);
     sendStringToDevice(String.format(Locale.US, "l%d,%d\n", front, back));
+    ledBrightnessPercent =
+        Math.max(0, Math.min(100, Math.round(((frontPercent + backPercent) / 2f) * 100f)));
+    if (ledBrightnessChangedListener != null) {
+      ledBrightnessChangedListener.onLedBrightnessChanged(ledBrightnessPercent);
+    }
   }
 
   public void sendControl() {

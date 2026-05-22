@@ -7,9 +7,8 @@ const config = require('../config');
 const { parseClientMessage, forwardClientMessage } = require('./clientRealtimeConnection');
 const { attachOpenaiRealtime } = require('./openaiRealtimeConnection');
 
-/*
- * Creates the /ws/realtime server.
- * Each incoming connection = one app client + one OpenAI Realtime upstream socket.
+/**
+ * Creates the websocket server.
  */
 function createWebSocketServer(httpServer) {
     const wss = new WebSocketServer({
@@ -43,7 +42,7 @@ function createWebSocketServer(httpServer) {
             config,
         };
 
-        const openaiWs = new WebSocket(config.openai.realtimeUrl, {
+        const openaiWs = new WebSocket("wss://api.openai.com/v1/realtime?model=gpt-realtime-mini", {
             headers: { Authorization: `Bearer ${config.openai.apiKey}` },
         });
 
@@ -92,7 +91,7 @@ function createWebSocketServer(httpServer) {
     return wss;
 }
 
-/*
+/**
  * Attaches WebSocket server and registers graceful shutdown (SIGTERM / SIGINT).
  */
 function setupWebSocketServer(httpServer) {

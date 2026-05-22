@@ -7,14 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.navigation.Navigation;
+import java.util.Collections;
 import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
 import org.openbot.R;
 import org.openbot.common.ControlsFragment;
 import org.openbot.databinding.FragmentRobotInfoBinding;
+import org.openbot.env.LightCommands;
 
 public class RobotInfoFragment extends ControlsFragment {
   private FragmentRobotInfoBinding binding;
+  private boolean updatingLightsSliderFromRemote;
 
   @Override
   public View onCreateView(
@@ -59,9 +62,33 @@ public class RobotInfoFragment extends ControlsFragment {
     binding.bleToggle.setOnCheckedChangeListener((buttonView, isChecked) -> refreshGui());
     binding.refreshToggle.setOnClickListener(v -> refreshGui());
 
+    binding.lightsSlider.setValues(
+        Collections.singletonList((float) vehicle.getLedBrightnessPercent()));
+
+    vehicle.setOnLedBrightnessChangedListener(
+        percent ->
+            requireActivity()
+                .runOnUiThread(
+                    () -> {
+                      if (binding == null) {
+                        return;
+                      }
+                      updatingLightsSliderFromRemote = true;
+                      binding.lightsSlider.setValues(
+                          Collections.singletonList((float) percent));
+                      updatingLightsSliderFromRemote = false;
+                    }));
+
     binding.lightsSlider.addOnChangeListener(
         (slider, value, fromUser) -> {
-          vehicle.sendLightIntensity(value / 100, value / 100);
+          if (updatingLightsSliderFromRemote) {
+            return;
+          }
+          int percent = Math.round(value);
+          vehicle.sendLightIntensity(percent / 100f, percent / 100f);
+          if (fromUser) {
+            LightCommands.broadcastBrightnessToController(percent);
+          }
         });
 
     binding.motorsForwardButton.setOnClickListener(v -> vehicle.setControl(0.75f, 0.75f));
@@ -185,5 +212,11 @@ public class RobotInfoFragment extends ControlsFragment {
   public void onResume() {
     super.onResume();
     binding.bleToggle.setChecked(vehicle.bleConnected());
+  }
+
+  @Override
+  public void onDestroyView() {
+    vehicle.setOnLedBrightnessChangedListener(null);
+    super.onDestroyView();
   }
 }

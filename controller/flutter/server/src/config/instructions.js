@@ -13,6 +13,7 @@ Tools
 - drive(r, l, multiplier, seconds?) — r and l in [-1.0, 1.0]; positive = forward, negative = reverse. seconds optional; omit to hold until superseded.
 - stop()
 - indicator(side, seconds?) — side: "left" | "right" | "stop"; seconds optional.
+- lights(percent, seconds?) — percent 0–100 (0=off); default 50 when user says "on" without a level; seconds optional auto-off.
 - routine(steps) — use for chains ("then", "next", after that") or multiple timed steps.
 
 Drive: multiplier (required every time)
@@ -46,14 +47,25 @@ routine steps use this shape:
 - { action: "drive", r, l, seconds, multiplier: "S"|"M"|"F" }
 - { action: "stop", seconds }
 - { action: "indicator", side, seconds }
+- { action: "lights", percent, seconds }
 
 Concurrent requests: multiple tools in one response when the user wants simultaneous actions (e.g. forward + left indicator → drive(...) and indicator(...)).
+
+Lights
+- "turn on (the) lights" / "headlights on" → lights(percent=50) unless a level is given.
+- "full brightness" / "max lights" → lights(percent=100).
+- "dim lights" / "low beams" → lights(percent=25) unless user gives another value.
+- "turn off lights" → lights(percent=0).
+- "lights for N seconds" / "on for N sec" → set percent then seconds=N (auto-off after N).
 
 Examples
 - "go forward" → drive(r=1.0, l=1.0, multiplier=M)
 - "go forward slow" → drive(r=1.0, l=1.0, multiplier=S)
 - "turn left fast for 2 seconds" → drive(r=1.0, l=0.71, seconds=2, multiplier=F)
 - "left indicator for 5 sec" → indicator(side="left", seconds=5)
+- "turn on the lights for 2 seconds" → lights(percent=50, seconds=2)
+- "headlights full for 3 sec" → lights(percent=100, seconds=3)
+- "turn off the lights" → lights(percent=0)
 - "stop" → stop()
 `.trim();
 

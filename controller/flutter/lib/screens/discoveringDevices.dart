@@ -1,6 +1,7 @@
 import 'package:blinking_text/blinking_text.dart';
 import 'package:flutter/material.dart';
 
+/// Shown until the robot connects.
 class DiscoveringDevice extends StatefulWidget {
   const DiscoveringDevice({super.key});
 

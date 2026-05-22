@@ -3,6 +3,7 @@ import 'package:nsd/nsd.dart';
 
 import '../utils/constants.dart';
 
+/// One line in the settings list for an NSD registration.
 class RegistrationWidget extends StatelessWidget {
   final Registration registration;
 
