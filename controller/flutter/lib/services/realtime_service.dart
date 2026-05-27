@@ -59,22 +59,20 @@ class RealtimeService {
 
   Future<bool> _ensureMicPermission() async {
     if (!Platform.isAndroid && !Platform.isIOS) return true;
+
     var status = await Permission.microphone.status;
     if (status.isGranted) return true;
 
-    if (status.isPermanentlyDenied || status.isRestricted) {
-      print('microphone permission denied: $status');
-      Fluttertoast.showToast(
-        msg: Platform.isIOS
-            ? 'Microphone blocked. Open Settings → Openbot Controller → Microphone.'
-            : 'Microphone blocked. Enable it in Settings → Apps → OpenBot Controller.',
-      );
-      await openAppSettings();
-      return false;
+    // iOS mic: missing permission flag.
+    if (!status.isPermanentlyDenied && !status.isRestricted) {
+      status = await Permission.microphone.request();
+      if (status.isGranted) return true;
+    } else if (Platform.isIOS) {
+      status = await Permission.microphone.request();
+      if (status.isGranted) return true;
+      status = await Permission.microphone.status;
+      if (status.isGranted) return true;
     }
-
-    status = await Permission.microphone.request();
-    if (status.isGranted) return true;
 
     print('microphone permission denied: $status');
     if (status.isPermanentlyDenied || status.isRestricted) {
