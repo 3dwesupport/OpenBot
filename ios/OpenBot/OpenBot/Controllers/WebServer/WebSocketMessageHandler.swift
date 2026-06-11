@@ -27,15 +27,19 @@ class WebSocketMessageHandler {
     }
 
     func speedUp(){
-      gameController.increaseSpeedMode();
+        gameController.increaseSpeedMode();
     }
 
     func driveMode(){
         NotificationCenter.default.post(name: .updateDriveMode, object: nil)
     }
 
-    func toggleLogging(){
+    func toggleLogging() {
+        NotificationCenter.default.post(name: .logData, object: nil)
+    }
 
+    func toggleNetwork() {
+        NotificationCenter.default.post(name: .toggleNetworks, object: nil)
     }
 
     func quit(){
