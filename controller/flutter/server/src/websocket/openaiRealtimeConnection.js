@@ -3,6 +3,7 @@
 const { WebSocket } = require('ws');
 const logger = require('../utils/logger');
 const { SESSION_CONFIG } = require('../config/sessionConfig');
+const { buildRoutineFromPreset } = require('../config/performPresets');
 
 /**
  * Handling OpenAI realtime connection through websocket
@@ -68,8 +69,27 @@ function attachOpenaiRealtime(openaiWs, ctx) {
                     }
                 }
 
-                logger.info('Robot command', { clientId, fn: call.name, args });
-                sendToClient({ type: 'robot_command', action: call.name, ...args });
+                // perform() → routine(steps) via performPresets.js
+                let robotCmd;
+                if (call.name === 'perform') {
+                    robotCmd = buildRoutineFromPreset(args);
+                    if (!robotCmd) {
+                        robotCmd = { action: 'stop' };
+                    }
+                    logger.info('Robot command', { clientId, fn: call.name, args });
+
+                    if (robotCmd.steps) {
+                        for (const step of robotCmd.steps) {
+                            const { action, ...stepArgs } = step;
+                            logger.info('Robot command', { clientId, fn: action, args: stepArgs });
+                        }
+                    }
+                } else {
+                    robotCmd = { action: call.name, ...args };
+                    logger.info('Robot command', { clientId, fn: call.name, args });
+                }
+
+                sendToClient({ type: 'robot_command', ...robotCmd });
 
                 // Required so OpenAI can accept the next tool call in the session
                 openaiWs.send(JSON.stringify({

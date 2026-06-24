@@ -88,6 +88,31 @@ const SESSION_CONFIG = {
             },
             {
                 type: 'function',
+                name: 'perform',
+                description: 'Whitelist-only: random*, zigzag, Mercedes G-turn (tank spin), draw letter L/I/T/O/P. NOT for plain turn/forward — use drive().',
+                parameters: {
+                    type: 'object',
+                    properties: {
+                        preset: {
+                            type: 'string',
+                            enum: ['movement', 'lights', 'indicators', 'movement_indicators', 'all', 'zigzag', 'g_turn', 'letter_L', 'letter_I', 'letter_T', 'letter_O', 'letter_P'],
+                            description: 'g_turn=Mercedes tank spin in place (speech must say G turn); movement requires "random".',
+                        },
+                        duration: {
+                            type: 'number',
+                            description: 'Total seconds. Default 8 if user did not specify.',
+                        },
+                        multiplier: {
+                            type: 'string',
+                            enum: ['S', 'M', 'F'],
+                            description: 'Speed for drive steps. Default M.',
+                        },
+                    },
+                    required: ['preset'],
+                },
+            },
+            {
+                type: 'function',
                 name: 'routine',
                 description: 'Execute a multi-step timed sequence of robot commands.',
                 parameters: {
