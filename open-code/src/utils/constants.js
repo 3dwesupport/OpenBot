@@ -221,6 +221,7 @@ export const Models = {
 export const PathName = {
     "home": "/",
     "playGround": "/playground",
+    "deleteAccount": "/delete-account",
 }
 
 /**
@@ -345,6 +346,24 @@ export const Carousal = [
  */
 export const errorToast = (message) => {
     toast.error(message, {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+        pauseOnFocusLoss: false,
+    })
+}
+
+/**
+ * success Toast
+ * @param message
+ */
+export const successToast = (message) => {
+    toast.success(message, {
         position: 'top-center',
         autoClose: 5000,
         hideProgressBar: false,

@@ -38,6 +38,7 @@ export function ProfileOptionModal(props) {
     const isSignedIn = localStorage.getItem("isSigIn") === "true";
     const isHomePage = location.pathname === PathName.home;
     const isOnPlaygroundPage = location.pathname === PathName.playGround;
+    const isOnDeleteAccountPage = location.pathname === PathName.deleteAccount;
     const tabletQuery = window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches;
     const isMobileLandscape = window.matchMedia("(max-height:440px) and (max-width: 1000px) and (orientation: landscape)").matches
     const date = new Date()
@@ -78,7 +79,7 @@ export function ProfileOptionModal(props) {
             <Box className={styles.profileOptionModalStyle}
                  style={{backgroundColor: theme === Themes.dark ? colors.blackPopupBackground : colors.whiteBackground}}>
 
-                {(isHomePage || (isOnPlaygroundPage && isSignedIn)) &&
+                {(isHomePage || isOnDeleteAccountPage || (isOnPlaygroundPage && isSignedIn)) &&
                     <PopUpInRowText
                         onClick={async () => {
                             setEditProfileLoaderOpen(true);
@@ -135,7 +136,7 @@ export function ProfileOptionModal(props) {
                         setDrawer(true)
                     }} text={"AI Assistant"}
                                     icon={theme === Themes.dark ? Images.chatIcon : Images.darkChatIcon}/>}
-                {((isHomePage) || (isOnPlaygroundPage)) &&
+                {((isHomePage) || (isOnPlaygroundPage) || isOnDeleteAccountPage) &&
                     <PopUpInRowText onClick={() => handleOnclick(setIsLogoutModal)} text={"Logout"}
                                     icon={theme === Themes.dark ? Images.darkLogoutIcon : Images.logoutIcon}/>
                 }
