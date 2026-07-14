@@ -1,6 +1,7 @@
 import {Outlet, Route, Routes, useNavigate} from 'react-router-dom'
 import Home from "../../pages/home";
 import Playground from "../../pages/playground";
+import DeleteAccount from "../../pages/deleteAccount";
 import {PathName} from "../../utils/constants";
 import {useContext} from "react";
 import {ThemeContext} from "../../App";
@@ -17,6 +18,7 @@ export const RouterComponent = () => {
             <Route path={PathName.home} element={<Outlet/>}>
                 <Route index element={<Home/>}/>
                 <Route path={PathName.playGround} element={<Playground/>}/>
+                <Route path={PathName.deleteAccount} element={<DeleteAccount/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Route>
         </Routes>

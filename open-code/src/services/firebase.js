@@ -1,13 +1,18 @@
 import firebase from "firebase/compat/app";
 import 'firebase/compat/auth';
-import {getDownloadURL, getStorage, ref, uploadBytes} from 'firebase/storage';
+import {deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from 'firebase/storage';
 import 'firebase/compat/firestore';
 import {
     getDoc,
+    getDocs,
     getFirestore,
     collection,
+    deleteDoc,
     doc,
+    query,
     setDoc,
+    where,
+    writeBatch,
 } from "firebase/firestore";
 import {getAuth, signOut} from "firebase/auth";
 import {localStorageKeys, tables} from "../utils/constants";
@@ -118,4 +123,72 @@ export async function setDateOfBirth(DOB) {
     } catch (e) {
         console.log("error in setting DOB:", e);
     }
+}
+
+/**
+ * function to revoke the Google OAuth grant (including Drive access) tied to the access token
+ * stored at sign-in. Revoking any token from a grant invalidates the whole grant, so Google
+ * will prompt for consent (including Drive scopes) again on the next sign-in.
+ * @returns {Promise<void>}
+ */
+export async function revokeGoogleAccess() {
+    const accessToken = localStorage.getItem(localStorageKeys.accessToken);
+    if (!accessToken || accessToken.trim() === "") {
+        return;
+    }
+    try {
+        await fetch(`https://oauth2.googleapis.com/revoke?token=${accessToken}`, {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        });
+    } catch (e) {
+        console.log("error revoking google access:", e);
+    }
+}
+
+/**
+ * function to permanently delete the signed-in user's account: every Firestore doc keyed to
+ * their uid (profile, projects, models, usage), their uploaded profile picture in Storage,
+ * the Firebase Auth account itself, and the Google OAuth grant (so Drive access has to be
+ * re-approved on the next sign-in).
+ * Firestore/Storage data must be removed before the Auth account, since access rules key off auth.currentUser.
+ * @returns {Promise<void>}
+ */
+export async function deleteUserAccount() {
+    const user = auth.currentUser;
+    if (!user) {
+        throw new Error("No signed-in user to delete.");
+    }
+    const uid = user.uid;
+
+    for (const table of [tables.projects, tables.models, tables.userUsage]) {
+        const snapshot = await getDocs(query(collection(db, table), where("uid", "==", uid)));
+        const batch = writeBatch(db);
+        snapshot.forEach((document) => batch.delete(document.ref));
+        await batch.commit();
+    }
+    await deleteDoc(doc(db, tables.users, uid));
+
+    try {
+        await deleteObject(ref(FirebaseStorage, `profile_pictures/${uid}.jpg`));
+    } catch (error) {
+        //no custom profile picture was ever uploaded for this user
+        if (error.code !== "storage/object-not-found") {
+            console.log("error deleting profile picture:", error);
+        }
+    }
+
+    try {
+        await user.delete();
+    } catch (error) {
+        //Firebase requires a recent sign-in before allowing account deletion.
+        if (error.code === "auth/requires-recent-login") {
+            await user.reauthenticateWithPopup(provider);
+            await user.delete();
+        } else {
+            throw error;
+        }
+    }
+
+    await revokeGoogleAccess();
 }
