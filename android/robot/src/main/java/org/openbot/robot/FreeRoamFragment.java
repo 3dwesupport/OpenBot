@@ -20,7 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import org.openbot.R;
 import org.openbot.common.ControlsFragment;
 import org.openbot.databinding.FragmentFreeRoamBinding;
+import org.openbot.env.BotToControllerEventBus;
 import org.openbot.env.PhoneController;
+import org.openbot.utils.ConnectionUtils;
 import org.openbot.utils.Constants;
 import org.openbot.utils.Enums;
 import org.openbot.utils.PermissionUtils;
@@ -65,6 +67,10 @@ public class FreeRoamFragment extends ControlsFragment {
     if (vehicle == null || binding == null) {
       return;
     }
+
+    BotToControllerEventBus.emitEvent(
+        ConnectionUtils.createStatus(
+            "FRAGMENT_TYPE", Enums.FragmentType.FREEROAM.getFragment()));
 
     binding.voltageInfo.setText(getString(R.string.voltageInfo, "--.-"));
     binding.controllerContainer.speedInfo.setText(getString(R.string.speedInfo, "---,---"));
