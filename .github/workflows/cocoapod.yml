@@ -36,11 +36,11 @@ jobs:
       - name: Pod install
         run: pod install
 
-      - name: Build for Simulator
+      - name: Build for Device (unsigned)
         run: |
           xcodebuild build \
             -workspace OpenBot.xcworkspace \
             -scheme OpenBot \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             CODE_SIGNING_ALLOWED=NO
