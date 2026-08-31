@@ -90,6 +90,7 @@ export const Toolbox = (props) => {
                 <Block type="variables_get"/>
                 <Block type="math_change"/>
                 <Block type="math_number"/>
+                <Block type="text"/>
             </Category>
 
             <Category name="Lights" colour={"#506481"}>
