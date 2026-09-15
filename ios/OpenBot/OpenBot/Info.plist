@@ -14,7 +14,6 @@
 				<string>com.openbot.tflite</string>
 			</array>
 		</dict>
-		<dict/>
 	</array>
 	<key>CFBundleIcons</key>
 	<dict/>
@@ -37,10 +36,9 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.000000000000-0000000000000000000000000000</string>
+				<string>com.googleusercontent.apps.955078484078-0kh6cdcgf6o5a3nf8rrcbeo5h4b2ov0o</string>
 			</array>
 		</dict>
-		<dict/>
 	</array>
 	<key>GCSupportedGameControllers</key>
 	<array>
