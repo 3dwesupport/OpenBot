@@ -14,16 +14,22 @@ appVersioning {
      */
     gitRootDirectory.set(rootProject.file("../"))
     // if the .git directory is in the root Gradle project's parent directory.
+
+    // versionCode/versionName are set directly in defaultConfig below, so this plugin is disabled.
+    enabled.set(false)
 }
 
 
 android {
     compileSdkVersion 36
     buildToolsVersion '36.0.0'
+
     defaultConfig {
         applicationId "org.openbot.app.robot"
         minSdkVersion 21
         targetSdkVersion 36
+        versionCode 800
+        versionName "v0.6.0"
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
