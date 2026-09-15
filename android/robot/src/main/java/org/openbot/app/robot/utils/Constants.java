@@ -28,7 +28,7 @@ public class Constants {
       Manifest.permission.BLUETOOTH_CONNECT;
 
   public static final String[] PERMISSIONS_LOGGING =
-      new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION};
+      new String[] {PERMISSION_CAMERA, PERMISSION_LOCATION};
   public static final String[] PERMISSIONS_CONTROLLER =
       new String[] {PERMISSION_CAMERA, PERMISSION_AUDIO, PERMISSION_LOCATION};
 

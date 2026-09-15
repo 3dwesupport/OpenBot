@@ -50,9 +50,7 @@ import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.main.OnItemClickListener;
 import org.openbot.app.robot.projects.GoogleSignInCallback;
 import org.openbot.app.robot.tflite.Model;
-import org.openbot.app.robot.utils.Constants;
 import org.openbot.app.robot.utils.FileUtils;
-import org.openbot.app.robot.utils.PermissionUtils;
 
 public class ModelManagementFragment extends Fragment
         implements OnItemClickListener<Model>, ModelAdapter.OnItemClickListener<Model> {
@@ -301,15 +299,7 @@ public class ModelManagementFragment extends Fragment
                     }
                 });
 
-        binding.addModel.setOnClickListener(
-                v -> {
-                    if (!PermissionUtils.hasStoragePermission(requireActivity()))
-                        requestPermissionLauncher.launch(Constants.PERMISSION_STORAGE);
-                    else if (PermissionUtils.shouldShowRational(
-                            requireActivity(), Constants.PERMISSION_STORAGE)) {
-                        PermissionUtils.showStoragePermissionModelManagementToast(requireActivity());
-                    } else openPicker();
-                });
+        binding.addModel.setOnClickListener(v -> openPicker());
     }
 
     // locally data saved in masterList
@@ -428,15 +418,4 @@ public class ModelManagementFragment extends Fragment
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(
-                    new ActivityResultContracts.RequestPermission(),
-                    isGranted -> {
-                        if (isGranted) {
-                            openPicker();
-                        } else {
-                            PermissionUtils.showStoragePermissionModelManagementToast(requireActivity());
-                        }
-                    });
 }

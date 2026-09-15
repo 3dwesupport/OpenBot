@@ -12,11 +12,13 @@ import static org.openbot.app.robot.utils.Constants.REQUEST_LOGGING_PERMISSIONS;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
@@ -60,13 +62,16 @@ public class PermissionUtils {
         == PackageManager.PERMISSION_GRANTED;
   }
 
-  public static boolean hasStoragePermission(Activity activity) {
-    return ContextCompat.checkSelfPermission(activity, PERMISSION_STORAGE)
+  public static boolean hasLocationPermission(Activity activity) {
+    return ContextCompat.checkSelfPermission(activity, PERMISSION_LOCATION)
         == PackageManager.PERMISSION_GRANTED;
   }
 
-  public static boolean hasLocationPermission(Activity activity) {
-    return ContextCompat.checkSelfPermission(activity, PERMISSION_LOCATION)
+  public static boolean hasStoragePermission(Activity activity) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      return Environment.isExternalStorageManager();
+    }
+    return ContextCompat.checkSelfPermission(activity, PERMISSION_STORAGE)
         == PackageManager.PERMISSION_GRANTED;
   }
 
@@ -88,8 +93,8 @@ public class PermissionUtils {
   }
 
   public static boolean hasLoggingPermissions(Activity activity) {
-    return hasPermissions(
-        activity, new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION});
+    return hasPermissions(activity, new String[] {PERMISSION_CAMERA, PERMISSION_LOCATION})
+        && hasStoragePermission(activity);
   }
 
   public static boolean hasControllerPermissions(Activity activity) {
@@ -102,16 +107,24 @@ public class PermissionUtils {
         activity, new String[] {PERMISSION_CAMERA}, REQUEST_CAMERA_PERMISSION);
   }
 
-  public static void requestStoragePermission(Activity activity) {
-    requestPermissions(
-        activity,
-        new String[] {Constants.PERMISSION_STORAGE},
-        Constants.REQUEST_STORAGE_PERMISSION);
-  }
-
   public static void requestLocationPermission(Activity activity) {
     requestPermissions(
         activity, new String[] {PERMISSION_LOCATION}, Constants.REQUEST_LOCATION_PERMISSION);
+  }
+
+  public static void requestStoragePermission(Activity activity) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      try {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        activity.startActivity(intent);
+      } catch (ActivityNotFoundException e) {
+        activity.startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+      }
+    } else {
+      requestPermissions(
+          activity, new String[] {PERMISSION_STORAGE}, Constants.REQUEST_STORAGE_PERMISSION);
+    }
   }
 
   public static void requestAudioPermission(Activity activity) {
@@ -120,10 +133,14 @@ public class PermissionUtils {
   }
 
   public static void requestLoggingPermissions(Activity activity) {
-    requestPermissions(
-        activity,
-        new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION},
-        REQUEST_LOGGING_PERMISSIONS);
+    if (!hasPermissions(activity, new String[] {PERMISSION_CAMERA, PERMISSION_LOCATION})) {
+      requestPermissions(
+          activity,
+          new String[] {PERMISSION_CAMERA, PERMISSION_LOCATION},
+          REQUEST_LOGGING_PERMISSIONS);
+    } else if (!hasStoragePermission(activity)) {
+      requestStoragePermission(activity);
+    }
   }
 
   public static void requestControllerPermissions(Activity activity) {
@@ -141,10 +158,9 @@ public class PermissionUtils {
   }
 
   public static boolean checkLoggingPermissions(int[] grantResults) {
-    return grantResults.length > 2
+    return grantResults.length > 1
         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-        && grantResults[2] == PackageManager.PERMISSION_GRANTED;
+        && grantResults[1] == PackageManager.PERMISSION_GRANTED;
   }
 
   public static void showControllerPermissionsToast(Activity activity) {
@@ -209,7 +225,7 @@ public class PermissionUtils {
       showCameraPermissionLoggingToast(activity);
     }
 
-    if (shouldShowRational(activity, Constants.PERMISSION_STORAGE)) {
+    if (!hasStoragePermission(activity)) {
       showStoragePermissionLoggingToast(activity);
     }
   }
@@ -241,16 +257,6 @@ public class PermissionUtils {
             permission
                 + " "
                 + activity.getResources().getString(R.string.permission_reason_settings),
-            Toast.LENGTH_LONG)
-        .show();
-  }
-
-  public static void showPermissionsModelManagementToast(Activity activity, String permission) {
-    Toast.makeText(
-            activity.getApplicationContext(),
-            permission
-                + " "
-                + activity.getResources().getString(R.string.permission_reason_model_from_phone),
             Toast.LENGTH_LONG)
         .show();
   }
@@ -288,11 +294,6 @@ public class PermissionUtils {
   public static void showNearbyPermissionSettingsToast(Activity activity) {
     showPermissionsSettingsToast(
         activity, activity.getResources().getString(R.string.nearby_permission_denied));
-  }
-
-  public static void showStoragePermissionModelManagementToast(Activity activity) {
-    showPermissionsModelManagementToast(
-        activity, activity.getResources().getString(R.string.storage_permission_denied));
   }
 
   public static void showStoragePermissionLoggingToast(Activity activity) {

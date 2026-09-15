@@ -439,7 +439,11 @@ public class LoggerFragment extends CameraFragment {
   protected void setLoggingActive(boolean enableLogging) {
     if (enableLogging && !loggingEnabled) {
       if (!PermissionUtils.hasLoggingPermissions(requireActivity())) {
-        requestPermissionLauncherLogging.launch(Constants.PERMISSIONS_LOGGING);
+        if (!PermissionUtils.hasPermissions(requireActivity(), Constants.PERMISSIONS_LOGGING)) {
+          requestPermissionLauncherLogging.launch(Constants.PERMISSIONS_LOGGING);
+        } else if (!PermissionUtils.hasStoragePermission(requireActivity())) {
+          PermissionUtils.requestStoragePermission(requireActivity());
+        }
         loggingEnabled = false;
       } else {
         startLogging();

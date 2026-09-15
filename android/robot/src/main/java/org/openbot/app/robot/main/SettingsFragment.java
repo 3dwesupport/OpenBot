@@ -5,10 +5,10 @@ import static org.openbot.app.robot.utils.Constants.PERMISSION_BLUETOOTH_CONNECT
 import static org.openbot.app.robot.utils.Constants.PERMISSION_BLUETOOTH_SCAN;
 import static org.openbot.app.robot.utils.Constants.PERMISSION_CAMERA;
 import static org.openbot.app.robot.utils.Constants.PERMISSION_LOCATION;
-import static org.openbot.app.robot.utils.Constants.PERMISSION_STORAGE;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.activity.result.ActivityResultLauncher;
@@ -46,13 +46,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                         else {
                           camera.setChecked(false);
                           PermissionUtils.showCameraPermissionSettingsToast(requireActivity());
-                        }
-                        break;
-                      case PERMISSION_STORAGE:
-                        if (granted) storage.setChecked(true);
-                        else {
-                          storage.setChecked(false);
-                          PermissionUtils.showStoragePermissionSettingsToast(requireActivity());
                         }
                         break;
                       case PERMISSION_LOCATION:
@@ -114,15 +107,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
       storage.setChecked(PermissionUtils.hasStoragePermission(requireActivity()));
       storage.setOnPreferenceChangeListener(
           (preference, newValue) -> {
-            if (storage.isChecked())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+              PermissionUtils.requestStoragePermission(requireActivity());
+            } else if (storage.isChecked()) {
               PermissionUtils.startInstalledAppDetailsActivity(requireActivity());
-            else {
-              if (PermissionUtils.shouldAskForPermission(
-                  requireActivity(), Constants.PERMISSION_STORAGE)) {
-                PermissionUtils.markedPermissionAsAsked(
-                    requireActivity(), Constants.PERMISSION_STORAGE);
-                requestPermissionLauncher.launch(new String[] {Constants.PERMISSION_STORAGE});
-              } else PermissionUtils.startInstalledAppDetailsActivity(requireActivity());
+            } else {
+              PermissionUtils.requestStoragePermission(requireActivity());
             }
 
             return false;
