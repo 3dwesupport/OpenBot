@@ -19,6 +19,8 @@
 	<dict/>
 	<key>CFBundleIcons~ipad</key>
 	<dict/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
