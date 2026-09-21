@@ -1,49 +1,49 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "firebase_url": "https://example-project-default-rtdb.firebasedatabase.app",
-    "project_id": "example-project",
-    "storage_bucket": "example-project.appspot.com"
+    "project_number": "955078484078",
+    "firebase_url": "https://opencode-openbot-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "opencode-openbot",
+    "storage_bucket": "opencode-openbot.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:955078484078:android:6714b6320c5fa42565867f",
         "android_client_info": {
           "package_name": "org.openbot.app.robot"
         }
       },
       "oauth_client": [
         {
-          "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
+          "client_id": "955078484078-fbgrp2atj2udqg0jv4tlr55ddu015dh1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "org.openbot.app.robot",
-            "certificate_hash": "0000000000000000000000000000000000000000"
+            "certificate_hash": "151d794477d26492ce9a81d76c4b77df8b4d252e"
           }
         },
         {
-          "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
+          "client_id": "955078484078-kbadvp54dljcpk0g0j5bnf5c17q63ir2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDUMMYDUMMYDUMMYDUMMYDUMMYDUMMYD"
+          "current_key": "AIzaSyDvxna8olcI5kv0eOYFOy70C2fAp4OV4L8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
+              "client_id": "955078484078-kbadvp54dljcpk0g0j5bnf5c17q63ir2.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "000000000000-0000000000000000000000000000.apps.googleusercontent.com",
+              "client_id": "955078484078-0kh6cdcgf6o5a3nf8rrcbeo5h4b2ov0o.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.openbot"
+                "bundle_id": "org.openbot.app.robot"
               }
             }
           ]
