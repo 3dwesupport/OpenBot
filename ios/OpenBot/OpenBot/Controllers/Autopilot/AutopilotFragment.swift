@@ -76,7 +76,7 @@ class AutopilotFragment: CameraController {
         gameController.resetControl = false
         fragmentType.currentFragment = "Autopilot";
         calculateFrame()
-        let msg = JSON.toString(FragmentStatus(FRAGMENT_TYPE: self.fragmentType.currentFragment));
+        let msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: self.fragmentType.currentFragment)));
         client.send(message: msg);
         //start the server
         var serverListener = ServerListener();
@@ -163,7 +163,6 @@ class AutopilotFragment: CameraController {
             vehicleControl = control
             bluetooth.sendData(payload: "c" + String(left) + "," + String(right) + "\n")
             NotificationCenter.default.post(name: .updateSpeedLabel, object: String(Int(left)) + "," + String(Int(right)))
-            NotificationCenter.default.post(name: .updateRpmLabel, object: String(Int(control.getLeft())) + "," + String(Int(control.getRight())))
         }
     }
 
@@ -173,6 +172,10 @@ class AutopilotFragment: CameraController {
         if autoPilotMode {
             autoPilotMode = false
         }
+         
+        let msg = JSON.toString(self.fragmentType.closeFragment())
+        client.send(message: msg)
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -250,7 +253,12 @@ class AutopilotFragment: CameraController {
         }
         if notification.object != nil {
             let command = notification.object as! String
-            let controllerCommand = command.slice(from: "command: ", to: " }")
+            let controllerCommand = command
+                .replacingOccurrences(of: "{", with: "")
+                .replacingOccurrences(of: "}", with: "")
+                .replacingOccurrences(of: "command:", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
             switch controllerCommand {
             case "INDICATOR_LEFT":
                 self.webSocketMsgHandler.indicatorLeft()
@@ -268,6 +276,12 @@ class AutopilotFragment: CameraController {
                 break;
             case "DRIVE_MODE":
                 self.webSocketMsgHandler.driveMode()
+                break;
+            case "NETWORK":
+                if let autoModeButton = self.expandedAutoPilotView?.autoModeButton {
+                    autoModeButton.setOn(!autoModeButton.isOn, animated: true)
+                    self.expandedAutoPilotView?.switchButton(autoModeButton)
+                }
                 break;
             default:
                 break;

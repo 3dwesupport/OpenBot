@@ -20,6 +20,16 @@
 	<dict/>
 	<key>CFBundleIcons~ipad</key>
 	<dict/>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>de</string>
+		<string>es</string>
+		<string>fr</string>
+		<string>zh-Hans</string>
+		<string>ko</string>
+		<string>hi</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -27,7 +37,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.955078484078-4m63lascf45ranfmedahhcgo10ainnfa</string>
+				<string>com.googleusercontent.apps.000000000000-0000000000000000000000000000</string>
 			</array>
 		</dict>
 		<dict/>

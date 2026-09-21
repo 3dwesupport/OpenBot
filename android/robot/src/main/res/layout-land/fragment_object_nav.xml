@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <org.openbot.customview.OverlayView
+        <org.openbot.app.robot.customview.OverlayView
             android:id="@+id/tracking_overlay"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -305,7 +305,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1.3"
-                    android:entries="@array/devices"
+                    tools:entries="@array/devices"
                     android:prompt="@string/device" />
 
                 <TextView

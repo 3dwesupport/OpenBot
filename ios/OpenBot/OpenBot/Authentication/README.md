@@ -36,6 +36,10 @@ building great user experiences.
   retrieves files from the user's Google Drive, which is created by Firebase Google Drive services. It's important to
   use the same Firebase project for both the IOS and web applications for Google Drive services to work properly.
 
+  The `GoogleService-Info.plist` file committed in this repo is a **dummy placeholder** with fake keys and identifiers.
+  Google Sign-In and other Firebase features will not work until you replace it with the real file downloaded from
+  your own Firebase project, as described below.
+
 - ### Prerequisites
   To integrate Firebase into an IOS OpenBot application for Google Sign-In, we will need a few prerequisites.
 - **Google Account:** To use Google Sign-In with Firebase, you must have a Google account. If you don't have one, click
@@ -70,9 +74,12 @@ building great user experiences.
        <img src="../../../../docs/images/firebase_bundle_id.jpg" alt="Bundle ID Name" width="30.5%"/>
        </p>
 
-    6. Click on the `Next` button and skip the third (Add Firebase SDK) and fourth (Add initialization code) steps as
+    6. Copy the `REVERSED_CLIENT_ID` value from your new `GoogleService-Info.plist` and paste it into the
+       `CFBundleURLSchemes` entry (under `CFBundleURLTypes`) in `Info.plist`. Google Sign-In will not work until this
+       value matches your own Firebase project.
+    7. Click on the `Next` button and skip the third (Add Firebase SDK) and fourth (Add initialization code) steps as
        it's already done for this project.
-    7. Continue to the Firebase Console to configure the Firebase services you want to use in your IOS app.
+    8. Continue to the Firebase Console to configure the Firebase services you want to use in your IOS app.
 
    <p>
      <img src="../../../../docs/images/firebase_google_service_info_plist.jpg" alt="Add IOS Application" width="35%"/>
@@ -108,12 +115,12 @@ pod init
 Open the Podfile using your preferred text editor and add the following lines at the end of the file:
 
 ```
-  pod 'Firebase/Core'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Auth'
-  pod 'GoogleSignIn'
-  pod 'GoogleSignInSwiftSupport'
-  pod 'GoogleAPIClientForREST/Drive' 
+pod 'Firebase/Core'
+pod 'Firebase/Storage'
+pod 'Firebase/Auth'
+pod 'GoogleSignIn'
+pod 'GoogleSignInSwiftSupport'
+pod 'GoogleAPIClientForREST/Drive' 
   ```
 
 Save and close the Podfile, then Run the following command to install the Firebase SDKs:
@@ -134,9 +141,16 @@ Some common issues that may occur during the Firebase configuration process and 
 - Delete the Podfile.lock file and run pod install again.
 - Make sure you have added the Firebase SDK pod to your Podfile correctly, using the exact version specified in the
   Firebase Console.
+```shell
+2. Reinstall Pods (if you encounter build or package-related issues)
+```
+- pod deintegrate 
+- rm -rf Pods
+- rm -rf Podfile.lock
+- pod install
 
 ```shell
-2. Firebase configuration errors: If you are unable to configure Firebase correctly, such as not being able to initialize Firebase in your app, try the following solutions:
+3. Firebase configuration errors: If you are unable to configure Firebase correctly, such as not being able to initialize Firebase in your app, try the following solutions:
 ```
 
 - Double-check that you have followed all the steps in the "Set up the iOS Project" section of this document correctly.

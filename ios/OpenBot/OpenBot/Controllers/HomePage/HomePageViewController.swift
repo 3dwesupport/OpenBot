@@ -47,6 +47,7 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
     /// Called after the view controller has loaded.
     override func viewDidLoad() {
         super.viewDidLoad()
+        tabBarItem.title = Strings.homeTab
 
         UITabBar.appearance().tintColor = traitCollection.userInterfaceStyle == .dark ? UIColor.white : UIColor.black;
         bluetoothDataController.shared.startScan()
@@ -86,7 +87,7 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
         gameController.resetControl = true
         fragmentType.currentFragment = "Home";
         setupOpenCodeIcon();
-        let msg = JSON.toString(FragmentStatus(FRAGMENT_TYPE: fragmentType.currentFragment));
+        let msg = JSON.toString(FragmentTypeEvent(status: .init(FRAGMENT_TYPE: fragmentType.currentFragment)));
         client.send(message: msg);
     }
 
@@ -228,6 +229,7 @@ class HomePageViewController: CameraController, UICollectionViewDataSource, UICo
             return headerView
         default:
             assert(false, "Unexpected element kind")
+            return UICollectionReusableView()
         }
     }
 
