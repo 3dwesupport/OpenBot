@@ -26,7 +26,7 @@ android {
 
     defaultConfig {
         applicationId "org.openbot.app.robot"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 36
         versionCode 1100
         versionName "v0.6.0"
