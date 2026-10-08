@@ -61,11 +61,23 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Please allow Bluetooth access for OpenBot to discover and connect to your robot.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_openbot._tcp.</string>
 		<string>_openbot-server._tcp.</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Please allow Camera access for OpenBot to stream video from your robot and enable object tracking.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Please allow Local Network access for OpenBot to discover and connect to your robot over Wi-Fi.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Please allow Location access for OpenBot to record GPS data while collecting driving data.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Please allow Location access for OpenBot to record GPS data while collecting driving data.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Please allow Microphone access for OpenBot to record audio alongside your robot's camera feed.</string>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>UIAppFonts</key>
