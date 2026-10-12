@@ -204,7 +204,6 @@ public class WebRtcServer implements IVideoServer {
 
   // Shared camera frames from CameraFragment
 
-
   /**
    * Called on the main thread when a CameraFragment binds or releases the camera preview.
    * switchCamera flips the preview between front and back camera and returns true if it is now
@@ -489,6 +488,7 @@ public class WebRtcServer implements IVideoServer {
       peerConnection.removeTrack(audioSender);
     }
   }
+
   // Ends the call: controllers drop their peer connection on VIDEO_COMMAND STOP, and the next
   // startServer() sends them a fresh offer.
   private void stopServer() {
@@ -811,40 +811,51 @@ public class WebRtcServer implements IVideoServer {
               Log.d(TAG, "Ignoring WebRTC event: no active call");
               return;
             }
-            String commandType = "";
-            // The controller sometimes sends webrtc_event as a JSON string instead of an object.
-            Object rawEvent = event.get("webrtc_event");
-            JSONObject webRtcEvent =
-                rawEvent instanceof JSONObject
-                    ? (JSONObject) rawEvent
-                    : new JSONObject(rawEvent.toString());
-            String type = webRtcEvent.getString("type");
-            switch (type) {
-              case "offer":
-                Timber.d("connectToSignallingServer: received an offer $isInitiator $isStarted");
-                peerConnection.setRemoteDescription(
-                    new SimpleSdpObserver(),
-                    new SessionDescription(
-                        SessionDescription.Type.OFFER, webRtcEvent.getString("sdp")));
-                doAnswer();
-                break;
+            // Any exception would end this subscription and every later call would never get
+            // the controller's answer, so a bad message is logged and skipped.
+            try {
+              String commandType = "";
+              // The controller sometimes sends webrtc_event as a JSON string instead of an object.
+              Object rawEvent = event.get("webrtc_event");
+              JSONObject webRtcEvent =
+                  rawEvent instanceof JSONObject
+                      ? (JSONObject) rawEvent
+                      : new JSONObject(rawEvent.toString());
+              String type = webRtcEvent.getString("type");
+              switch (type) {
+                case "offer":
+                  Timber.d("connectToSignallingServer: received an offer $isInitiator $isStarted");
+                  peerConnection.setRemoteDescription(
+                      new SimpleSdpObserver(),
+                      new SessionDescription(
+                          SessionDescription.Type.OFFER, webRtcEvent.getString("sdp")));
+                  doAnswer();
+                  break;
 
-              case "answer":
-                String remoteDescr = webRtcEvent.getString("sdp");
-                Timber.i("Got remote description %s", remoteDescr);
-                peerConnection.setRemoteDescription(
-                    new SimpleSdpObserver(),
-                    new SessionDescription(SessionDescription.Type.ANSWER, remoteDescr));
-                break;
+                case "answer":
+                  String remoteDescr = webRtcEvent.getString("sdp");
+                  Timber.i("Got remote description %s", remoteDescr);
+                  peerConnection.setRemoteDescription(
+                      new SimpleSdpObserver(),
+                      new SessionDescription(SessionDescription.Type.ANSWER, remoteDescr));
+                  break;
 
-              case "candidate":
-                IceCandidate candidate =
-                    new IceCandidate(
-                        webRtcEvent.getString("id"),
-                        webRtcEvent.getInt("label"),
-                        webRtcEvent.getString("candidate"));
-                peerConnection.addIceCandidate(candidate);
-                break;
+                case "candidate":
+                  // The Flutter controller uses the standard sdpMid/sdpMLineIndex names.
+                  IceCandidate candidate =
+                      new IceCandidate(
+                          webRtcEvent.has("id")
+                              ? webRtcEvent.getString("id")
+                              : webRtcEvent.getString("sdpMid"),
+                          webRtcEvent.has("label")
+                              ? webRtcEvent.getInt("label")
+                              : webRtcEvent.getInt("sdpMLineIndex"),
+                          webRtcEvent.getString("candidate"));
+                  peerConnection.addIceCandidate(candidate);
+                  break;
+              }
+            } catch (JSONException e) {
+              Log.e(TAG, "Ignoring malformed WebRTC event: " + event, e);
             }
           },
           error -> Log.d(TAG, "Error occurred in handleControllerWebRtcEvents: %s", error),
