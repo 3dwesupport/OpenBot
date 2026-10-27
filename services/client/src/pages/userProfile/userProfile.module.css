@@ -1,0 +1,131 @@
+.mainScreen {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.parentDiv {
+    width: 70%;
+}
+
+.editProfileContainer {
+    padding-top: 4%;
+}
+
+.editProfileTextDiv {
+    font-family: Gilroy-SemiBold, serif;
+    font-size: 20px;
+}
+
+.editProfileImageDiv {
+    position: relative;
+    display: flex;
+    padding-top: 2%;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.mainImageDiv {
+    display: flex;
+}
+
+.profileImage {
+    display: flex;
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon {
+    padding-top: 2%;
+}
+
+.editProfileIcon {
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+    position: absolute;
+}
+
+.text {
+    font-size: 18px;
+}
+
+.childDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    row-gap: 30px;
+    padding-top: 4%;
+}
+
+.saveButton {
+    background: #0071c5;
+    border-radius: 6px;
+    color: #fff;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 20px;
+    height: 45px;
+    justify-content: center;
+    width: 30%;
+}
+
+.loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: darkred;
+}
+
+@media only screen and (max-width: 768px) {
+    .parentDiv {
+        width: 90%;
+    }
+
+    .childDiv {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .saveButton {
+        width: 100%;
+    }
+
+    .editProfileIcon {
+        height: 25px;
+        width: 25px;
+        padding-top: 9%;
+        padding-left: 12%;
+    }
+
+    .editProfileImageDiv {
+        padding-top: 30px;
+    }
+
+    .mainImageDiv {
+        justify-content: center;
+    }
+
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+    .profileImage {
+        height: 8rem;
+    }
+
+    .editProfileIcon {
+        height: 45px;
+        width: 45px;
+        padding-top: 10%;
+        padding-left: 12%;
+    }
+
+}

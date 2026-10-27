@@ -1,0 +1,43 @@
+.billingParentDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.billingChildDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    flex-direction: column;
+}
+
+.billingTitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Gilroy-Medium, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    height: 100px;
+}
+
+.billingPlanDiv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+@media only screen and (max-width: 821px) {
+    .billingPlanDiv {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .billingChildDiv {
+        width: 90%;
+    }
+}

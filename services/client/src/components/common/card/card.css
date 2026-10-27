@@ -1,0 +1,81 @@
+.container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cardContainer {
+    height: 73%;
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.title {
+    font-size: 1.3rem;
+    font-family: Gilroy-Medium, sans-serif;
+    padding-left: 5%;
+}
+
+.cardImageAndText {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.textDiv {
+    display: flex;
+    justifyContent: center;
+    align-items: center;
+    width: 100%;
+}
+
+.textStyleDiv {
+    color: #FFFFFF;
+    font-family: Gilroy-Medium, serif;
+}
+.newFileIcon{
+    display: flex;
+    justify-content: flex-end;
+    width: 90%;
+    align-items: flex-end;
+    position: absolute;
+    top: 0;
+    padding: 15px;
+}
+.cardImage{
+    height: 55px;
+}
+
+@media only screen and (max-width: 768px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .cardContainer {
+        height: 73%;
+        width: 95%;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .textDiv {
+        height: 10%;
+    }
+
+    .textStyleDiv {
+        font-size: 12px;
+    }
+    .cardImage{
+        height: 40px;
+    }
+.newFileIcon{
+    padding: 10px;
+}
+
+}
