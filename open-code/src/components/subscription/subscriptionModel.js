@@ -24,6 +24,11 @@ const SubscriptionModel = (props) => {
         setIsSubscriptionExpire(false);
     }
 
+    // function to open the Billing page
+    function sendDashboard(){
+        window.location.href = "about:blank";
+    }
+
     return (
         <Modal
             className={Styles.expireModel}
@@ -53,6 +58,7 @@ const SubscriptionModel = (props) => {
                                        extraStyle={Styles.expirationDescription}/>}
                         <BlueButton onClick={() => {
                             //TODO add subscriptions page of dashboard
+                            sendDashboard()
                         }} buttonType={"contained"}
                                     buttonName={Constants.subscribeButton}
                                     extraStyle={Styles.subscribeButton}/>

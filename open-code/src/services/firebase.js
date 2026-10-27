@@ -10,9 +10,11 @@ import {
     setDoc,
 } from "firebase/firestore";
 import {getAuth, signOut} from "firebase/auth";
-import {localStorageKeys, tables} from "../utils/constants";
+import {Constants, localStorageKeys, tables} from "../utils/constants";
 import {setConfigData} from "./workspace";
 import configData from "../config.json";
+import {Cookies} from "react-cookie-consent";
+import {addSubscription} from "../apis/subscription";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -65,10 +67,21 @@ export async function googleSigIn() {
         const signIn = await auth.signInWithPopup(provider);
         localStorage.setItem("isSigIn", "true");
         localStorage.setItem(localStorageKeys.accessToken, signIn.credential?.accessToken);
+        localStorage.setItem(localStorageKeys.uid, signIn.user.uid);
+        const cookieOptions = {
+            // domain: '.openbot.org',
+            domain: 'localhost',
+            // domain: ".itinker.io",
+            secure: true,
+        };
+        await addSubscription(auth?.currentUser?.uid, Constants.free).then(async (res) => {
+            console.log("res::", res)
+            Cookies.set(localStorageKeys.playgroundPlanDetails, JSON.stringify(res), cookieOptions);
+        });
         await setConfigData();
         return signIn
     }
-}
+};
 
 /**
  * function to log out user from Goole account
@@ -82,6 +95,12 @@ export async function googleSignOut() {
         localStorage.setItem(localStorageKeys.accessToken, " ");
         localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
         // delete_cookie("user");
+
+        Cookies.remove(localStorageKeys.accessToken, " ");
+        Cookies.remove(localStorageKeys.playgroundPlanDetails);
+        localStorage.setItem(localStorageKeys.uid, "");
+        Cookies.remove('CookieConsent');
+
     }).catch((error) => {
         console.log("Sign-out error ", error)
     });
@@ -95,7 +114,7 @@ export async function getDateOfBirth() {
     const docRef = doc(db, "users", auth.currentUser?.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        if(docSnap.data()?.dob) {
+        if (docSnap.data()?.dob) {
             const date = new Date(docSnap.data().dob.toDate());
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1

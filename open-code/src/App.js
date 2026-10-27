@@ -3,8 +3,13 @@ import {RouterComponent} from "./components/router/router";
 import StoreProvider from './context/context';
 import {createContext, useEffect, useState} from "react";
 import {localStorageKeys, Themes} from "./utils/constants";
-import {auth, googleSignOut} from "./services/firebase";
+import {auth, db, googleSignOut} from "./services/firebase";
 import {ToastContainer} from "react-toastify";
+import {getCookie} from "./services/workspace";
+import {addSubscription} from "./apis/subscription";
+import {Cookies} from "react-cookie-consent";
+import {collection, onSnapshot} from "@firebase/firestore"
+import {query, where} from "firebase/firestore";
 
 export const ThemeContext = createContext(null);
 
@@ -49,10 +54,21 @@ function App() {
                 if (result.credential) {
                     localStorage.setItem(localStorageKeys.accessToken, result.credential.accessToken);
                     localStorage.setItem("isSigIn", "true");
+                    localStorage.setItem(localStorageKeys.uid, result?.user.uid);
                     setUser({
                         photoURL: result.user?.photoURL,
                         displayName: result.user?.displayName,
                         email: result.user?.email,
+                    });
+                    const cookieOptions = {
+                        // domain: '.openbot.org',
+                        domain: 'localhost',
+                        // domain: ".itinker.io",
+                        secure: true,
+                    };
+                    await addSubscription(auth?.currentUser?.uid).then(async (res) => {
+                        console.log("res::", res)
+                        Cookies.set(localStorageKeys.playgroundPlanDetails, JSON.stringify(res), cookieOptions);
                     });
                 }
             });
@@ -96,6 +112,16 @@ function App() {
             localStorage.setItem("isSigIn", "true");
             auth.signInWithCustomToken(result).then((res) => {
                 delete_cookie("user");
+                const cookieOptions = {
+                    // domain: '.openbot.org',
+                    domain: 'localhost',
+                    // domain: ".itinker.io",
+                    secure: true,
+                };
+                addSubscription(auth?.currentUser?.uid).then(async (res) => {
+                    console.log("res::", res)
+                    Cookies.set(localStorageKeys.playgroundPlanDetails, JSON.stringify(res), cookieOptions);
+                });
             })
                 .catch((error) => {
                     console.log("error::", error);
@@ -136,12 +162,36 @@ function App() {
                 clearTimeout(timeoutId);
             }
         });
-
         return () => {
             unsubscribe();
             clearTimeout(timeoutId);
         }
     }, [isTimeoutId]);
+
+    useEffect(() => {
+        console.log(localStorage.getItem(localStorageKeys.uid))
+
+        if (localStorage.getItem("isSigIn") === "true") {
+            const q = query(collection(db, "subscription"), where("uid", "==", localStorage.getItem(localStorageKeys.uid)));
+            onSnapshot(q, (snapshot) => {
+                console.log("Data fetched ::::", snapshot);
+                snapshot.docChanges().forEach((change) => {
+                    console.log("change::", change)
+                    if (change.type === "added") {
+                        console.log("New city: ", change.doc.data());
+                        Cookies.set("playgroundPlanDetails", change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        console.log("Modified city: ", change.doc.data());
+                        Cookies.set("playgroundPlanDetails", change.doc.data());
+                    }
+                });
+
+            }, (error) => {
+                console.log("error during fetch data from firebase :");
+            })
+        }
+    }, []);
 
     useEffect(() => {
         if (isSessionExpire) {
@@ -173,6 +223,20 @@ function App() {
         }
     };
 
+    /**
+     * Update cookies real time data from firebase
+     * @param subscriptionData
+     */
+    // const updateCookies=(subscriptionData)=>{
+    //     // update Cookies with the subscription data
+    //     const cookieOptions = {
+    //         // domain: '.openbot.org',
+    //         domain: 'localhost',
+    //         // domain: ".itinker.io",
+    //         secure: true,
+    //     };
+    //     Cookies.set("SubscriptionData",JSON.stringify(subscriptionData),cookieOptions);
+    // }
     return (
         <ThemeContext.Provider value={{theme, toggleTheme}}>
             <StoreProvider isOnline={internetOn} isSessionExpireModal={isSessionExpireModal}
