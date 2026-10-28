@@ -146,6 +146,13 @@
 "setupProfilePromptLine2" = "deinem Google-Konto anmeldest.";
 "editProfile" = "Profil bearbeiten";
 "logoutMenuItem" = "Abmelden";
+"deleteAccountTitle" = "Konto löschen";
+"deleteAccountButton" = "Konto löschen";
+"deleteAccountMessage" = "Dein Konto wird dauerhaft gelöscht, zusammen mit deinem Profil und den dazu gespeicherten Daten. Deine Projekte in Google Drive werden nicht gelöscht; du kannst sie selbst in Google Drive entfernen.";
+"deleteAccountConfirmTitle" = "Konto löschen?";
+"deleteAccountConfirmMessage" = "Dein Konto und deine Daten werden dauerhaft gelöscht. Das kann nicht rückgängig gemacht werden.";
+"deleteAccountSuccessToast" = "Dein Konto wurde gelöscht.";
+"deleteAccountErrorMessage" = "Das Konto konnte nicht gelöscht werden. Bitte melde dich erneut an und versuche es noch einmal.";
 "firstNameFieldLabel" = "Vorname";
 "lastNameFieldLabel" = "Nachname";
 "dateOfBirthFieldLabel" = "Geburtsdatum";

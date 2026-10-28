@@ -127,6 +127,7 @@
 		727D3D5ABACE7CF224FA3349 /* EditProfileFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D384384E67F20294222AC /* EditProfileFragment.swift */; };
 		727D3D7ED38D147ECD48C9BA /* SignalingMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D37586F16DE497CEA62CE /* SignalingMessage.swift */; };
 		727D3D8A8059D87F84174B97 /* AdaptiveLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3F45A25D4C4A8A309FFC /* AdaptiveLayoutHelper.swift */; };
+		727D3DE00000000000000002 /* DeleteAccountFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3DE00000000000000001 /* DeleteAccountFragment.swift */; };
 		727D3E26C05E5911CC9BF342 /* Readme.md in Sources */ = {isa = PBXBuildFile; fileRef = 727D300DE421E6957CB4CD67 /* Readme.md */; };
 		727D3E359F26636BBDC6E3A4 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3C4EBE89B9B6E537BE8B /* Device.swift */; };
 		727D3E6881E8758C94FF74F4 /* GifLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 727D3A51A7A6155C22E62412 /* GifLoader.swift */; };
@@ -297,6 +298,7 @@
 		727D3D2F7F5D7109583A8A39 /* DeviceCurrentOrientation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceCurrentOrientation.swift; sourceTree = "<group>"; };
 		727D3D5655D02C86CD08281C /* UITextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITextField.swift; sourceTree = "<group>"; };
 		727D3D5C91B30251F62FA65B /* ServerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerItem.swift; sourceTree = "<group>"; };
+		727D3DE00000000000000001 /* DeleteAccountFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeleteAccountFragment.swift; sourceTree = "<group>"; };
 		727D3E0255E9EFCEBD190510 /* WebRTCClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebRTCClient.swift; path = WebRTC/WebRTCClient.swift; sourceTree = "<group>"; };
 		727D3E372C09E1BADA2A03FA /* ScannerFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScannerFragment.swift; sourceTree = "<group>"; };
 		727D3E5643531AC215E4101B /* UIButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
@@ -792,6 +794,7 @@
 			children = (
 				727D3A89E5445B66EEB3177C /* ProfileFragment.swift */,
 				727D384384E67F20294222AC /* EditProfileFragment.swift */,
+				727D3DE00000000000000001 /* DeleteAccountFragment.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -1386,6 +1389,7 @@
 				727D37C2806C8F8AC502DDBE /* README.md in Sources */,
 				727D354EAA4CA78176DD1064 /* Toast.swift in Sources */,
 				727D37F0A374924D485368CD /* Reachability.swift in Sources */,
+				727D3DE00000000000000002 /* DeleteAccountFragment.swift in Sources */,
 				727D36856575D19091290CFF /* WebViewFragment.swift in Sources */,
 				727D3E26C05E5911CC9BF342 /* Readme.md in Sources */,
 				727D397E28A6A94840B702D4 /* AlertFragment.swift in Sources */,

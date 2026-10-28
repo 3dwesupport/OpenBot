@@ -20,6 +20,8 @@ class profileFragment: UIViewController {
     var logoutLabel = UILabel()
     var userImgView = UIImageView()
     var logoutImgView = UIImageView()
+    var deleteAccountLabel = UILabel()
+    var deleteAccountImgView = UIImageView()
     var signInView = UIView()
     var guestView = UIView()
 
@@ -60,15 +62,19 @@ class profileFragment: UIViewController {
             guestView.frame.origin = CGPoint(x: 0, y: height / 2 - 100);
             userImgView.frame.origin.x = safeAreaLayoutValue.left + 38;
             logoutImgView.frame.origin.x = safeAreaLayoutValue.left + 38;
+            deleteAccountImgView.frame.origin.x = safeAreaLayoutValue.left + 38;
             editProfileLabel.frame.origin.x = userImgView.right + 20;
             logoutLabel.frame.origin.x = editProfileLabel.left;
+            deleteAccountLabel.frame.origin.x = editProfileLabel.left;
         } else {
             signInView.frame = CGRect(origin: CGPoint(x: 0, y: 100), size: CGSize(width: height, height: width - 100))
             guestView.frame.origin = CGPoint(x: height / 2 - 200, y: width / 2 - 100);
             userImgView.frame.origin.x = safeAreaLayoutValue.top + 38;
             logoutImgView.frame.origin.x = safeAreaLayoutValue.top + 38;
+            deleteAccountImgView.frame.origin.x = safeAreaLayoutValue.top + 38;
             editProfileLabel.frame.origin.x = userImgView.right + 20;
             logoutLabel.frame.origin.x = editProfileLabel.left;
+            deleteAccountLabel.frame.origin.x = editProfileLabel.left;
         }
         updateUIConstraints();
     }
@@ -124,6 +130,10 @@ class profileFragment: UIViewController {
         logoutLabel.isUserInteractionEnabled = true;
         let tapOnLogout = UITapGestureRecognizer(target: self, action: #selector(logoutHandler))
         logoutLabel.addGestureRecognizer(tapOnLogout);
+        deleteAccountLabel = CustomLabel(text: Strings.deleteAccountTitle, fontSize: 16, fontColor: .systemRed, frame: CGRect(x: userImgView.right + 72, y: logoutLabel.bottom + 25, width: 200, height: 50))
+        signInView.addSubview(deleteAccountLabel);
+        deleteAccountLabel.isUserInteractionEnabled = true;
+        deleteAccountLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(deleteAccountHandler)));
     }
 
     /**
@@ -138,6 +148,11 @@ class profileFragment: UIViewController {
         logoutImgView.image = logoutIcon;
         signInView.addSubview(userImgView);
         signInView.addSubview(logoutImgView);
+        deleteAccountImgView = UIImageView(image: UIImage(systemName: "trash"));
+        deleteAccountImgView.tintColor = .systemRed;
+        deleteAccountImgView.contentMode = .scaleAspectFit;
+        deleteAccountImgView.frame = CGRect(x: safeAreaLayoutValue.left + 38, y: logoutLabel.bottom + 25 + 15, width: 20, height: 20);
+        signInView.addSubview(deleteAccountImgView);
     }
 
     /**
@@ -165,6 +180,13 @@ class profileFragment: UIViewController {
         let storyboard = UIStoryboard(name: "openCode", bundle: nil)
         let viewController = storyboard.instantiateViewController(withIdentifier: "editProfile")
         self.navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    /**
+     Opens the delete account page
+     */
+    @objc func deleteAccountHandler() {
+        navigationController?.pushViewController(DeleteAccountFragment(), animated: true)
     }
 
     /**

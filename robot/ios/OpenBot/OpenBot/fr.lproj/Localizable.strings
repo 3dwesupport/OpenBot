@@ -146,6 +146,13 @@
 "setupProfilePromptLine2" = "votre compte Google.";
 "editProfile" = "Modifier le Profil";
 "logoutMenuItem" = "Déconnexion";
+"deleteAccountTitle" = "Supprimer le compte";
+"deleteAccountButton" = "Supprimer le compte";
+"deleteAccountMessage" = "Votre compte sera définitivement supprimé, ainsi que votre profil et les données associées. Vos projets dans Google Drive ne sont pas supprimés ; vous pouvez les retirer vous-même depuis Google Drive.";
+"deleteAccountConfirmTitle" = "Supprimer votre compte ?";
+"deleteAccountConfirmMessage" = "Votre compte et vos données seront définitivement supprimés. Cette action est irréversible.";
+"deleteAccountSuccessToast" = "Votre compte a été supprimé.";
+"deleteAccountErrorMessage" = "Impossible de supprimer votre compte. Reconnectez-vous et réessayez.";
 "firstNameFieldLabel" = "Prénom";
 "lastNameFieldLabel" = "Nom";
 "dateOfBirthFieldLabel" = "Date de Naissance";

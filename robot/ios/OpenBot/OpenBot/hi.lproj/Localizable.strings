@@ -146,6 +146,13 @@
 "setupProfilePromptLine2" = "अपनी प्रोफ़ाइल सेट करें।";
 "editProfile" = "प्रोफ़ाइल संपादित करें";
 "logoutMenuItem" = "लॉग आउट";
+"deleteAccountTitle" = "खाता हटाएं";
+"deleteAccountButton" = "खाता हटाएं";
+"deleteAccountMessage" = "आपका खाता, आपकी प्रोफ़ाइल और उससे जुड़े डेटा के साथ स्थायी रूप से हटा दिया जाएगा। Google Drive में आपके प्रोजेक्ट नहीं हटाए जाते; आप उन्हें Google Drive से खुद हटा सकते हैं।";
+"deleteAccountConfirmTitle" = "क्या आप अपना खाता हटाना चाहते हैं?";
+"deleteAccountConfirmMessage" = "इससे आपका खाता और डेटा स्थायी रूप से हट जाएगा। इसे वापस नहीं किया जा सकता।";
+"deleteAccountSuccessToast" = "आपका खाता हटा दिया गया है।";
+"deleteAccountErrorMessage" = "आपका खाता हटाया नहीं जा सका। कृपया फिर से साइन इन करें और दोबारा प्रयास करें।";
 "firstNameFieldLabel" = "पहला नाम";
 "lastNameFieldLabel" = "अंतिम नाम";
 "dateOfBirthFieldLabel" = "जन्म तिथि";

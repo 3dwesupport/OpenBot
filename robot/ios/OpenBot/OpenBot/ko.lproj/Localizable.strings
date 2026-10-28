@@ -146,6 +146,13 @@
 "setupProfilePromptLine2" = "프로필을 설정하세요: Google 계정.";
 "editProfile" = "프로필 편집";
 "logoutMenuItem" = "로그아웃";
+"deleteAccountTitle" = "계정 삭제";
+"deleteAccountButton" = "계정 삭제";
+"deleteAccountMessage" = "계정이 프로필 및 저장된 데이터와 함께 영구적으로 삭제됩니다. Google Drive의 프로젝트는 삭제되지 않으며, Google Drive에서 직접 삭제할 수 있습니다.";
+"deleteAccountConfirmTitle" = "계정을 삭제하시겠습니까?";
+"deleteAccountConfirmMessage" = "계정과 데이터가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.";
+"deleteAccountSuccessToast" = "계정이 삭제되었습니다.";
+"deleteAccountErrorMessage" = "계정을 삭제하지 못했습니다. 다시 로그인한 후 다시 시도해 주세요.";
 "firstNameFieldLabel" = "이름";
 "lastNameFieldLabel" = "성";
 "dateOfBirthFieldLabel" = "생년월일";

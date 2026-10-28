@@ -218,6 +218,13 @@ struct Strings {
     static var setupProfilePromptLine2: String { L10n.string("setupProfilePromptLine2") }
     static var editProfile: String { L10n.string("editProfile") }
     static var logoutMenuItem: String { L10n.string("logoutMenuItem") }
+    static var deleteAccountTitle: String { L10n.string("deleteAccountTitle") }
+    static var deleteAccountButton: String { L10n.string("deleteAccountButton") }
+    static var deleteAccountMessage: String { L10n.string("deleteAccountMessage") }
+    static var deleteAccountConfirmTitle: String { L10n.string("deleteAccountConfirmTitle") }
+    static var deleteAccountConfirmMessage: String { L10n.string("deleteAccountConfirmMessage") }
+    static var deleteAccountSuccessToast: String { L10n.string("deleteAccountSuccessToast") }
+    static var deleteAccountErrorMessage: String { L10n.string("deleteAccountErrorMessage") }
     static var firstNameFieldLabel: String { L10n.string("firstNameFieldLabel") }
     static var lastNameFieldLabel: String { L10n.string("lastNameFieldLabel") }
     static var dateOfBirthFieldLabel: String { L10n.string("dateOfBirthFieldLabel") }

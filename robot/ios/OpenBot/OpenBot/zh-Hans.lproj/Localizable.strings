@@ -146,6 +146,13 @@
 "setupProfilePromptLine2" = "Google 账号以设置个人资料。";
 "editProfile" = "编辑资料";
 "logoutMenuItem" = "退出登录";
+"deleteAccountTitle" = "删除账户";
+"deleteAccountButton" = "删除账户";
+"deleteAccountMessage" = "你的账户将被永久删除，同时删除你的个人资料及相关数据。你在 Google Drive 中的项目不会被删除，你可以自行在 Google Drive 中移除。";
+"deleteAccountConfirmTitle" = "要删除你的账户吗？";
+"deleteAccountConfirmMessage" = "你的账户和数据将被永久删除，此操作无法撤销。";
+"deleteAccountSuccessToast" = "你的账户已删除。";
+"deleteAccountErrorMessage" = "无法删除账户。请重新登录后再试。";
 "firstNameFieldLabel" = "名";
 "lastNameFieldLabel" = "姓";
 "dateOfBirthFieldLabel" = "出生日期";
