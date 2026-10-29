@@ -183,7 +183,12 @@ export async function deleteUserAccount() {
     } catch (error) {
         //Firebase requires a recent sign-in before allowing account deletion.
         if (error.code === "auth/requires-recent-login") {
-            await user.reauthenticateWithPopup(provider);
+            //same as googleSigIn: the Android WebView cannot open popups, so it re-authenticates through a redirect
+            if (/Android/i.test(navigator.userAgent)) {
+                await user.reauthenticateWithRedirect(provider);
+            } else {
+                await user.reauthenticateWithPopup(provider);
+            }
             await user.delete();
         } else {
             throw error;
