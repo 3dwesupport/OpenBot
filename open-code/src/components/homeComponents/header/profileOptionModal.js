@@ -8,7 +8,8 @@ import WhiteText from "../../fonts/whiteText";
 import BlueText from "../../fonts/blueText";
 import {Constants, errorToast, PathName, Themes} from "../../../utils/constants";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import trash from "../../../assets/images/icon/trash.png";
 import {getDateOfBirth, googleSigIn} from "../../../services/firebase";
 import {StoreContext} from "../../../context/context";
 import {autoSync} from "../../../services/workspace";
@@ -31,6 +32,7 @@ export function ProfileOptionModal(props) {
         isAutoSync, setIsAutoSync
     } = props
     const location = useLocation();
+    const navigate = useNavigate();
     const themes = useTheme();
     const {theme, toggleTheme} = useContext(ThemeContext);
     const {isOnline, setIsDob, isDob, setIsAutoSyncEnabled, setUser, setCategory, setDrawer} = useContext(StoreContext);
@@ -136,6 +138,12 @@ export function ProfileOptionModal(props) {
                         setDrawer(true)
                     }} text={"AI Assistant"}
                                     icon={theme === Themes.dark ? Images.chatIcon : Images.darkChatIcon}/>}
+                {isSignedIn && (isHomePage || isOnPlaygroundPage) &&
+                    <PopUpInRowText onClick={() => {
+                        handleClose();
+                        navigate(PathName.deleteAccount);
+                    }} text={"Delete Account"} icon={trash} noWrap/>
+                }
                 {((isHomePage) || (isOnPlaygroundPage) || isOnDeleteAccountPage) &&
                     <PopUpInRowText onClick={() => handleOnclick(setIsLogoutModal)} text={"Logout"}
                                     icon={theme === Themes.dark ? Images.darkLogoutIcon : Images.logoutIcon}/>
@@ -158,14 +166,14 @@ export function ProfileOptionModal(props) {
  */
 function PopUpInRowText(params) {
     const theme = useContext(ThemeContext);
-    const {onClick, text, icon, modelStyle, isAutoSync} = params
+    const {onClick, text, icon, modelStyle, isAutoSync, noWrap} = params
 
     return (
         <div onClick={onClick}
              className={`${styles.item} ${styles.editProfileMargin}  ${(theme.theme === Themes.dark ? styles.darkItem : styles.lightItem)}`}>
             <img alt="icon" src={icon}
                  className={`${styles.modalIcon} ${isAutoSync && styles.sync}`} style={modelStyle}/>
-            <span className={`${styles.inRowText}`}>
+            <span className={`${styles.inRowText}`} style={noWrap ? {whiteSpace: "nowrap"} : undefined}>
                 {theme.theme === Themes.dark ?
                     <WhiteText extraStyle={styles.modalText} styles text={text}/> :
                     <BlueText extraStyle={styles.modalText} styles text={text}/>}
