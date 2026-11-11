@@ -44,6 +44,12 @@ public final class GoalValidator {
    */
   public static final float MAX_RAY_DISTANCE_M = 6f;
 
+  /** A hit more than this above the floor is furniture or a wall, not the floor. */
+  public static final float FLOOR_TOLERANCE_M = 0.05f;
+
+  /** Depth hits get less accurate with distance (~10 cm high at 3-4 m); plane hits don't. */
+  public static final float DEPTH_TOLERANCE_PER_M = 0.04f;
+
   public enum Result {
     OK,
     NOT_FLOOR,
@@ -66,6 +72,36 @@ public final class GoalValidator {
   }
 
   /**
+   * Floor hit: that exact spot. Hit above the floor: null. No hit, or one below a detected floor (a
+   * reflection): where the tap ray meets the floor. An estimated floor can be too high (robot held
+   * up), so a hit below it is used.
+   */
+  @Nullable
+  public static float[] goalOnFloor(
+      @Nullable float[] origin,
+      @Nullable float[] direction,
+      @Nullable float[] surfaceHit,
+      boolean depthHit,
+      float floorY,
+      boolean floorFound) {
+    if (surfaceHit != null) {
+      float tolerance =
+          origin == null
+              ? FLOOR_TOLERANCE_M
+              : floorTolerance(depthHit, distance(origin, surfaceHit));
+      if (surfaceHit[1] > floorY + tolerance) return null;
+      if (!floorFound || surfaceHit[1] >= floorY - tolerance) {
+        if (origin != null && horizontalDistance(origin, surfaceHit) > MAX_RAY_DISTANCE_M) {
+          return null;
+        }
+        return surfaceHit;
+      }
+    }
+    if (origin == null || direction == null) return null;
+    return intersectFloor(origin, direction, floorY);
+  }
+
+  /**
    * Where the tap ray meets the floor. Taps at or above the horizon (window, wall, sky) never do.
    *
    * @return {x, y, z}, or null if the ray doesn't point down at the floor
@@ -82,24 +118,71 @@ public final class GoalValidator {
     return hit;
   }
 
+  /** Smaller planes are ignored when picking the lowest plane. */
+  private static final float MIN_FLOOR_AREA_M2 = 0.25f;
+
+  /** A locked floor only moves this much. */
+  private static final float FLOOR_UPDATE_M = 0.05f;
+
   /**
-   * Floor height from the tracked upward-facing planes: the largest one below the camera. The
-   * lowest one would pick up false planes reflected in shiny floors.
+   * Floor height from the tracked upward-facing planes.
    *
    * @param planes each entry is {y, area}
+   * @param lockedFloorY the locked floor, or null
    */
   @Nullable
-  public static Float pickFloorY(List<float[]> planes, float cameraY) {
-    Float floorY = null;
+  public static Float pickFloorY(
+      List<float[]> planes, float cameraY, @Nullable Float lockedFloorY) {
+    // Locked floor: only follow planes within 5 cm.
+    if (lockedFloorY != null) {
+      Float refined =
+          largestPlaneY(planes, lockedFloorY - FLOOR_UPDATE_M, lockedFloorY + FLOOR_UPDATE_M);
+      return refined != null ? refined : lockedFloorY;
+    }
+    // Robot on the floor: plane 4-40 cm below the camera.
+    Float underRobot =
+        largestPlaneY(planes, cameraY - MAX_MOUNT_HEIGHT_M, cameraY - MIN_MOUNT_HEIGHT_M);
+    if (underRobot != null) return underRobot;
+    // Else the lowest large plane (the largest may be a table).
+    return lowestPlaneY(planes, cameraY - MIN_CAMERA_HEIGHT_M, MIN_FLOOR_AREA_M2);
+  }
+
+  @Nullable
+  private static Float largestPlaneY(List<float[]> planes, float minY, float maxY) {
+    Float largest = null;
     float bestArea = 0f;
     for (float[] plane : planes) {
-      if (plane[0] > cameraY - MIN_CAMERA_HEIGHT_M) continue;
-      if (plane[1] > bestArea) {
+      if (plane[0] >= minY && plane[0] <= maxY && plane[1] > bestArea) {
         bestArea = plane[1];
-        floorY = plane[0];
+        largest = plane[0];
       }
     }
-    return floorY;
+    return largest;
+  }
+
+  @Nullable
+  private static Float lowestPlaneY(List<float[]> planes, float maxY, float minArea) {
+    Float lowest = null;
+    for (float[] plane : planes) {
+      if (plane[0] <= maxY && plane[1] >= minArea && (lowest == null || plane[0] < lowest)) {
+        lowest = plane[0];
+      }
+    }
+    return lowest;
+  }
+
+  /** How far a hit may be from the floor and still count as the floor. */
+  public static float floorTolerance(boolean depthHit, float distanceM) {
+    return depthHit
+        ? Math.max(FLOOR_TOLERANCE_M, DEPTH_TOLERANCE_PER_M * distanceM)
+        : FLOOR_TOLERANCE_M;
+  }
+
+  private static float distance(float[] a, float[] b) {
+    float dx = a[0] - b[0];
+    float dy = a[1] - b[1];
+    float dz = a[2] - b[2];
+    return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   public static float horizontalDistance(float[] a, float[] b) {
