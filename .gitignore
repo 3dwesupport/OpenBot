@@ -17,6 +17,7 @@ wandb/
 # build
 /bin
 /node_modules/
+
 /caches
 /wrapper
 controller/flutter/android/build
@@ -24,4 +25,4 @@ controller/flutter/android/build
 kotlin-profile
 native
 jdks
-/android/FakeDependency.jar
+/robot/android/FakeDependency.jar

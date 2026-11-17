@@ -17,27 +17,89 @@ Die Hauptaufgabe der MCU besteht darin, die Steuerung des Fahrzeugs auf niedrige
 
 ## Einrichtung
 
-Zuerst müssen Sie Ihre Hardwarekonfiguration am Anfang des Codes einrichten. Wenn Sie den DIY-Bau (mit dem L298N-Motortreiber) durchgeführt haben, setzen Sie `OPENBOT DIY`. Wenn Sie die benutzerdefinierte Leiterplatte verwendet haben, überprüfen Sie die Version und setzen Sie entweder `OPENBOT PCB_V1` oder `OPENBOT PCB_V2`. Wenn Sie ein OpenBot-Kit haben, setzen Sie `OPENBOT RTR_TT`. Wenn Sie einen RC-Truck nachgerüstet haben, setzen Sie `OPENBOT RC_CAR`. Wenn Sie die kleinere DIY-Version für Bildungszwecke verwenden, setzen Sie `OPENBOT LITE`. Wenn Sie das OpenBot Ready-to-Run-Kit mit 520-Motoren verwenden, setzen Sie `OPENBOT RTR_520`. Wenn Sie das Multi Terrain Vehicle gebaut haben, sollten Sie `OPENBOT MTV` setzen. Um den `OpenBot DIY` mit dem ESP32 zu betreiben, setzen Sie OpenBot `DIY_ESP32`.
+Alle Einstellungen stehen im Abschnitt **SETTINGS** ganz oben in `openbot.ino`. Darunter müssen Sie nichts ändern.
 
-## Bluetooth
+Damit Ihre Einstellungen bei einem Firmware-Update erhalten bleiben, kopieren Sie die Zeilen des SETTINGS-Abschnitts zwischen `#else` und `#endif` in eine neue Datei `openbot_settings.h` neben `openbot.ino` und ändern Sie sie dort. Wenn `openbot_settings.h` existiert, verwendet die Firmware sie statt des Abschnitts in `openbot.ino`. Git ignoriert die Datei, sodass sie nicht versehentlich gepusht wird.
 
-Sie können den OpenBot auch über Bluetooth betreiben, dazu können Sie Bluetooth aktivieren, indem Sie `BLUETOOTH 1` setzen (deaktivieren: 0). Damit Bluetooth funktioniert, benötigen Sie OpenBot mit ESP32-Boards wie `(RTR_520, MTV, DIY_ESP32)`.
+### Roboterkörper
 
-## Konfiguration
+Setzen Sie `OPENBOT` auf Ihren Roboterkörper und wählen Sie in der Arduino IDE ein Board, das er unterstützt. Die Firmware erkennt das Board; mit jedem anderen Board bricht der Build mit einem Fehler ab.
 
-Als nächstes müssen Sie konfigurieren, welche Funktionen Sie aktivieren möchten. Deaktivierte Funktionen werden nicht kompiliert, um Speicher zu sparen und den Code schneller zu machen. Wenn ein Flag nicht definiert ist, wird die Funktion deaktiviert. Jedes Modell hat einige Standardeinstellungen, die Sie je nach Konfiguration ändern müssen.
+| Körper | `OPENBOT` | Arduino Nano | ESP32 Dev Module |
+|---|---|:---:|:---:|
+| DIY-Bau (L298N-Motortreiber) | `DIY` | ✓ | ✓ |
+| Eigene Platine V1 / V2 | `PCB_V1` / `PCB_V2` | ✓ | |
+| Ready-to-Run-Kit, TT-Motoren | `RTR_TT` | ✓ | |
+| Ready-to-Run-Kit, TT-Motoren, ESP32 | `RTR_TT2` | | ✓ |
+| Ready-to-Run-Kit, 520-Motoren | `RTR_520` | | ✓ |
+| RC-Truck | `RC_CAR` | ✓ | |
+| OpenBot Lite | `LITE` | ✓ | |
+| Multi Terrain Vehicle | `MTV` | | ✓ |
 
-- Aktivieren Sie den Spannungsteiler, indem Sie `HAS_VOLTAGE_DIVIDER 1` setzen (deaktivieren: 0). Wenn Sie einen Spannungsteiler haben, sollten Sie auch den `VOLTAGE_DIVIDER_FACTOR` angeben, der als (R1+R2)/R2 berechnet wird, `VOLTAGE_MIN`, die minimale Spannung zum Antrieb der Motoren, `VOLTAGE_LOW`, die minimale Batteriespannung und `VOLTAGE_MAX`, die maximale Batteriespannung.
-- Aktivieren Sie die Anzeigelampen, indem Sie `HAS_INDICATORS 1` setzen (deaktivieren: 0).
-- Aktivieren Sie die Geschwindigkeitsmesser vorne/hinten, indem Sie `HAS_SPEED_SENSORS_FRONT 1` / `HAS_SPEED_SENSORS_BACK 1` setzen (deaktivieren: 0).
-- Aktivieren Sie den Ultraschallsensor, indem Sie `HAS_SONAR 1` setzen (deaktivieren: 0). Aktivieren Sie den Medianfilter für Sonarmessungen, indem Sie `USE_MEDIAN 1` setzen (deaktivieren: 0).
-- Aktivieren Sie den Stoßfängersensor, der zur Erkennung von Kollisionen verwendet wird, indem Sie `HAS_BUMPER 1` setzen (deaktivieren: 0).
-- Aktivieren Sie das OLED-Display, indem Sie `HAS_OLED 1` setzen (deaktivieren: 0).
-- Aktivieren Sie die LEDs vorne/hinten/Status, indem Sie `HAS_LEDS_FRONT 1` / `HAS_LEDS_BACK 1` / `HAS_LEDS_STATUS 1` setzen (deaktivieren: 0).
+`DIY_ESP32` wurde durch `DIY` mit ausgewähltem ESP32-Board ersetzt.
+
+### Fahren
+
+Standardmäßig steuern Sie den Roboter mit der Telefon-App. Für den [Kein-Telefon-Modus](#kein-telefon-modus) setzen Sie `NO_PHONE_MODE 1`; mit einem ESP32 können Sie dann auch mit einem [Gamepad](#gamepad-steuerung) fahren (`HAS_GAMEPAD 1`). `COAST_MODE` legt fest, ob die Motoren ohne Steuerung ausrollen (1) oder bremsen (0), und `DEBUG 1` gibt Debug-Ausgaben auf dem seriellen Monitor aus. Mit der Bluetooth-Verbindung zum Handy legt `BLE_NAME` den Namen fest, unter dem der Roboter in der App erscheint, zum Beispiel `#define BLE_NAME "Team 3"` (bis zu 20 Buchstaben, Ziffern, Leerzeichen, - oder _).
+
+### Teile
+
+Jeder Körper schaltet die Teile ein, die er normalerweise hat:
+
+| `OPENBOT` | Eingeschaltete Teile |
+|---|---|
+| `DIY`, `PCB_V1`, `PCB_V2` | Spannungsteiler, Blinker, Sonar, vordere Geschwindigkeitssensoren |
+| `RTR_TT`, `RTR_TT2`, `RTR_520` | Spannungsteiler, Blinker, Sonar, Stoßfänger, vordere und hintere Geschwindigkeitssensoren, vordere, hintere und Status-LEDs |
+| `LITE` | Blinker |
+| `RC_CAR` | Keine |
+| `MTV` | Vordere, mittlere und hintere Geschwindigkeitssensoren |
+
+Bei einem ESP32 ist außerdem die Bluetooth-Verbindung zum Telefon eingeschaltet.
+
+In den Einstellungen steht jedes Teil auf dem Standard des Körpers, z.B. `#define HAS_SONAR DEFAULT_HAS_SONAR`, und eine Tabelle darüber zeigt die Standards jedes Körpers. Um ein Teil zu ändern, setzen Sie es stattdessen auf `1` (ein) oder `0` (aus), z.B. `#define HAS_SONAR 0`, wenn Sie keinen Ultraschallsensor eingebaut haben. Ein eingeschaltetes, aber nicht eingebautes Teil schadet nicht, aber die App zeigt dafür unsinnige Werte, etwa einen Sonar-Abstand von 300 cm.
+
+| Einstellung | Teil |
+|---|---|
+| `HAS_VOLTAGE_DIVIDER` | Messung der Batteriespannung |
+| `HAS_INDICATORS` | Blinker |
+| `HAS_SONAR`, `SONAR_MEDIAN` | Ultraschallsensor und ein Medianfilter für seine Messwerte |
+| `HAS_BUMPER` | Stoßfänger zur Kollisionserkennung |
+| `HAS_SPEED_SENSORS_FRONT`, `_BACK`, `_MIDDLE` | Raddrehzahlsensoren |
+| `HAS_LEDS_FRONT`, `HAS_LEDS_BACK`, `HAS_LEDS_STATUS` | Frontlichter, Rücklichter und Status-LEDs |
+| `HAS_OLED` | OLED-Display |
+| `HAS_BLUETOOTH` | Bluetooth-Verbindung zum Telefon (ESP32) |
+
+### Batterie
+
+Die Batterieanzeige der App reicht von `VOLTAGE_LOW` (leer) bis `VOLTAGE_MAX` (voll). Sie stehen auf den Standards des Körpers; für eine andere Batterie setzen Sie sie in den Einstellungen, zum Beispiel `#define VOLTAGE_LOW 6.8f`:
+
+| Batterie | `VOLTAGE_LOW` | `VOLTAGE_MAX` |
+|---|---:|---:|
+| 2S Li-Ion / LiPo | 6.8f | 8.4f |
+| 3S Li-Ion / LiPo | 10.2f | 12.6f |
+| 6 × AA | 6.0f | 9.0f |
+| 8 × AA | 8.0f | 12.0f |
+
+Wenn Ihr Spannungsteiler von dem des Körpers abweicht, setzen Sie auch `VOLTAGE_DIVIDER_FACTOR` auf (R1 + R2) / R2. `VOLTAGE_MIN` ist die niedrigste Spannung, bei der sich die Motoren noch drehen; die Firmware verwendet sie nur im Kein-Telefon-Modus.
+
+**Der Roboter reagiert bei voller Geschwindigkeit nicht mehr.** Bei hoher Geschwindigkeit, vor allem beim Anfahren auf dem Boden, ziehen die Motoren viel Strom. Mit schwachen oder Alkaline-AA-Batterien kann die Spannung so weit einbrechen, dass die Platine neu startet und die App oder das Gamepad die Verbindung verliert. Verwenden Sie frische oder wiederaufladbare Akkus (NiMH oder Li-Ion), oder fahren Sie in einer langsameren Stufe. Ein Gamepad muss danach eventuell [neu gekoppelt](#koppeln) werden.
+
+### Konfiguration prüfen
+
+Beim Start zeigt der serielle Monitor (115200 Baud) den Körper und die eingeschalteten Teile, zum Beispiel:
+
+```
+OpenBot DIY (ESP32): voltage, indicators, sonar, speed sensors front, Bluetooth
+OpenBot settings: openbot_settings.h
+```
+
+Die zweite Zeile zeigt, woher die Einstellungen kommen: `openbot_settings.h` oder `openbot.ino`, wenn es keine Einstellungsdatei gibt.
+
+Wenn zwei Teile denselben Pin verwenden, bricht der Build mit dem Fehler "Two parts use the same pin" ab.
 
 ### Abhängigkeiten
 
-Wenn Sie die Geschwindigkeitsmesser oder den Ultraschallsensor aktiviert haben, müssen Sie die [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) Bibliothek installieren. Der Arduino Nano hat nur zwei externe Interrupt-Pins (D2 und D3) und D3 ist auch einer von nur sechs Pins, die PWM unterstützen. Glücklicherweise hat er auch drei Port-Interrupts, die alle Pins auf dem Arduino abdecken. Diese Bibliothek analysiert diese Port-Interrupts und ermöglicht es, alle Pins des Arduino als Interrupts zu verwenden.
+Auf dem Arduino Nano brauchen die Geschwindigkeitssensoren und der Ultraschallsensor die [PinChangeInterrupt](https://github.com/NicoHood/PinChangeInterrupt) Bibliothek; die meisten Körper haben sie standardmäßig eingeschaltet. Der Arduino Nano hat nur zwei externe Interrupt-Pins (D2 und D3) und D3 ist auch einer von nur sechs Pins, die PWM unterstützen. Glücklicherweise hat er auch drei Port-Interrupts, die alle Pins auf dem Arduino abdecken. Diese Bibliothek analysiert diese Port-Interrupts und ermöglicht es, alle Pins des Arduino als Interrupts zu verwenden.
 
 Wenn Sie das OLED aktiviert haben, müssen Sie die Bibliotheken [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306) und [Adafruit_GFX Library](https://github.com/adafruit/Adafruit-GFX-Library) installieren.
 
@@ -180,11 +242,76 @@ Bevor Sie fortfahren, stellen Sie sicher, dass die Reifen entfernt sind. Sie ben
 
 ### Kein Telefon-Modus
 
-Bevor Sie das Auto mit einem Smartphone testen, auf dem die OpenBot-Anwendung installiert ist, können Sie das Auto auch ohne Telefon testen. Setzen Sie einfach die Option `NO_PHONE_MODE` auf `1`. Das Auto fährt nun mit _normaler Geschwindigkeit_ (75% PWM) und verlangsamt sich, wenn es Hindernisse mit dem Ultraschallsensor erkennt. Sobald es sich dem `TURN_THRESHOLD` (Standard: 50 cm) nähert, beginnt es, sich in eine zufällige Richtung zu drehen und schaltet die LED auf dieser Seite ein. Wenn der geschätzte freie Raum vor dem Auto unter den `TURN_THRESHOLD` fällt, fährt es langsam rückwärts und beide LEDs leuchten auf. Beachten Sie, dass sowohl das Auto als auch der Arduino mit Strom versorgt werden müssen. Der Arduino kann mit Strom versorgt werden, indem der 5V-Pin mit dem 5V-Ausgang des L298N-Motortreibers verbunden wird oder indem das USB-Kabel an eine Stromquelle (z.B. Telefon) angeschlossen wird.
+Bevor Sie das Auto mit einem Smartphone testen, auf dem die OpenBot-Anwendung installiert ist, können Sie das Auto auch ohne Telefon testen. Setzen Sie einfach `NO_PHONE_MODE 1` in den Einstellungen. Das Auto fährt nun mit _normaler Geschwindigkeit_ (75% PWM) und verlangsamt sich, wenn es Hindernisse mit dem Ultraschallsensor erkennt. Sobald es sich dem `TURN_THRESHOLD` (Standard: 50 cm) nähert, beginnt es, sich in eine zufällige Richtung zu drehen und schaltet die LED auf dieser Seite ein. Wenn der geschätzte freie Raum vor dem Auto unter den `TURN_THRESHOLD` fällt, fährt es langsam rückwärts und beide LEDs leuchten auf. Beachten Sie, dass sowohl das Auto als auch der Arduino mit Strom versorgt werden müssen. Der Arduino kann mit Strom versorgt werden, indem der 5V-Pin mit dem 5V-Ausgang des L298N-Motortreibers verbunden wird oder indem das USB-Kabel an eine Stromquelle (z.B. Telefon) angeschlossen wird.
 
-Bevor Sie das Auto laufen lassen, empfehlen wir, die Reifen zu entfernen, den Arduino mit einem Computer zu verbinden und den seriellen Monitor wie im Abschnitt [Testen](#testing) zu beobachten. Die Ausgabe auf dem seriellen Monitor ist etwas einfacher zu parsen (gleich wie OLED) und zeigt die Batteriespannung, die Umdrehungen pro Minute für die linken und rechten Motoren und den geschätzten freien Raum vor dem Auto an. Sie können ein großes Objekt vor dem Ultraschallsensor hin und her bewegen und beobachten, wie sich die Geschwindigkeit der Motoren ändert.
+Bevor Sie das Auto laufen lassen, empfehlen wir, die Reifen zu entfernen, den Arduino mit einem Computer zu verbinden und den seriellen Monitor wie im Abschnitt [Testen](#testen) zu beobachten. Die Ausgabe auf dem seriellen Monitor ist etwas einfacher zu parsen (gleich wie OLED) und zeigt die Batteriespannung, die Umdrehungen pro Minute für die linken und rechten Motoren und den geschätzten freien Raum vor dem Auto an. Sie können ein großes Objekt vor dem Ultraschallsensor hin und her bewegen und beobachten, wie sich die Geschwindigkeit der Motoren ändert.
 
 :warning: WARNUNG: Wenn Sie keinen Ultraschallsensor installiert haben oder wenn er deaktiviert ist, fährt das Auto einfach mit _normaler Geschwindigkeit_ (75% PWM) vorwärts und wird schließlich kollidieren. Selbst mit installiertem Sensor kann das Auto gelegentlich aufgrund von Rauschmessungen kollidieren.
+
+### Gamepad-Steuerung
+
+Im Kein-Telefon-Modus können Sie einen ESP32-Körper mit einem Bluetooth-Gamepad steuern, statt ihn selbstständig fahren zu lassen.
+
+#### Einrichtung
+
+1. Fügen Sie in der Arduino IDE unter **Einstellungen > Zusätzliche Boardverwalter-URLs** diese URL hinzu:
+   `https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json`
+2. Installieren Sie im Boardverwalter **esp32_bluepad32** (4.1.0). Es basiert auf demselben esp32-Core (2.0.17) wie die normale Firmware.
+3. Wählen Sie **ESP32 Dev Module** aus den esp32_bluepad32-Boards.
+4. Setzen Sie in den Einstellungen `NO_PHONE_MODE 1` und `HAS_GAMEPAD 1` und laden Sie hoch.
+
+Das Gamepad nutzt das Bluetooth des ESP32, daher ist die Bluetooth-Verbindung zum Telefon in diesem Modus aus. Um mit der Telefon-App zu fahren, lassen Sie `HAS_GAMEPAD 0` und koppeln Sie das Gamepad stattdessen mit dem Telefon.
+
+#### Koppeln
+
+Schalten Sie den Roboter ein und versetzen Sie das Gamepad in den Kopplungsmodus. Es verbindet sich innerhalb weniger Sekunden und danach jedes Mal, wenn Sie es einschalten. Um ein anderes Gamepad zu koppeln, schalten Sie zuerst das verbundene aus: Es fährt immer nur ein Gamepad.
+
+| Gamepad | Kopplungsmodus |
+|---|---|
+| PS5 DualSense | **Create** gedrückt halten, dann **PS** halten, bis die Lichtleiste blinkt. |
+| PS4 DualShock 4 | **Share** gedrückt halten, dann **PS** halten, bis die Lichtleiste blinkt. |
+| Xbox Wireless (Modell 1708 oder neuer) | Einschalten, dann die Kopplungstaste 3 s lang halten. Aktualisieren Sie vorher die Controller-Firmware auf 5.15 oder neuer (z. B. mit der App Xbox-Zubehör). |
+| Switch Pro, Joy-Con, 8BitDo und andere | Den Bluetooth-Kopplungsmodus des Gamepads verwenden (siehe Anleitung). |
+
+Die [Bluepad32-Liste unterstützter Gamepads](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/) enthält weitere Modelle, darunter den PS3 DualShock 3, der zusätzliche Einrichtung braucht. Mit `DEBUG 1` zeigt der serielle Monitor den Namen jedes Gamepads an, das sich verbindet.
+
+Wenn ein bereits gekoppeltes Gamepad die Steuerung nicht übernimmt, zum Beispiel ein PS4- oder PS5-Controller, dessen Lichtleiste blau bleibt, statt grün, orange oder rot zu werden, versetzen Sie es erneut in den Kopplungsmodus und starten Sie den Roboter neu.
+
+Verbindet es sich dann immer noch nicht, setzen Sie beim Flashen auf der [Einrichtungsseite](https://tools.openbot.org/firmware/) das Häkchen bei **Forget paired gamepads**. Der Roboter vergisst dann alle gekoppelten Gamepads.
+
+#### Bedienung
+
+Tasten sind als PlayStation / Xbox angegeben.
+
+| Bedienelement | Funktion |
+|---|---|
+| **R2 / L2** | Vorwärts / rückwärts (Spielmodus) |
+| **Linker Stick** | Lenken (Spielmodus), fahren und lenken (Joystick-Modus) oder linke Seite (Dual-Modus) |
+| **Rechter Stick** | Rechte Seite (Dual-Modus) |
+| **L1** | Nächster Fahrmodus: Spiel → Joystick → Dual. Das Gamepad vibriert einmal: kurz für Spiel, länger für Joystick, am längsten für Dual. |
+| **Steuerkreuz oben / R3** | Schneller |
+| **Steuerkreuz unten / L3** | Langsamer |
+| **Quadrat / X** | Linker Blinker ein oder aus |
+| **Kreis / B** | Rechter Blinker ein oder aus |
+| **Dreieck / Y** | Blinker aus |
+| **Kreuz / A** | Licht ein oder aus |
+| **Start** | Erkunden ein oder aus |
+| **Select / Back** | Hindernisstopp ein oder aus |
+
+Bei Start und Select bedeutet eine lange Vibration ein und eine kurze aus.
+
+**Fahrmodi.** Das Gamepad startet im Modus aus `GAMEPAD_DRIVE_MODE` (Standard: Spiel).
+- **Spiel:** R2 fährt vorwärts, L2 rückwärts, und der linke Stick lenkt. Beim Rückwärtsfahren ist die Lenkung gespiegelt, wie bei einem Auto.
+- **Joystick:** Der linke Stick fährt und lenkt. Der Roboter dreht sich immer in die Richtung, in die der Stick zeigt, auch rückwärts.
+- **Dual:** Jeder Stick steuert eine Seite, wie bei einem Panzer.
+
+**Geschwindigkeiten.** Es gibt drei Geschwindigkeiten: langsam (50 %), normal (75 %, die Startgeschwindigkeit) und schnell (100 %). Das Gamepad zeigt die Geschwindigkeit mit seinen Spieler-LEDs (eine bis drei) oder seiner Lichtleiste (grün, orange, rot) an.
+
+**Erkunden.** Erkunden ist das oben beschriebene Fahren im Kein-Telefon-Modus: Der Roboter fährt selbstständig herum und weicht Hindernissen aus. Beim Start ist es aus; drücken Sie **Start**, um es einzuschalten. Während Erkunden an ist, übernimmt das Gamepad, sobald Sie einen Stick oder Trigger bewegen. Wenn Sie loslassen, hält der Roboter kurz an und erkundet weiter. Erkunden braucht einen angeschlossenen Sonarsensor mit `HAS_SONAR 1`; ohne ihn fährt der Roboter einfach geradeaus (siehe Warnung oben).
+
+**Hindernisstopp.** Während Sie mit dem Gamepad fahren, fährt der Roboter nicht vorwärts, wenn das Sonar ein Hindernis näher als `STOP_DISTANCE` erkennt. Beim Start ist er an; drücken Sie **Select**, um ihn auszuschalten, z. B. um etwas zu schieben. Er funktioniert nur mit einem angeschlossenen Sonarsensor und `HAS_SONAR 1`; sonst hält der Roboter nie vor Hindernissen.
+
+**Sicherheit.** Der Roboter hält an, wenn die Verbindung zum Gamepad abbricht. Die meisten Gamepads senden außerdem ständig Daten; schweigt ein solches Gamepad 0,5 s lang (außer Reichweite, Akku leer), hält der Roboter sofort an, statt auf den Verbindungsabbruch zu warten.
 
 ## Verwendung anderer MCUs (Anforderungen)
 
@@ -199,4 +326,4 @@ Sie können jede andere MCU mit den folgenden Funktionen verwenden:
 
 ## Weiter
 
-Kompilieren und ausführen der [Android App](../android/README.de-DE.md)
+Kompilieren und ausführen der [Android App](../robot/android/README.de-DE.md)

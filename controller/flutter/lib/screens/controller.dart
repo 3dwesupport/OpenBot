@@ -67,6 +67,9 @@ class ControllerState extends State<Controller> {
 
   final RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   RTCPeerConnection? _peerConnection;
+  // Signaling messages are applied one at a time, so candidates never reach a peer connection
+  // that is being replaced.
+  Future<void> _signalingQueue = Future.value();
 
   /// Set up WebRTC renderer and peer connection.
   Future<void> videoConnection() async {
@@ -87,7 +90,7 @@ class ControllerState extends State<Controller> {
       "sdp": sdp,
     };
     if (description["type"] == "offer") {
-      _setRemoteDescription(description);
+      _enqueueSignaling(() => _setRemoteDescription(description));
     }
     if (description["type"] == "candidate") {
       var candidateValue = {
@@ -95,19 +98,32 @@ class ControllerState extends State<Controller> {
         "label": label,
         "candidate": candidate,
       };
-      _addCandidate(candidateValue);
+      _enqueueSignaling(() => _addCandidate(candidateValue));
     }
   }
 
-  void _setRemoteDescription(doc) async {
-    RTCSessionDescription description =
-        RTCSessionDescription(doc["sdp"], doc["type"]);
-    await _peerConnection
-        ?.setRemoteDescription(description)
-        .whenComplete(() => createAnswer());
+  void _enqueueSignaling(Future<void> Function() task) {
+    _signalingQueue = _signalingQueue
+        .then((_) => task())
+        .catchError((e) => log("WebRTC signaling error: $e"));
   }
 
-  void _addCandidate(candidateValue) async {
+  Future<void> _setRemoteDescription(doc) async {
+    // The robot starts a new call with a fresh offer every time it restarts video, so a second
+    // offer belongs to a new call: replace the peer connection instead of renegotiating on it.
+    if (await _peerConnection?.getRemoteDescription() != null) {
+      final oldConnection = _peerConnection;
+      await oldConnection?.close();
+      await oldConnection?.dispose();
+      _peerConnection = await _createPeerConnection();
+    }
+    RTCSessionDescription description =
+        RTCSessionDescription(doc["sdp"], doc["type"]);
+    await _peerConnection?.setRemoteDescription(description);
+    await createAnswer();
+  }
+
+  Future<void> _addCandidate(candidateValue) async {
     dynamic candidate = RTCIceCandidate(candidateValue['candidate'],
         candidateValue['id'], candidateValue['label']);
     await _peerConnection?.addCandidate(candidate);
@@ -145,11 +161,21 @@ class ControllerState extends State<Controller> {
       });
     };
 
+    // Fallback path in case the legacy onAddStream compatibility shim doesn't
+    // fire for this WebRTC build: onTrack is the canonical Unified Plan event.
+    pc.onTrack = (RTCTrackEvent event) {
+      if (event.track.kind == 'video' && event.streams.isNotEmpty) {
+        _remoteVideoRenderer.srcObject = event.streams[0];
+        setState(() {
+          _remoteVideoRenderer;
+        });
+      }
+    };
+
     return pc;
   }
 
-  /// SDP answer after we accept the robot's WebRTC offer.
-  void createAnswer() async {
+  Future<void> createAnswer() async {
     final Map<String, dynamic> offerSdpConstraints =
         Constants.offerSdpConstraints;
     RTCSessionDescription? description =
@@ -354,7 +380,7 @@ class ControllerState extends State<Controller> {
                             isSettings = true;
                           });
                         },
-                        child: const Icon(Icons.menu),
+                        child: const Icon(Icons.menu, color: Color(0xFF0071C5)),
                       ),
                     ),
                     const MicButton(),
@@ -429,6 +455,12 @@ class ControllerState extends State<Controller> {
     String candidate = "";
     if (items["CONNECTION_ACTIVE"] != null) {
       setDeviceConnected(items["CONNECTION_ACTIVE"]);
+    }
+
+    if (items["FRAGMENT_TYPE"] != null) {
+      setState(() {
+        fragmentType = items["FRAGMENT_TYPE"];
+      });
     }
 
     if (items["VIDEO_PROTOCOL"] != null) {

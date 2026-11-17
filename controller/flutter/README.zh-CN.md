@@ -11,6 +11,12 @@
 
 这个控制器应用程序作为 [OpenBot](https://www.openbot.org) 车辆的 `远程控制器`，类似于 BT 控制器（例如 PS3/4 或 Xbox）。它运行在另一台 Android/iOS 设备上，除了控制功能外，还支持实时视频/音频流。
 
+## 安装应用
+
+在 Android 上，从最新[版本](https://github.com/ob-f/OpenBot/releases)的资源中下载 `Controller-<version>.apk`，然后在手机上[安装](https://www.lifewire.com/install-apk-on-android-4177185)。
+
+> **现有用户注意：** 此应用取代旧版 Android 控制器应用，成为每个版本发布的控制器 APK。由于两个应用使用不同的包 ID（`org.openbot.app.controller` 与 `org.openbot.controller`），安装此 APK 不会更新旧版应用，而是作为单独的应用与其并存。切换完成后，你可以卸载旧版控制器。
+
 ## 入门指南
 首先在你的系统上安装 [Flutter](https://flutter.dev/)。选择适合你操作系统的下载选项，包括 Windows、macOS、Linux 和 ChromeOS。请按照官方 Flutter 安装指南进行详细安装：[Flutter 安装指南](https://docs.flutter.dev/get-started/install)
 
@@ -47,7 +53,37 @@
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
+## 构建签名的发布版本（Android）
+发布版本（`flutter build apk --release` / `flutter build appbundle --release`）使用 `android/key.properties` 中引用的密钥库签名。该文件已被 **gitignore**，不会提交到仓库——每位开发者都需要创建自己的本地副本。调试版本（`flutter build apk --debug`、`flutter run`）不需要这些。
+
+### 1. 生成密钥库（一次）
+```bash
+keytool -genkey -v -keystore ~/release.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+请将生成的 `.keystore`/`.jks` 文件及其密码妥善保存在仓库之外——一旦丢失，就无法再以相同的应用签名发布更新。
+
+### 2. 创建 `android/key.properties`
+`android/app/build.gradle` 会读取 `controller/flutter/android/key.properties`，因此请在该位置创建此文件，内容如下：
+```properties
+storePassword=<your keystore password>
+keyPassword=<your key password>
+keyAlias=upload
+storeFile=/absolute/path/to/release.keystore
+```
+`storeFile` 必须是指向第 1 步生成的密钥库的绝对路径（或可从 `controller/flutter/android/app/` 解析的路径）。
+
+### 3. 构建
+```bash
+cd controller/flutter
+flutter build appbundle --release   # 用于上传到 Play 商店（.aab）
+# 或
+flutter build apk --release         # 用于生成签名的可安装 APK
+```
+如果存在 `key.properties`，`app/build.gradle` 会自动加载它并用于 `release` 签名配置；如果缺少该文件，发布配置没有签名值，签名将失败（调试版本不受影响）。
+
 ## 连接
+
+控制器手机和机器人手机必须连接到同一 Wi-Fi 网络，或其中一部手机连接到另一部手机的热点。无需互联网连接。
 
 启动控制器应用程序时，它会立即尝试连接到机器人并显示以下屏幕：
 
@@ -103,5 +139,19 @@
 - 按下 `加速` 按钮，机器人将在 2 秒内加速到全速。当你松开按钮时，机器人将减速至停止（停止速度设置为最大速度的 0%，可以调整）。
 - 按下 `刹车` 按钮，机器人将立即停止。如果我们再按住刹车一秒钟，机器人将开始倒退，直到在一秒钟内达到最大倒车速度。当我们松开刹车时，机器人将停止。
 - 通过左右倾斜控制器手机来转向机器人。
+
+### 控制器设置界面
+
+下面是 `Controller Settings` 界面的图片：
+
+- 控制器选择：使用图标在不同的控制器类型（例如手机、摇杆）之间切换。
+ 
+- 服务器：显示当前服务器状态，并提供下拉菜单选择或更换服务器。
+ 
+- 噪声开关：通过开关启用或停用噪声模拟。
+
+<p float="left">
+  <img src="../../docs/images/flutter_controller_setting.jpg" width="50%" />
+</p>
 
 这里有一个控制器应用程序的 [技术概述](../../docs/technical/OpenBotController.pdf)。

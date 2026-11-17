@@ -31,7 +31,7 @@ OpenBot 利用智能手机作为低成本机器人的大脑。我们设计了一
 - 阅读 [免责声明](DISCLAIMER.md)
 - 构建你自己的 [机器人主体](body/README.zh-CN.md)
 - 刷写 [Arduino 固件](firmware/README.zh-CN.md)
-- 安装 [Android 应用](android/README.zh-CN.md)
+- 安装 [机器人应用](robot/README.zh-CN.md)
 - 通过 [控制器](controller/README.zh-CN.md) 驾驶机器人
 - 在 [Playground](open-code/README.zh-CN.md) 中编程你的机器人
 - 训练你自己的 [驾驶策略](policy/README.zh-CN.md)

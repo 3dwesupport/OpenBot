@@ -31,7 +31,7 @@ OpenBot leverages smartphones as brains for low-cost robots. We have designed a 
 - Read the [Disclaimer](DISCLAIMER.md)
 - Build your own [Robot Body](body/README.md)
 - Flash the [Arduino Firmware](firmware/README.md)
-- Install the [Android Apps](android/README.md)
+- Install the [Robot App](robot/README.md)
 - Drive the robot via a [Controller](controller/README.md)
 - Program your robot in the [Playground](open-code/README.md)
 - Train your own [Driving Policy](policy/README.md)

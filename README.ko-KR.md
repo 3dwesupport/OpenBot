@@ -30,7 +30,7 @@ OpenBot은 스마트폰을 저렴한 로봇의 두뇌로 활용합니다. 약 50
 - [면책 조항](DISCLAIMER.ko-KR.md) 읽기
 - [로봇 본체](body/README.ko-KR.md) 만들기
 - [Arduino 펌웨어](firmware/README.ko-KR.md) 플래시하기
-- [Android 앱](android/README.ko-KR.md) 설치하기
+- [로봇 앱](robot/README.ko-KR.md) 설치하기
 - [컨트롤러](controller/README.ko-KR.md)를 통해 로봇 조종하기
 - [Playground](open-code/README.ko-KR.md)에서 로봇을 프로그래밍하기
 - [주행 정책](policy/README.ko-KR.md) 훈련하기

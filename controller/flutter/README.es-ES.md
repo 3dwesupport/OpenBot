@@ -11,6 +11,12 @@
 
 Esta aplicación de control sirve como un `control remoto` para el vehículo [OpenBot](https://www.openbot.org) similar a un controlador BT (por ejemplo, PS3/4 o Xbox). Se ejecuta en otro dispositivo Android/iOS y admite transmisión de video/audio en vivo además del control.
 
+## Instalar la aplicación
+
+En Android, descarga `Controller-<version>.apk` de los assets del [release](https://github.com/ob-f/OpenBot/releases) más reciente e [instálalo](https://www.lifewire.com/install-apk-on-android-4177185) en tu teléfono.
+
+> **Nota para usuarios actuales:** Esta aplicación sustituye a la antigua aplicación de control para Android como el APK de control que se publica con cada release. Como las dos aplicaciones usan IDs de paquete distintos (`org.openbot.app.controller` frente a `org.openbot.controller`), instalar este APK no actualizará la aplicación antigua, sino que se instalará como una aplicación aparte junto a ella. Puedes desinstalar el controlador antiguo cuando hayas hecho el cambio.
+
 ## Comenzando
 Comienza instalando [Flutter](https://flutter.dev/) en tu sistema. Elige la descarga adecuada para tu sistema operativo, que incluye opciones para Windows, macOS, Linux y ChromeOS. Sigue la guía oficial de instalación de Flutter para obtener instrucciones detalladas: [Guía de Instalación de Flutter](https://docs.flutter.dev/get-started/install)
 
@@ -47,7 +53,37 @@ Comienza instalando [Flutter](https://flutter.dev/) en tu sistema. Elige la desc
     <img src="../../docs/images/run_editor.jpg" width="50%" />
   </p>
 
+## Compilar una versión firmada (Android)
+Las compilaciones de lanzamiento (`flutter build apk --release` / `flutter build appbundle --release`) se firman con un almacén de claves indicado en `android/key.properties`. Este archivo está **en .gitignore** y nunca se sube al repositorio: cada desarrollador debe crear su propia copia local. Las compilaciones de depuración (`flutter build apk --debug`, `flutter run`) no necesitan nada de esto.
+
+### 1. Generar un almacén de claves (una vez)
+```bash
+keytool -genkey -v -keystore ~/release.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+```
+Guarda el archivo `.keystore`/`.jks` generado y sus contraseñas en un lugar seguro fuera del repositorio: si lo pierdes, ya no podrás publicar actualizaciones con la misma firma de la aplicación.
+
+### 2. Crear `android/key.properties`
+`android/app/build.gradle` lee este archivo en `controller/flutter/android/key.properties`, así que créalo ahí con:
+```properties
+storePassword=<your keystore password>
+keyPassword=<your key password>
+keyAlias=upload
+storeFile=/absolute/path/to/release.keystore
+```
+`storeFile` debe ser una ruta absoluta (o una ruta que se pueda resolver desde `controller/flutter/android/app/`) al almacén de claves que generaste en el paso 1.
+
+### 3. Compilar
+```bash
+cd controller/flutter
+flutter build appbundle --release   # para subir a Play Store (.aab)
+# o
+flutter build apk --release         # para un APK firmado e instalable
+```
+`app/build.gradle` carga `key.properties` automáticamente si existe y lo usa en la configuración de firma `release`; si falta el archivo, la configuración de lanzamiento no tiene valores de firma y la firma falla (las compilaciones de depuración no se ven afectadas).
+
 ## Conexión 
+
+El teléfono del controlador y el del robot deben estar en la misma red Wi-Fi, o uno de ellos debe estar conectado al punto de acceso del otro. No se necesita acceso a internet.
 
 Cuando se inicia la aplicación de control, intenta conectarse inmediatamente al robot y muestra la siguiente pantalla:
 
@@ -110,5 +146,19 @@ Usa los botones de `acelerador` y `freno` para moverte hacia adelante/atrás.
   comenzará a moverse hacia atrás hasta alcanzar la velocidad máxima en reversa en un segundo. Cuando soltemos el freno, el
   robot se detendrá.
 - El robot se dirige inclinando el teléfono controlador hacia la izquierda o la derecha.
+
+### Ajustes del controlador
+
+Esta es una imagen de la pantalla `Controller Settings`:
+
+- Selección de controlador: cambia entre distintos tipos de controlador (p. ej., móvil, joystick) con los iconos.
+ 
+- Servidor: muestra el estado actual del servidor, con un menú desplegable para seleccionar o cambiar el servidor.
+ 
+- Ruido: activa o desactiva la simulación de ruido con el interruptor.
+
+<p float="left">
+  <img src="../../docs/images/flutter_controller_setting.jpg" width="50%" />
+</p>
 
 Aquí hay una [Descripción Técnica](../../docs/technical/OpenBotController.pdf) de la aplicación de control.
