@@ -41,6 +41,7 @@ public class FeatureList {
   public static final String AUTONOMOUS_DRIVING = "Autonomous Driving";
   public static final String VISUAL_GOALS = "Visual Goals";
   public static final String SMART_VOICE = "Smart Voice (left/right/straight, Ar Core)";
+  public static final String VOICE_CONTROL = "Voice Control";
 
   // Remote Access
   public static final String REMOTE_ACCESS = "Remote Access";
@@ -107,6 +108,9 @@ public class FeatureList {
             R.string.tile_model_management,
             R.drawable.ic_list_bulleted_48,
             "#BC7680"));
+    subCategories.add(
+        new SubCategory(
+            VOICE_CONTROL, R.string.tile_voice_control, R.drawable.ic_voice_over, "#4B7BFF"));
     categories.add(new Category(AI, R.string.tile_ai, subCategories));
 
     subCategories = new ArrayList<>();

@@ -72,6 +72,10 @@ Make sure that your Android device has BLE (Bluetooth Low Energy) support. If yo
 <img src="../../../docs/images/ble_device_connected.jpg" alt="Disconnect button" width="25%"/>
 </p>
 
+#### Voice Control (Gemini Live)
+
+Set or update the Gemini API key and Gemini Live model used by the [Voice Control](#voice-control) screen.
+
 ### Free Roam
 
 Free Roam offers simple robot control with real time updates and information about battery, speed and distance from surfaces.
@@ -166,6 +170,50 @@ Note that this fragment requires ARCore and camera permission. If your device do
 <p align="left">
 <img src="../../../docs/images/screen_point_goal_nav.gif" alt="Alt text" width="50%" />
 </p>
+
+### Voice Control
+
+Voice Control lets you talk to the robot in real time using the [Gemini Live API](https://ai.google.dev/gemini-api/docs/live). Ask it to move, come closer, turn around, or flash its lights, and it will call the matching robot function while replying out loud. If camera permission is granted, it also periodically shares a snapshot of what the camera sees, so you can ask things like "what do you see?" and it can find and follow a person on request. A live transcript of the conversation is shown on screen, and a typed-text field is available as a fallback if you would rather not use the microphone.
+
+#### Setup
+
+The first time you open Voice Control you will be asked for a Gemini API key:
+
+- Tap **Get a free API key at Google AI Studio** to open the key-creation page in your browser, sign in, and create a key.
+- Switch back to OpenBot. If the key is still on your clipboard it will be suggested automatically; otherwise paste it in yourself. Tap **Save & Continue**.
+
+The key (and the Gemini Live model used, in case Google ships a newer one) can be changed later from the gear icon on the Voice Control screen, or from **Settings > Voice Control (Gemini Live)**.
+
+#### Talking to the robot
+
+Tap the microphone button to start a session. The orb in the middle of the screen shows what is happening: green while it is listening to you, blue while the robot is speaking, purple while it is thinking, and amber while it is executing an action — the orb (and matching action entries in the transcript) stay amber for the whole duration of a long-running action like following someone or driving a precise distance, not just a brief flash. Say something like "move forward", "come a bit closer", "turn around", or "flash your lights", and the robot will do it and reply. Tap the microphone again to end the session.
+
+A small camera thumbnail appears in the top-left corner once a session starts (camera permission required), showing what the rear camera currently sees. While `follow_person` is active, the tracked person's bounding box is drawn on top of it. This thumbnail is backed by a single ARCore session that runs for the entire conversation rather than being started per-feature — ARCore's world tracking only supports the rear-facing camera, so there is no front/back toggle.
+
+#### Available voice commands
+
+The assistant can call the following functions, which mirror the equivalent blocks in the [Playground](../../open-code/README.md):
+
+| Function | What it does |
+|---|---|
+| `move_forward` / `move_backward` | Drives straight at a given speed, optionally for a set duration |
+| `turn_left` / `turn_right` | Pivots in place |
+| `turn_around` | Spins ~180 degrees and stops automatically |
+| `stop` | Immediately stops all movement |
+| `set_speed_mode` | Switches between slow/normal/fast |
+| `set_lights` / `flash_lights` | Turns the headlights on/off, or blinks them |
+| `set_turn_signal` | Left/right/off indicator |
+| `get_robot_status` | Reports battery voltage, drive gear, speed, and sonar distance back to the assistant |
+| `follow_person` / `stop_following` | Finds a person with the camera and drives to keep them in view, using the same detector and tracker as the Blockly "follow object" block |
+| `move_distance` | Drives a precise distance in meters (e.g. "move 1 meter forward and 1 meter left") using ARCore visual-inertial navigation, the same approach as the [Point Goal Navigation](#point-goal-navigation) screen |
+| `get_current_time` | Reads back the current date/time in the device's local timezone |
+| `get_weather` | Looks up current conditions (temperature, wind, general conditions) at the robot's location via [Open-Meteo](https://open-meteo.com) (free, no API key needed); asks for location permission the first time it's used |
+
+For safety, any movement command is automatically stopped after a few seconds if no follow-up command arrives (for example if the connection drops), and leaving the Voice Control screen always stops the robot.
+
+`move_distance` reuses the same always-running ARCore session as the camera thumbnail, so by the time you ask for a precise move, ARCore has typically already been tracking for a while and can start immediately — an earlier version created a brand new ARCore session for every `move_distance` call, which regularly failed with "no ARCore pose yet" since a fresh session hasn't had time to lock onto a pose yet.
+
+`move_distance` briefly takes over the camera from the regular camera feed to run ARCore, so following/live-vision pause for the few seconds it takes to drive there, then resume automatically.
 
 ### Model Management
 

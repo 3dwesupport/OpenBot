@@ -100,4 +100,19 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Voice Control (Gemini Live)">
+
+        <EditTextPreference
+            app:key="gemini_api_key"
+            app:title="Gemini API Key"
+            app:summary="Required to talk to the robot. Get a free key at aistudio.google.com" />
+
+        <ListPreference
+            app:entries="@array/gemini_model_fallback"
+            app:entryValues="@array/gemini_model_fallback"
+            app:key="gemini_model"
+            app:title="Gemini Live Model" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

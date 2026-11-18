@@ -97,6 +97,11 @@ public class MainFragment extends Fragment implements OnItemClickListener<SubCat
             .navigate(R.id.action_mainFragment_to_modelManagementFragment);
         break;
 
+      case FeatureList.VOICE_CONTROL:
+        Navigation.findNavController(requireView())
+            .navigate(R.id.action_mainFragment_to_voiceControlFragment);
+        break;
+
       case FeatureList.DEFAULT:
         Intent intent = new Intent(requireActivity(), DefaultActivity.class);
         startActivity(intent);

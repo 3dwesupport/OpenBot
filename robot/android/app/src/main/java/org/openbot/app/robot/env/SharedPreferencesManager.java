@@ -2,6 +2,7 @@ package org.openbot.app.robot.env;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import androidx.preference.PreferenceManager;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import java.lang.reflect.Type;
@@ -43,13 +44,20 @@ public class SharedPreferencesManager {
   private static final String DELAY = "DELAY";
   private static final String PROJECTS_LIST = "PROJECTS_LIST";
 
+  // Stored in the default SharedPreferences file since these are edited via the Settings
+  // PreferenceScreen (root_preferences.xml), which binds to PreferenceManager's default file.
+  private static final String GEMINI_API_KEY = "gemini_api_key";
+  private static final String GEMINI_MODEL = "gemini_model";
+
   private final SharedPreferences preferences;
+  private final SharedPreferences defaultPreferences;
 
   public SharedPreferencesManager(Context context) {
     preferences =
         context
             .getApplicationContext()
             .getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+    defaultPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
   }
 
   public int getBaudrate() {
@@ -199,6 +207,22 @@ public class SharedPreferencesManager {
     String json = gson.toJson(allProjects);
     // Store the JSON string in SharedPreferences
     preferences.edit().putString(PROJECTS_LIST, json).apply();
+  }
+
+  public void setGeminiApiKey(String apiKey) {
+    defaultPreferences.edit().putString(GEMINI_API_KEY, apiKey).apply();
+  }
+
+  public String getGeminiApiKey() {
+    return defaultPreferences.getString(GEMINI_API_KEY, "");
+  }
+
+  public void setGeminiModel(String model) {
+    defaultPreferences.edit().putString(GEMINI_MODEL, model).apply();
+  }
+
+  public String getGeminiModel() {
+    return defaultPreferences.getString(GEMINI_MODEL, org.openbot.app.robot.voice.GeminiLiveClient.DEFAULT_MODEL);
   }
 
   public ArrayList<ProjectsDataInObject> getProjectList() {

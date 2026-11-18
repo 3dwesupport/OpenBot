@@ -174,6 +174,10 @@
         <item>Bluetooth</item>
         <item>USB</item>
     </string-array>
+    <!-- Placeholder shown only until GeminiModelsFetcher replaces it with the real, live list. -->
+    <string-array name="gemini_model_fallback">
+        <item>models/gemini-3.1-flash-live-preview</item>
+    </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string-array name="speed_modes">
         <item>Slow</item>
@@ -245,6 +249,7 @@
     <string name="tile_object_nav">Object Tracking</string>
     <string name="tile_point_goal_navigation">Point Goal Navigation</string>
     <string name="tile_model_management">Model Management</string>
+    <string name="tile_voice_control">Voice Control</string>
     <string name="tile_default_mode">Default</string>
 
     <string name="log_data">Log Data</string>
@@ -262,4 +267,51 @@
     <string name="ble_disconnect">Disconnect</string>
     <string name="ble_connect">Connect</string>
     <string name="firebase_not_configured">Google sign-in isn\'t set up in this build. It needs the project\'s own Firebase configuration (google-services.json).</string>
+
+    <!-- Voice Control (Gemini Live) -->
+    <string name="voice_control">Voice Control</string>
+    <string name="voice_setup_title">Talk to your robot</string>
+    <string name="voice_setup_description">Voice Control uses the Gemini Live API so you can ask
+        your robot to move, turn, or flash its lights just by talking. Add a Gemini API key to
+        get started.</string>
+    <string name="voice_setup_get_key_link">Get a free API key at Google AI Studio →</string>
+    <string name="voice_setup_api_key_hint">Gemini API key</string>
+    <string name="voice_setup_api_key_required">Please enter an API key</string>
+    <string name="voice_setup_key_detected">API key copied from clipboard, review and save</string>
+    <string name="voice_setup_save_button">Save &amp; Continue</string>
+    <string name="voice_model_loading">Loading available models…</string>
+    <string name="voice_model_needs_api_key">Enter your API key above to load available models</string>
+    <string name="voice_model_load_error">Couldn\'t load models: %1$s</string>
+    <string name="voice_model_none_found">No Live-capable models found for this API key</string>
+    <string name="voice_status_idle">Tap the circle to start talking</string>
+    <string name="voice_status_connecting">Connecting…</string>
+    <string name="voice_status_listening">Listening…</string>
+    <string name="voice_status_thinking">Thinking…</string>
+    <string name="voice_status_speaking">Speaking…</string>
+    <string name="voice_status_acting">Acting…</string>
+    <string name="voice_status_error">Something went wrong. Tap the circle to retry.</string>
+    <string name="voice_mic_permission_required">Microphone permission is required for Voice
+        Control.</string>
+    <string name="voice_type_command_hint">Type a command…</string>
+    <string name="voice_mic_button_description">Tap to start or stop talking to the robot</string>
+    <string name="voice_send_button_description">Send typed command</string>
+    <string name="voice_settings_button_description">Voice Control settings</string>
+    <string name="voice_system_instruction">You are the onboard voice assistant of an OpenBot
+        robot. You can hear and speak with the user, you periodically receive still images from
+        the robot\'s camera so you know what is currently in front of it, and you can control the
+        physical robot by calling the provided functions: move_forward, move_backward, turn_left,
+        turn_right, turn_around, stop, set_speed_mode, set_lights, flash_lights, set_turn_signal,
+        get_robot_status, follow_person, stop_following, move_distance, get_current_time, and
+        get_weather. Always call the matching function when the user asks the robot to move, turn,
+        come closer, back away, spin around, follow someone, or control its lights, instead of
+        just talking about it. If the user gives a specific distance (e.g. "move 1 meter forward",
+        "go 2 meters forward and 1 meter left"), use move_distance instead of move_forward since it
+        drives that distance precisely; move_distance takes a little while to complete and you
+        will be told when the robot arrives. If the user asks the robot to follow them or follow a
+        person, call follow_person; call stop_following when they ask it to stop following (this
+        does not stop other movement). Use get_current_time or get_weather when asked about the
+        time or the weather rather than guessing. You can also describe what you currently see if
+        asked. Keep spoken replies short and conversational. If a request is unsafe, unclear, or
+        you are not sure what they mean, ask a brief clarifying question instead of guessing. If
+        the robot is already moving and the user asks it to stop, immediately call stop.</string>
 </resources>

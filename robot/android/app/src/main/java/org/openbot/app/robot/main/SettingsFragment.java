@@ -11,20 +11,27 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
+import java.util.List;
 import java.util.Objects;
 import org.openbot.app.robot.R;
+import org.openbot.app.robot.env.SharedPreferencesManager;
 import org.openbot.app.robot.utils.Constants;
 import org.openbot.app.robot.utils.LanguageOption;
 import org.openbot.app.robot.utils.LocaleUtils;
 import org.openbot.app.robot.utils.PermissionUtils;
+import org.openbot.app.robot.voice.GeminiLiveClient;
+import org.openbot.app.robot.voice.GeminiModelsFetcher;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
   private MainViewModel mViewModel;
@@ -242,6 +249,97 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             return true;
           });
     }
+
+    ListPreference geminiModel = findPreference("gemini_model");
+    EditTextPreference geminiApiKey = findPreference("gemini_api_key");
+    if (geminiApiKey != null) {
+      geminiApiKey.setOnBindEditTextListener(
+          editText ->
+              editText.setInputType(
+                  InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
+      geminiApiKey.setOnPreferenceChangeListener(
+          (preference, newValue) -> {
+            if (geminiModel != null) refreshGeminiModelList(geminiModel, newValue.toString());
+            return true;
+          });
+    }
+
+    if (geminiModel != null) {
+      refreshGeminiModelList(
+          geminiModel, new SharedPreferencesManager(requireContext()).getGeminiApiKey());
+    }
+  }
+
+  /**
+   * Populates the Gemini Live model dropdown from ListModels, keeping only models that actually
+   * support {@code bidiGenerateContent}. Live models are added/retired often, so this is fetched
+   * live from the given API key rather than hardcoded.
+   */
+  private void refreshGeminiModelList(ListPreference geminiModel, String apiKey) {
+    String currentValue = geminiModel.getValue();
+    String fallback =
+        currentValue != null && !currentValue.isEmpty() ? currentValue : GeminiLiveClient.DEFAULT_MODEL;
+    geminiModel.setEntries(new CharSequence[] {fallback});
+    geminiModel.setEntryValues(new CharSequence[] {fallback});
+    if (geminiModel.getValue() == null) geminiModel.setValue(fallback);
+
+    if (apiKey == null || apiKey.trim().isEmpty()) {
+      geminiModel.setSummary(getString(R.string.voice_model_needs_api_key));
+      return;
+    }
+
+    geminiModel.setSummary(getString(R.string.voice_model_loading));
+    Handler mainHandler = new Handler(Looper.getMainLooper());
+    new Thread(
+            () ->
+                GeminiModelsFetcher.fetchLiveModels(
+                    apiKey.trim(),
+                    new GeminiModelsFetcher.Callback() {
+                      @Override
+                      public void onSuccess(List<GeminiModelsFetcher.ModelInfo> liveModels) {
+                        mainHandler.post(() -> applyModelList(geminiModel, liveModels));
+                      }
+
+                      @Override
+                      public void onError(String message) {
+                        mainHandler.post(
+                            () -> {
+                              if (!isAdded()) return;
+                              geminiModel.setSummary(getString(R.string.voice_model_load_error, message));
+                            });
+                      }
+                    }))
+        .start();
+  }
+
+  private void applyModelList(ListPreference geminiModel, List<GeminiModelsFetcher.ModelInfo> liveModels) {
+    if (!isAdded()) return;
+    if (liveModels.isEmpty()) {
+      geminiModel.setSummary(getString(R.string.voice_model_none_found));
+      return;
+    }
+
+    CharSequence[] entries = new CharSequence[liveModels.size()];
+    CharSequence[] entryValues = new CharSequence[liveModels.size()];
+    for (int i = 0; i < liveModels.size(); i++) {
+      entries[i] = liveModels.get(i).displayName;
+      entryValues[i] = liveModels.get(i).name;
+    }
+    geminiModel.setEntries(entries);
+    geminiModel.setEntryValues(entryValues);
+
+    String currentValue = geminiModel.getValue();
+    boolean currentValueStillAvailable = false;
+    for (CharSequence entryValue : entryValues) {
+      if (entryValue.equals(currentValue)) {
+        currentValueStillAvailable = true;
+        break;
+      }
+    }
+    if (!currentValueStillAvailable) {
+      geminiModel.setValue(entryValues[0].toString());
+    }
+    geminiModel.setSummary(geminiModel.getEntry());
   }
 
   private void updateLanguageIcon() {

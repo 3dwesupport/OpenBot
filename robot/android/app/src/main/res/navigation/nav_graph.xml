@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_mainFragment_to_robotInfoFragment"
             app:destination="@id/robotInfoFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_voiceControlFragment"
+            app:destination="@id/voiceControlFragment" />
     </fragment>
     <fragment
         android:id="@+id/freeRoamFragment"
@@ -171,4 +174,10 @@
         android:id="@+id/robotInfoFragment"
         android:name="org.openbot.app.robot.robot.RobotInfoFragment"
         android:label="RobotInfoFragment" />
+
+    <fragment
+        android:id="@+id/voiceControlFragment"
+        android:name="org.openbot.app.robot.voice.VoiceControlFragment"
+        android:label="@string/voice_control"
+        tools:layout="@layout/fragment_voice_control" />
 </navigation>
