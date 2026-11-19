@@ -2,6 +2,7 @@
     package="org.openbot.app.controller">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
    <application
         android:label="OpenBot Controller"
         android:name="${applicationName}"
