@@ -149,4 +149,24 @@ public class SharedPreferencesManager {
         // Default IP. Replace it with your own server IP address in Settings.
         return userDefaults.string(forKey: web_signaling_server_url) ?? "ws://192.168.1.40:8080/ws"
     }
+
+    public var gemini_api_key : String = "gemini_api_key"
+
+    public var gemini_model : String = "gemini_model"
+
+    public func setGeminiApiKey(value: String) {
+        userDefaults.set(value, forKey: gemini_api_key)
+    }
+
+    public func getGeminiApiKey() -> String {
+        (userDefaults.string(forKey: gemini_api_key) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    public func setGeminiModel(value: String) {
+        userDefaults.set(value, forKey: gemini_model)
+    }
+
+    public func getGeminiModel() -> String {
+        userDefaults.string(forKey: gemini_model) ?? GeminiLiveClient.defaultModel
+    }
 }

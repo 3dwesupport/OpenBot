@@ -49,6 +49,7 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         createPermissionIcon(image: Images.bluetooth, tinted: false, topAnchor: adapted(dimensionSize: 300, to: .height))
         scrollView.addSubview(createLabel(text: Strings.webSignalingServer, leadingAnchor: 40, topAnchor: adapted(dimensionSize: 350, to: .height)))
         createWebSignalingServerField()
+        createVoiceControlRow()
         updateSwitchPosition()
         registerKeyboardNotifications()
     }
@@ -212,6 +213,31 @@ class SettingsFragment: UIViewController, CLLocationManagerDelegate, UITextField
         webSignalingServerField.delegate = self
         webSignalingServerField.frame = CGRect(x: 40, y: adapted(dimensionSize: 380, to: .height), width: width - 80, height: 40)
         scrollView.addSubview(webSignalingServerField)
+    }
+
+    /// Tappable row that opens the Voice Control (Gemini Live) key and model settings.
+    func createVoiceControlRow() {
+        let rowTop = adapted(dimensionSize: 440, to: .height)
+        let title = UILabel()
+        title.text = Strings.voiceSettingsTitle
+        title.textColor = Colors.border
+        title.font = UIFont.systemFont(ofSize: 15.0)
+        title.frame = CGRect(x: 40, y: rowTop, width: width - 110, height: 40)
+        scrollView.addSubview(title)
+
+        let chevron = UIImageView(image: UIImage(systemName: "chevron.right"))
+        chevron.tintColor = Colors.border
+        chevron.contentMode = .scaleAspectFit
+        chevron.frame = CGRect(x: width - 60, y: rowTop + 10, width: 20, height: 20)
+        scrollView.addSubview(chevron)
+
+        let tapArea = UIView(frame: CGRect(x: 0, y: rowTop, width: width, height: 40))
+        tapArea.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(openVoiceControlSettings)))
+        scrollView.addSubview(tapArea)
+    }
+
+    @objc func openVoiceControlSettings() {
+        navigationController?.pushViewController(VoiceControlSettingsViewController(), animated: true)
     }
 
     /// persists the web signaling server URL when the user finishes editing

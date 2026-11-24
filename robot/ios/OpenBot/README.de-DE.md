@@ -205,6 +205,18 @@ Diese Funktion nutzt `ARKit`, das Augmented-Reality-Framework von Apple. Sie bra
 </p>
 
 
+### Sprachsteuerung
+
+Auf dem Bildschirm `Sprachsteuerung` sprichst du in Echtzeit mit dem Roboter, über die [Gemini Live API](https://ai.google.dev/gemini-api/docs/live). Bitte ihn zu fahren, näher zu kommen, sich umzudrehen oder zu blinken: Er ruft die passende Roboterfunktion auf und antwortet laut. Etwa einmal pro Sekunde sieht er ein Kamerabild, sodass du fragen kannst, was er sieht, oder ihn dir folgen lassen kannst. Das Gespräch wird angezeigt, und du kannst Befehle auch eintippen.
+
+Beim ersten Öffnen fragt der Bildschirm nach einem Gemini-API-Schlüssel. Tippe auf `Kostenlosen API-Schlüssel bei Google AI Studio holen`, erstelle einen Schlüssel, kehre zu OpenBot zurück (ein kopierter Schlüssel wird eingefügt) und tippe auf `Speichern & weiter`. Schlüssel und Modell lassen sich später über das Zahnrad oder unter `Einstellungen > Sprachsteuerung (Gemini Live)` ändern.
+
+Tippe auf den Kreis, um ein Gespräch zu starten oder zu beenden. Grün heißt zuhören, blau sprechen, gelb handeln. Der Bildschirm läuft im Querformat, so wie das Handy auf dem Roboter sitzt.
+
+Verfügbare Funktionen: fahren (`move_forward`, `move_backward`), drehen (`turn_left`, `turn_right`, `turn_around`), `stop`, Geschwindigkeit (`set_speed_mode`), Licht und Blinker (`set_lights`, `flash_lights`, `set_turn_signal`), Status (`get_robot_status`), einer Person folgen (`follow_person`, `stop_following`), eine Strecke in Metern mit ARKit fahren (`move_distance`), Uhrzeit und Wetter (`get_current_time`, `get_weather`, über [Open-Meteo](https://open-meteo.com)).
+
+Zur Sicherheit stoppt jede Bewegung nach einigen Sekunden von selbst, wenn kein neuer Befehl kommt, und beim Verlassen des Bildschirms hält der Roboter immer an. Folgen und Streckenfahrten brauchen die Kameraberechtigung und ein ARKit-fähiges Gerät, das Wetter die Standortberechtigung. Eine Internetverbindung ist nötig.
+
 ### Projekte
 
 Der Bildschirm Projekte zeigt Ihre Projekte aus dem OpenBot Playground, wenn Sie mit Ihrem Google-Konto angemeldet sind. Sie können diese Projekte ausführen, um Ihren OpenBot zu steuern, oder ihre QR-Codes über das Scanner-Symbol oben rechts scannen. Wenn Sie nicht angemeldet sind, zeigt der Bildschirm eine Schaltfläche für die Google-Anmeldung, Sie können den QR-Code Ihres Projekts aber trotzdem scannen. Erscheint nach der Anmeldung `Oops, no project found`, prüfen Sie, ob das Konto Projekte in Google Drive gespeichert hat.

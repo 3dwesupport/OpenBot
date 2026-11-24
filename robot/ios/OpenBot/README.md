@@ -277,6 +277,30 @@ Note that this feature uses `ARKit`, a framework developed by Apple for augmente
 </p>
 
 
+### Voice Control
+
+The `Voice Control` screen lets you talk to the robot in real time with the [Gemini Live API](https://ai.google.dev/gemini-api/docs/live). Ask it to move, come closer, turn around or flash its lights, and it calls the matching robot function while answering out loud. It also sees a camera snapshot about once per second, so you can ask "what do you see?" or ask it to follow you. The conversation is shown on screen, and you can type a command instead of speaking.
+
+The first time you open the screen, it asks for a Gemini API key. Tap `Get a free API key at Google AI Studio`, create a key, come back to OpenBot (a copied key is filled in for you) and tap `Save & Continue`. The key and the Gemini Live model can be changed later with the gear icon on the screen or in `Settings > Voice Control (Gemini Live)`.
+
+Tap the circle to start or end a conversation. Its color shows what is happening: green while listening, blue while speaking, amber while the robot is doing something. The screen is shown in landscape, the way the phone sits on the robot.
+
+The assistant can call these functions:
+
+| Function | What it does |
+|---|---|
+| `move_forward` / `move_backward` | Drives straight, optionally for a set time |
+| `turn_left` / `turn_right` / `turn_around` | Turns the robot |
+| `stop` | Stops all movement, including following and distance drives |
+| `set_speed_mode` | Switches between slow, normal and fast |
+| `set_lights` / `flash_lights` / `set_turn_signal` | Headlights and indicators |
+| `get_robot_status` | Battery voltage, speed and sonar distance |
+| `follow_person` / `stop_following` | Finds a person with the camera and follows them |
+| `move_distance` | Drives a set distance in meters with ARKit, like the [Navigation](#navigation) screen |
+| `get_current_time` / `get_weather` | Time, and weather at the robot's location from [Open-Meteo](https://open-meteo.com) |
+
+For safety, a movement stops by itself after a few seconds unless a new command arrives, and leaving the screen always stops the robot. Following and distance drives need camera permission and an ARKit-compatible device; the weather needs location permission. Voice Control needs an internet connection.
+
 ### Projects Screen
 
 The Projects Screen displays a list of your OpenBot Playground projects if you are signed in with your Google account. You can execute these projects to connect with your OpenBot, or scan their QR codes by clicking the scanner icon in the top right corner. If you are not signed in, the screen will display a Google Sign-In button, but you can still scan your project's QR code without signing in. If you get the message `Oops, no project found` on the screen after signing in, make sure that the account has projects stored on Google Drive.

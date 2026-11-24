@@ -200,6 +200,35 @@
 "pointGoalTrackingLost" = "Seguimiento perdido. El robot se detuvo.";
 "pointGoalModelFailure" = "No se pudo inicializar la política de navegación.";
 
+/* Voice Control (Gemini Live) */
+"voiceControl" = "Control por voz";
+"voiceSettingsTitle" = "Control por voz (Gemini Live)";
+"voiceSetupTitle" = "Habla con tu robot";
+"voiceSetupDescription" = "El control por voz usa la API Gemini Live para que puedas pedirle a tu robot que se mueva, gire o encienda sus luces solo hablando. Añade una clave de API de Gemini para empezar.";
+"voiceSetupGetKeyLink" = "Obtén una clave de API gratis en Google AI Studio →";
+"voiceSetupApiKeyHint" = "Clave de API de Gemini";
+"voiceSetupApiKeyRequired" = "Introduce una clave de API";
+"voiceSetupKeyDetected" = "Clave de API copiada del portapapeles, revísala y guárdala";
+"voiceSetupSaveButton" = "Guardar y continuar";
+"voiceModelTitle" = "Modelo de Gemini Live";
+"voiceModelLoading" = "Cargando modelos disponibles…";
+"voiceModelNeedsApiKey" = "Introduce tu clave de API arriba para cargar los modelos disponibles";
+"voiceModelLoadError" = "No se pudieron cargar los modelos: %@";
+"voiceModelNoneFound" = "No se encontraron modelos compatibles con Live para esta clave de API";
+"voiceStatusIdle" = "Toca el círculo para empezar a hablar";
+"voiceStatusConnecting" = "Conectando…";
+"voiceStatusListening" = "Escuchando…";
+"voiceStatusSpeaking" = "Hablando…";
+"voiceStatusActing" = "Actuando…";
+"voiceStatusError" = "Algo salió mal. Toca el círculo para reintentar.";
+"voiceMicPermissionRequired" = "Se necesita permiso de micrófono para el control por voz.";
+"voiceTypeCommandHint" = "Escribe un comando…";
+"voiceMicButtonDescription" = "Toca para empezar o dejar de hablar con el robot";
+"voiceSendButtonDescription" = "Enviar comando escrito";
+"voiceSettingsButtonDescription" = "Ajustes del control por voz";
+"voiceTrackingLost" = "Se perdió el seguimiento. El robot se detuvo.";
+"voicePersonDetectorFailure" = "No se pudo cargar el detector de personas.";
+
 /* Model Management filter dropdown */
 "modelFilterAll" = "Todos";
 "modelFilterAllCaps" = "TODOS";

@@ -200,6 +200,35 @@
 "pointGoalTrackingLost" = "Suivi perdu. Le robot a été arrêté.";
 "pointGoalModelFailure" = "Impossible d'initialiser la politique de navigation.";
 
+/* Voice Control (Gemini Live) */
+"voiceControl" = "Commande vocale";
+"voiceSettingsTitle" = "Commande vocale (Gemini Live)";
+"voiceSetupTitle" = "Parlez à votre robot";
+"voiceSetupDescription" = "La commande vocale utilise l'API Gemini Live : demandez simplement à votre robot d'avancer, de tourner ou de faire clignoter ses lumières. Ajoutez une clé API Gemini pour commencer.";
+"voiceSetupGetKeyLink" = "Obtenir une clé API gratuite sur Google AI Studio →";
+"voiceSetupApiKeyHint" = "Clé API Gemini";
+"voiceSetupApiKeyRequired" = "Veuillez saisir une clé API";
+"voiceSetupKeyDetected" = "Clé API copiée depuis le presse-papiers, vérifiez-la puis enregistrez";
+"voiceSetupSaveButton" = "Enregistrer et continuer";
+"voiceModelTitle" = "Modèle Gemini Live";
+"voiceModelLoading" = "Chargement des modèles disponibles…";
+"voiceModelNeedsApiKey" = "Saisissez votre clé API ci-dessus pour charger les modèles disponibles";
+"voiceModelLoadError" = "Impossible de charger les modèles : %@";
+"voiceModelNoneFound" = "Aucun modèle compatible Live trouvé pour cette clé API";
+"voiceStatusIdle" = "Touchez le cercle pour commencer à parler";
+"voiceStatusConnecting" = "Connexion…";
+"voiceStatusListening" = "Écoute…";
+"voiceStatusSpeaking" = "Parle…";
+"voiceStatusActing" = "Agit…";
+"voiceStatusError" = "Un problème est survenu. Touchez le cercle pour réessayer.";
+"voiceMicPermissionRequired" = "L'accès au micro est nécessaire pour la commande vocale.";
+"voiceTypeCommandHint" = "Tapez une commande…";
+"voiceMicButtonDescription" = "Touchez pour commencer ou arrêter de parler au robot";
+"voiceSendButtonDescription" = "Envoyer la commande saisie";
+"voiceSettingsButtonDescription" = "Réglages de la commande vocale";
+"voiceTrackingLost" = "Suivi perdu. Le robot a été arrêté.";
+"voicePersonDetectorFailure" = "Le détecteur de personnes n'a pas pu être chargé.";
+
 /* Model Management filter dropdown */
 "modelFilterAll" = "Tous";
 "modelFilterAllCaps" = "TOUS";

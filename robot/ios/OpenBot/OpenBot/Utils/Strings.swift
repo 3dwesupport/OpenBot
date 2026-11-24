@@ -104,6 +104,7 @@ struct Strings {
     static let ScreenBottomSheet: String = "ScreenBottomSheet"
     static let ScreenRobotInfo: String = "ScreenRobotInfo"
     static let ScreenNavigation: String = "ScreenNavigation"
+    static let ScreenVoiceControl: String = "ScreenVoiceControl"
 
     // UIVIew Identifiers
     static let secondView: String = "secondView"
@@ -277,6 +278,36 @@ struct Strings {
     static var pointGoalWatchdog: String { L10n.string("pointGoalWatchdog") }
     static var pointGoalTrackingLost: String { L10n.string("pointGoalTrackingLost") }
     static var pointGoalModelFailure: String { L10n.string("pointGoalModelFailure") }
+
+    // Voice Control (Gemini Live)
+    static var voiceControl: String { L10n.string("voiceControl") }
+    static var voiceSettingsTitle: String { L10n.string("voiceSettingsTitle") }
+    static var voiceSetupTitle: String { L10n.string("voiceSetupTitle") }
+    static var voiceSetupDescription: String { L10n.string("voiceSetupDescription") }
+    static var voiceSetupGetKeyLink: String { L10n.string("voiceSetupGetKeyLink") }
+    static var voiceSetupApiKeyHint: String { L10n.string("voiceSetupApiKeyHint") }
+    static var voiceSetupApiKeyRequired: String { L10n.string("voiceSetupApiKeyRequired") }
+    static var voiceSetupKeyDetected: String { L10n.string("voiceSetupKeyDetected") }
+    static var voiceSetupSaveButton: String { L10n.string("voiceSetupSaveButton") }
+    static var voiceModelTitle: String { L10n.string("voiceModelTitle") }
+    static var voiceModelLoading: String { L10n.string("voiceModelLoading") }
+    static var voiceModelNeedsApiKey: String { L10n.string("voiceModelNeedsApiKey") }
+    /// Format string with one %@ placeholder for the error message.
+    static var voiceModelLoadError: String { L10n.string("voiceModelLoadError") }
+    static var voiceModelNoneFound: String { L10n.string("voiceModelNoneFound") }
+    static var voiceStatusIdle: String { L10n.string("voiceStatusIdle") }
+    static var voiceStatusConnecting: String { L10n.string("voiceStatusConnecting") }
+    static var voiceStatusListening: String { L10n.string("voiceStatusListening") }
+    static var voiceStatusSpeaking: String { L10n.string("voiceStatusSpeaking") }
+    static var voiceStatusActing: String { L10n.string("voiceStatusActing") }
+    static var voiceStatusError: String { L10n.string("voiceStatusError") }
+    static var voiceMicPermissionRequired: String { L10n.string("voiceMicPermissionRequired") }
+    static var voiceTypeCommandHint: String { L10n.string("voiceTypeCommandHint") }
+    static var voiceMicButtonDescription: String { L10n.string("voiceMicButtonDescription") }
+    static var voiceSendButtonDescription: String { L10n.string("voiceSendButtonDescription") }
+    static var voiceSettingsButtonDescription: String { L10n.string("voiceSettingsButtonDescription") }
+    static var voiceTrackingLost: String { L10n.string("voiceTrackingLost") }
+    static var voicePersonDetectorFailure: String { L10n.string("voicePersonDetectorFailure") }
 
     // Model Management filter dropdown
     static var modelFilterAll: String { L10n.string("modelFilterAll") }

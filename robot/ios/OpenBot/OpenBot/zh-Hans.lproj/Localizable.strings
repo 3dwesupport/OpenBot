@@ -200,6 +200,35 @@
 "pointGoalTrackingLost" = "跟踪丢失，机器人已停止。";
 "pointGoalModelFailure" = "无法初始化导航策略。";
 
+/* Voice Control (Gemini Live) */
+"voiceControl" = "语音控制";
+"voiceSettingsTitle" = "语音控制 (Gemini Live)";
+"voiceSetupTitle" = "和你的机器人对话";
+"voiceSetupDescription" = "语音控制使用 Gemini Live API，只需开口就能让机器人移动、转向或闪灯。添加 Gemini API 密钥即可开始。";
+"voiceSetupGetKeyLink" = "在 Google AI Studio 免费获取 API 密钥 →";
+"voiceSetupApiKeyHint" = "Gemini API 密钥";
+"voiceSetupApiKeyRequired" = "请输入 API 密钥";
+"voiceSetupKeyDetected" = "已从剪贴板读取 API 密钥，请检查后保存";
+"voiceSetupSaveButton" = "保存并继续";
+"voiceModelTitle" = "Gemini Live 模型";
+"voiceModelLoading" = "正在加载可用模型…";
+"voiceModelNeedsApiKey" = "请在上方输入 API 密钥以加载可用模型";
+"voiceModelLoadError" = "无法加载模型：%@";
+"voiceModelNoneFound" = "此 API 密钥没有可用的 Live 模型";
+"voiceStatusIdle" = "点击圆圈开始说话";
+"voiceStatusConnecting" = "正在连接…";
+"voiceStatusListening" = "正在聆听…";
+"voiceStatusSpeaking" = "正在说话…";
+"voiceStatusActing" = "正在执行…";
+"voiceStatusError" = "出现问题。点击圆圈重试。";
+"voiceMicPermissionRequired" = "语音控制需要麦克风权限。";
+"voiceTypeCommandHint" = "输入指令…";
+"voiceMicButtonDescription" = "点击开始或停止与机器人对话";
+"voiceSendButtonDescription" = "发送输入的指令";
+"voiceSettingsButtonDescription" = "语音控制设置";
+"voiceTrackingLost" = "跟踪丢失，机器人已停止。";
+"voicePersonDetectorFailure" = "无法加载人物检测模型。";
+
 /* Model Management filter dropdown */
 "modelFilterAll" = "全部";
 "modelFilterAllCaps" = "全部";

@@ -43,6 +43,7 @@ struct Images {
     static let openBotLogo = UIImage(named: "openBotLogo")
     static let gmapMarker = UIImage(named: "gmap_marker")
     static let pointGoalIcon = UIImage(named: "pointGoal")
+    static let voiceControlIcon = UIImage(systemName: "waveform", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40, weight: .medium))?.withTintColor(.white, renderingMode: .alwaysOriginal)
 }
 
 /// Colors of the user inerface
@@ -68,6 +69,7 @@ struct Colors {
     static let objectTrackingColor = UIColor(red: 1.0, green: 217.0 / 255.0, blue: 102.0 / 255.0, alpha: 1.00)
     static let pointGoalColor = UIColor(red: 52.0 / 255.0, green: 181.0 / 255.0, blue: 183.0 / 255.0, alpha: 1.00)
     static let modelColor = UIColor(red: 183.0 / 255.0, green: 138.0 / 255.0, blue: 164.0 / 255.0, alpha: 1.00)
+    static let voiceControlColor = UIColor(red: 75.0 / 255.0, green: 123.0 / 255.0, blue: 1.0, alpha: 1.00)
 }
 
 /// Set of constants used in the code
@@ -93,7 +95,8 @@ struct Constants {
                 ModeItem(label: Strings.Autopilot, icon: Images.autopilotIcon!, identifier: Strings.AutopilotFragment, color: Colors.autopilotColor),
                 ModeItem(label: Strings.ObjectTracking, icon: Images.objectTrackingIcon!, identifier: Strings.ObjectTrackingFragment, color: Colors.objectTrackingColor),
                 ModeItem(label: Strings.navigation, icon: Images.pointGoalIcon!, identifier: Strings.ScreenNavigation, color: Colors.pointGoalColor),
-                ModeItem(label: Strings.modelManagement, icon: Images.modelManagementIcon!, identifier: Strings.ScreenModelManagement, color: Colors.modelColor)
+                ModeItem(label: Strings.modelManagement, icon: Images.modelManagementIcon!, identifier: Strings.ScreenModelManagement, color: Colors.modelColor),
+                ModeItem(label: Strings.voiceControl, icon: Images.voiceControlIcon!, identifier: Strings.ScreenVoiceControl, color: Colors.voiceControlColor)
             ],
             // Legacy
             []

@@ -264,6 +264,18 @@ iOS 기기를 OpenBot 차량과 연결하려면, 목록에서 차량을 선택�
 <img src="../../../docs/images/ios_navigation_screen.jpg" alt="Model Management" width="25%" />
 </p>
 
+### 음성 제어
+
+`음성 제어` 화면에서는 [Gemini Live API](https://ai.google.dev/gemini-api/docs/live)로 로봇과 실시간으로 대화할 수 있습니다. 움직이기, 가까이 오기, 돌아서기, 라이트 깜빡이기를 요청하면 로봇이 해당 기능을 실행하고 소리 내어 대답합니다. 약 1초마다 카메라 이미지를 보기 때문에 무엇이 보이는지 묻거나 따라오라고 할 수 있습니다. 대화는 화면에 표시되며 명령을 직접 입력할 수도 있습니다.
+
+처음 열면 Gemini API 키를 요청합니다. `Google AI Studio에서 무료 API 키 받기`를 탭하여 키를 만들고 OpenBot으로 돌아오면(복사한 키가 자동으로 입력됨) `저장 후 계속`을 탭하세요. 키와 모델은 톱니바퀴 아이콘이나 `설정 > 음성 제어 (Gemini Live)`에서 바꿀 수 있습니다.
+
+원을 탭하여 대화를 시작하거나 종료합니다. 초록색은 듣는 중, 파란색은 말하는 중, 주황색은 동작 중입니다. 화면은 로봇에 휴대폰을 거치하는 방향인 가로 모드로 표시됩니다.
+
+사용 가능한 기능: 전진/후진(`move_forward`, `move_backward`), 회전(`turn_left`, `turn_right`, `turn_around`), `stop`, 속도(`set_speed_mode`), 라이트와 방향지시등(`set_lights`, `flash_lights`, `set_turn_signal`), 상태(`get_robot_status`), 사람 따라가기(`follow_person`, `stop_following`), ARKit으로 정해진 거리 이동(`move_distance`), 시간과 날씨(`get_current_time`, `get_weather`, [Open-Meteo](https://open-meteo.com) 사용).
+
+안전을 위해 새 명령이 없으면 몇 초 후 움직임이 자동으로 멈추고, 화면을 나가면 로봇은 항상 정지합니다. 따라가기와 거리 이동에는 카메라 권한과 ARKit 지원 기기가, 날씨에는 위치 권한이 필요합니다. 인터넷 연결이 필요합니다.
+
 ### 프로젝트 화면
 
 프로젝트 화면은 Google 계정으로 로그인하면 OpenBot Playground 프로젝트 목록을 보여줘요. 이 프로젝트들을 실행하여 OpenBot과 연결하거나, 화면 오른쪽 상단에 있는 스캐너 아이콘을 클릭해 QR 코드를 스캔할 수 있어요. 만약 로그인하지 않았다면, 화면에 Google 로그인 버튼이 보이지만, 로그인하지 않고도 프로젝트의 QR 코드는 여전히 스캔할 수 있어요. 로그인 후 화면에 `Oops, no project found`라는 메시지가 뜬다면, Google Drive에 저장된 프로젝트가 있는지 확인해보세요.

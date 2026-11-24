@@ -200,6 +200,35 @@
 "pointGoalTrackingLost" = "Tracking verloren. Der Roboter wurde angehalten.";
 "pointGoalModelFailure" = "Die Navigationssteuerung konnte nicht initialisiert werden.";
 
+/* Voice Control (Gemini Live) */
+"voiceControl" = "Sprachsteuerung";
+"voiceSettingsTitle" = "Sprachsteuerung (Gemini Live)";
+"voiceSetupTitle" = "Sprich mit deinem Roboter";
+"voiceSetupDescription" = "Die Sprachsteuerung nutzt die Gemini Live API. So kannst du deinen Roboter einfach per Sprache fahren, drehen oder blinken lassen. Füge einen Gemini-API-Schlüssel hinzu, um loszulegen.";
+"voiceSetupGetKeyLink" = "Kostenlosen API-Schlüssel bei Google AI Studio holen →";
+"voiceSetupApiKeyHint" = "Gemini-API-Schlüssel";
+"voiceSetupApiKeyRequired" = "Bitte gib einen API-Schlüssel ein";
+"voiceSetupKeyDetected" = "API-Schlüssel aus der Zwischenablage übernommen, prüfen und speichern";
+"voiceSetupSaveButton" = "Speichern & weiter";
+"voiceModelTitle" = "Gemini-Live-Modell";
+"voiceModelLoading" = "Verfügbare Modelle werden geladen…";
+"voiceModelNeedsApiKey" = "Gib oben deinen API-Schlüssel ein, um die verfügbaren Modelle zu laden";
+"voiceModelLoadError" = "Modelle konnten nicht geladen werden: %@";
+"voiceModelNoneFound" = "Für diesen API-Schlüssel wurden keine Live-fähigen Modelle gefunden";
+"voiceStatusIdle" = "Tippe auf den Kreis, um zu sprechen";
+"voiceStatusConnecting" = "Verbinden…";
+"voiceStatusListening" = "Hört zu…";
+"voiceStatusSpeaking" = "Spricht…";
+"voiceStatusActing" = "Handelt…";
+"voiceStatusError" = "Etwas ist schiefgelaufen. Tippe auf den Kreis, um es erneut zu versuchen.";
+"voiceMicPermissionRequired" = "Für die Sprachsteuerung ist der Mikrofonzugriff erforderlich.";
+"voiceTypeCommandHint" = "Befehl eingeben…";
+"voiceMicButtonDescription" = "Tippen, um das Gespräch mit dem Roboter zu starten oder zu beenden";
+"voiceSendButtonDescription" = "Eingegebenen Befehl senden";
+"voiceSettingsButtonDescription" = "Einstellungen der Sprachsteuerung";
+"voiceTrackingLost" = "Tracking verloren. Der Roboter wurde gestoppt.";
+"voicePersonDetectorFailure" = "Die Personenerkennung konnte nicht geladen werden.";
+
 /* Model Management filter dropdown */
 "modelFilterAll" = "Alle";
 "modelFilterAllCaps" = "ALLE";

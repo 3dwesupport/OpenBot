@@ -209,6 +209,18 @@ Cette fonctionnalité utilise `ARKit`, le framework de réalité augmentée d'Ap
 </p>
 
 
+### Commande vocale
+
+L'écran `Commande vocale` permet de parler au robot en temps réel grâce à l'[API Gemini Live](https://ai.google.dev/gemini-api/docs/live). Demandez-lui d'avancer, de s'approcher, de faire demi-tour ou de faire clignoter ses lumières : il appelle la fonction correspondante et répond à voix haute. Il voit aussi une image de la caméra environ une fois par seconde, vous pouvez donc lui demander ce qu'il voit ou de vous suivre. La conversation s'affiche à l'écran et vous pouvez aussi taper vos commandes.
+
+À la première ouverture, l'écran demande une clé API Gemini. Touchez `Obtenir une clé API gratuite sur Google AI Studio`, créez une clé, revenez dans OpenBot (une clé copiée est remplie automatiquement) et touchez `Enregistrer et continuer`. La clé et le modèle se modifient avec l'icône d'engrenage ou dans `Réglages > Commande vocale (Gemini Live)`.
+
+Touchez le cercle pour commencer ou terminer une conversation. Vert : écoute, bleu : parle, ambre : agit. L'écran s'affiche en paysage, comme le téléphone posé sur le robot.
+
+Fonctions disponibles : avancer et reculer (`move_forward`, `move_backward`), tourner (`turn_left`, `turn_right`, `turn_around`), `stop`, vitesse (`set_speed_mode`), phares et clignotants (`set_lights`, `flash_lights`, `set_turn_signal`), état (`get_robot_status`), suivre une personne (`follow_person`, `stop_following`), parcourir une distance en mètres avec ARKit (`move_distance`), heure et météo (`get_current_time`, `get_weather`, via [Open-Meteo](https://open-meteo.com)).
+
+Par sécurité, chaque mouvement s'arrête seul après quelques secondes sans nouvelle commande, et quitter l'écran arrête toujours le robot. Le suivi et les trajets en mètres nécessitent l'accès à la caméra et un appareil compatible ARKit ; la météo nécessite la localisation. Une connexion internet est nécessaire.
+
 ### Écran Projets
 
 L'écran Projets affiche la liste de vos projets OpenBot Playground si vous êtes connecté avec votre compte Google. Vous pouvez exécuter ces projets pour piloter votre OpenBot, ou scanner leur code QR avec l'icône du scanner en haut à droite. Si vous n'êtes pas connecté, l'écran affiche un bouton de connexion Google, mais vous pouvez quand même scanner le code QR de votre projet. Si le message `Oops, no project found` s'affiche après la connexion, vérifiez que le compte a des projets enregistrés sur Google Drive.

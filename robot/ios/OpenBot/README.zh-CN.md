@@ -209,6 +209,18 @@
 </p>
 
 
+### 语音控制
+
+`语音控制` 界面让你通过 [Gemini Live API](https://ai.google.dev/gemini-api/docs/live) 与机器人实时对话。让它前进、靠近、掉头或闪灯，它会调用对应的机器人功能并大声回答。它大约每秒看到一张摄像头画面，所以你可以问它看到了什么，或让它跟着你。对话会显示在屏幕上，你也可以直接输入指令。
+
+第一次打开时需要 Gemini API 密钥。点击 `在 Google AI Studio 免费获取 API 密钥`，创建密钥后回到 OpenBot（复制的密钥会自动填入），再点击 `保存并继续`。之后可以通过齿轮图标或 `设置 > 语音控制 (Gemini Live)` 更改密钥和模型。
+
+点击圆圈开始或结束对话。绿色表示正在聆听，蓝色表示正在说话，琥珀色表示正在执行。界面以横屏显示，与手机在机器人上的摆放方向一致。
+
+可用功能：前进和后退（`move_forward`、`move_backward`）、转向（`turn_left`、`turn_right`、`turn_around`）、`stop`、速度（`set_speed_mode`）、车灯和转向灯（`set_lights`、`flash_lights`、`set_turn_signal`）、状态（`get_robot_status`）、跟随人物（`follow_person`、`stop_following`）、用 ARKit 行驶指定米数（`move_distance`）、时间和天气（`get_current_time`、`get_weather`，来自 [Open-Meteo](https://open-meteo.com)）。
+
+为了安全，如果没有新指令，任何移动都会在几秒后自动停止，离开界面时机器人总会停下。跟随和指定距离行驶需要摄像头权限和支持 ARKit 的设备，天气需要位置权限。需要联网。
+
 ### 项目界面
 
 如果您已使用 Google 帐号登录，项目界面会列出您的 OpenBot Playground 项目。您可以运行这些项目来控制 OpenBot，也可以点击右上角的扫描图标扫描它们的二维码。如果未登录，界面会显示 Google 登录按钮，但您仍然可以在不登录的情况下扫描项目二维码。如果登录后界面显示 `Oops, no project found`，请确认该帐号在 Google Drive 中存有项目。

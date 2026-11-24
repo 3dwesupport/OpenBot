@@ -200,6 +200,35 @@
 "pointGoalTrackingLost" = "ट्रैकिंग खो गई। रोबोट रोक दिया गया।";
 "pointGoalModelFailure" = "नेविगेशन पॉलिसी शुरू नहीं हो सकी।";
 
+/* Voice Control (Gemini Live) */
+"voiceControl" = "वॉइस कंट्रोल";
+"voiceSettingsTitle" = "वॉइस कंट्रोल (Gemini Live)";
+"voiceSetupTitle" = "अपने रोबोट से बात करें";
+"voiceSetupDescription" = "वॉइस कंट्रोल Gemini Live API का उपयोग करता है, ताकि आप बस बोलकर अपने रोबोट को चलने, मुड़ने या लाइट जलाने के लिए कह सकें। शुरू करने के लिए Gemini API key जोड़ें।";
+"voiceSetupGetKeyLink" = "Google AI Studio पर मुफ़्त API key पाएं →";
+"voiceSetupApiKeyHint" = "Gemini API key";
+"voiceSetupApiKeyRequired" = "कृपया API key डालें";
+"voiceSetupKeyDetected" = "क्लिपबोर्ड से API key ली गई, जांचें और सेव करें";
+"voiceSetupSaveButton" = "सेव करें और आगे बढ़ें";
+"voiceModelTitle" = "Gemini Live मॉडल";
+"voiceModelLoading" = "उपलब्ध मॉडल लोड हो रहे हैं…";
+"voiceModelNeedsApiKey" = "उपलब्ध मॉडल लोड करने के लिए ऊपर अपनी API key डालें";
+"voiceModelLoadError" = "मॉडल लोड नहीं हो सके: %@";
+"voiceModelNoneFound" = "इस API key के लिए कोई Live मॉडल नहीं मिला";
+"voiceStatusIdle" = "बात शुरू करने के लिए गोले पर टैप करें";
+"voiceStatusConnecting" = "कनेक्ट हो रहा है…";
+"voiceStatusListening" = "सुन रहा है…";
+"voiceStatusSpeaking" = "बोल रहा है…";
+"voiceStatusActing" = "काम कर रहा है…";
+"voiceStatusError" = "कुछ गलत हो गया। फिर से कोशिश करने के लिए गोले पर टैप करें।";
+"voiceMicPermissionRequired" = "वॉइस कंट्रोल के लिए माइक्रोफ़ोन की अनुमति ज़रूरी है।";
+"voiceTypeCommandHint" = "कमांड टाइप करें…";
+"voiceMicButtonDescription" = "रोबोट से बात शुरू या बंद करने के लिए टैप करें";
+"voiceSendButtonDescription" = "टाइप की गई कमांड भेजें";
+"voiceSettingsButtonDescription" = "वॉइस कंट्रोल सेटिंग्स";
+"voiceTrackingLost" = "ट्रैकिंग खो गई। रोबोट रोक दिया गया।";
+"voicePersonDetectorFailure" = "व्यक्ति पहचानने वाला मॉडल लोड नहीं हो सका।";
+
 /* Model Management filter dropdown */
 "modelFilterAll" = "सभी";
 "modelFilterAllCaps" = "सभी";

@@ -200,6 +200,35 @@
 "pointGoalTrackingLost" = "Tracking lost. The robot was stopped.";
 "pointGoalModelFailure" = "Navigation policy could not be initialized.";
 
+/* Voice Control (Gemini Live) */
+"voiceControl" = "Voice Control";
+"voiceSettingsTitle" = "Voice Control (Gemini Live)";
+"voiceSetupTitle" = "Talk to your robot";
+"voiceSetupDescription" = "Voice Control uses the Gemini Live API so you can ask your robot to move, turn, or flash its lights just by talking. Add a Gemini API key to get started.";
+"voiceSetupGetKeyLink" = "Get a free API key at Google AI Studio →";
+"voiceSetupApiKeyHint" = "Gemini API key";
+"voiceSetupApiKeyRequired" = "Please enter an API key";
+"voiceSetupKeyDetected" = "API key copied from clipboard, review and save";
+"voiceSetupSaveButton" = "Save & Continue";
+"voiceModelTitle" = "Gemini Live model";
+"voiceModelLoading" = "Loading available models…";
+"voiceModelNeedsApiKey" = "Enter your API key above to load available models";
+"voiceModelLoadError" = "Couldn't load models: %@";
+"voiceModelNoneFound" = "No Live-capable models found for this API key";
+"voiceStatusIdle" = "Tap the circle to start talking";
+"voiceStatusConnecting" = "Connecting…";
+"voiceStatusListening" = "Listening…";
+"voiceStatusSpeaking" = "Speaking…";
+"voiceStatusActing" = "Acting…";
+"voiceStatusError" = "Something went wrong. Tap the circle to retry.";
+"voiceMicPermissionRequired" = "Microphone permission is required for Voice Control.";
+"voiceTypeCommandHint" = "Type a command…";
+"voiceMicButtonDescription" = "Tap to start or stop talking to the robot";
+"voiceSendButtonDescription" = "Send typed command";
+"voiceSettingsButtonDescription" = "Voice Control settings";
+"voiceTrackingLost" = "Tracking lost. The robot was stopped.";
+"voicePersonDetectorFailure" = "The person detector could not be loaded.";
+
 /* Model Management filter dropdown */
 "modelFilterAll" = "All";
 "modelFilterAllCaps" = "ALL";

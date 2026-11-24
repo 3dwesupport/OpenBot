@@ -146,6 +146,14 @@
 		D05873148B42EC94B04CA2D7 /* fr.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 3BB0877EC1CEBF363E89AC40 /* fr.lproj */; };
 		DE140ADB3A5AD0CB5887236E /* zh-Hans.lproj in Resources */ = {isa = PBXBuildFile; fileRef = FEF69C473286A88068044136 /* zh-Hans.lproj */; };
 		E72DD15800419B5599A50187 /* LanguageApplyingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C349227CFEDFA7E55F8ACB73 /* LanguageApplyingView.swift */; };
+		08869E53775F95409A05CA35 /* GeminiLiveClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3771A7CFEFE053D3F89B0632 /* GeminiLiveClient.swift */; };
+		59662D4B3841CB43D70CF8C3 /* GeminiModelsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F7A4EFBB2513C111FA64D9 /* GeminiModelsFetcher.swift */; };
+		85E82F220F22C876A6DE4D71 /* VoiceAudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586CB4069352ABA525F688A6 /* VoiceAudioEngine.swift */; };
+		6C8671DD58C25614EB85B89D /* RobotToolExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D5970F55C167D2DF4669C6 /* RobotToolExecutor.swift */; };
+		BB152D61D7F9CAEFE2620F12 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33F77633F6764297A71336F7 /* WeatherService.swift */; };
+		7D76A7048D606E443DF783A6 /* VoiceControlViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B7FD629FE816A9E928AFC9 /* VoiceControlViews.swift */; };
+		BE807F15A3D5EB94E7AC2D7A /* VoiceControlSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE543E1E9EC6C24D9DFD66E /* VoiceControlSettingsViewController.swift */; };
+		78315F25CB9B407BCA95BFB0 /* VoiceControlFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CC4D739BBFEFB793008ED26 /* VoiceControlFragment.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -313,6 +321,14 @@
 		F6D876AB60453F7E405CAED2 /* LanguagePickerViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LanguagePickerViewController.swift; sourceTree = "<group>"; };
 		FA864C211FDA0FFF7C141891 /* Pods-OpenBot.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenBot.debug.xcconfig"; path = "Target Support Files/Pods-OpenBot/Pods-OpenBot.debug.xcconfig"; sourceTree = "<group>"; };
 		FEF69C473286A88068044136 /* zh-Hans.lproj */ = {isa = PBXFileReference; explicitFileType = folder; includeInIndex = 1; path = "zh-Hans.lproj"; sourceTree = "<group>"; };
+		3771A7CFEFE053D3F89B0632 /* GeminiLiveClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeminiLiveClient.swift; sourceTree = "<group>"; };
+		F5F7A4EFBB2513C111FA64D9 /* GeminiModelsFetcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeminiModelsFetcher.swift; sourceTree = "<group>"; };
+		586CB4069352ABA525F688A6 /* VoiceAudioEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceAudioEngine.swift; sourceTree = "<group>"; };
+		B5D5970F55C167D2DF4669C6 /* RobotToolExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RobotToolExecutor.swift; sourceTree = "<group>"; };
+		33F77633F6764297A71336F7 /* WeatherService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		53B7FD629FE816A9E928AFC9 /* VoiceControlViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceControlViews.swift; sourceTree = "<group>"; };
+		3FE543E1E9EC6C24D9DFD66E /* VoiceControlSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceControlSettingsViewController.swift; sourceTree = "<group>"; };
+		5CC4D739BBFEFB793008ED26 /* VoiceControlFragment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceControlFragment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -585,6 +601,7 @@
 				727D3AD9225580EC94775651 /* WebView */,
 				727D3DEDE1506A0363E8D959 /* Alert */,
 				727D395E131B59268FC75AF3 /* WebServer */,
+				A6CCE25AF431CDC2E302ECA3 /* VoiceControl */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -835,6 +852,21 @@
 				06318656CBC7BD5A24BCD958 /* Pods-OpenBotTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		A6CCE25AF431CDC2E302ECA3 /* VoiceControl */ = {
+			isa = PBXGroup;
+			children = (
+				3771A7CFEFE053D3F89B0632 /* GeminiLiveClient.swift */,
+				F5F7A4EFBB2513C111FA64D9 /* GeminiModelsFetcher.swift */,
+				586CB4069352ABA525F688A6 /* VoiceAudioEngine.swift */,
+				B5D5970F55C167D2DF4669C6 /* RobotToolExecutor.swift */,
+				33F77633F6764297A71336F7 /* WeatherService.swift */,
+				53B7FD629FE816A9E928AFC9 /* VoiceControlViews.swift */,
+				3FE543E1E9EC6C24D9DFD66E /* VoiceControlSettingsViewController.swift */,
+				5CC4D739BBFEFB793008ED26 /* VoiceControlFragment.swift */,
+			);
+			path = VoiceControl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1288,6 +1320,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4FEF4DC031698B6DEEB01AEB /* AppDelegate.swift in Sources */,
+				08869E53775F95409A05CA35 /* GeminiLiveClient.swift in Sources */,
+				59662D4B3841CB43D70CF8C3 /* GeminiModelsFetcher.swift in Sources */,
+				85E82F220F22C876A6DE4D71 /* VoiceAudioEngine.swift in Sources */,
+				6C8671DD58C25614EB85B89D /* RobotToolExecutor.swift in Sources */,
+				BB152D61D7F9CAEFE2620F12 /* WeatherService.swift in Sources */,
+				7D76A7048D606E443DF783A6 /* VoiceControlViews.swift in Sources */,
+				BE807F15A3D5EB94E7AC2D7A /* VoiceControlSettingsViewController.swift in Sources */,
+				78315F25CB9B407BCA95BFB0 /* VoiceControlFragment.swift in Sources */,
 				66AC721029B885410022108A /* BluetoothTable.swift in Sources */,
 				4FEF4F78919CCCC28C418C5B /* SceneDelegate.swift in Sources */,
 				66AC720C29B885410022108A /* CheckBox.swift in Sources */,

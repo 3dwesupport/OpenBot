@@ -209,6 +209,18 @@ Esta función usa `ARKit`, el framework de realidad aumentada de Apple. Necesita
 </p>
 
 
+### Control por voz
+
+La pantalla `Control por voz` te permite hablar con el robot en tiempo real con la [API Gemini Live](https://ai.google.dev/gemini-api/docs/live). Pídele que se mueva, se acerque, dé la vuelta o encienda sus luces: llama a la función del robot correspondiente y responde en voz alta. Además ve una imagen de la cámara cada segundo aproximadamente, así que puedes preguntarle qué ve o pedirle que te siga. La conversación aparece en pantalla y también puedes escribir los comandos.
+
+La primera vez, la pantalla pide una clave de API de Gemini. Toca `Obtén una clave de API gratis en Google AI Studio`, crea una clave, vuelve a OpenBot (una clave copiada se rellena sola) y toca `Guardar y continuar`. La clave y el modelo se pueden cambiar con el icono de engranaje o en `Ajustes > Control por voz (Gemini Live)`.
+
+Toca el círculo para empezar o terminar una conversación. Verde significa escuchando, azul hablando y ámbar actuando. La pantalla se muestra en horizontal, como va el teléfono en el robot.
+
+Funciones disponibles: avanzar y retroceder (`move_forward`, `move_backward`), girar (`turn_left`, `turn_right`, `turn_around`), `stop`, velocidad (`set_speed_mode`), luces e intermitentes (`set_lights`, `flash_lights`, `set_turn_signal`), estado (`get_robot_status`), seguir a una persona (`follow_person`, `stop_following`), recorrer una distancia en metros con ARKit (`move_distance`), hora y tiempo (`get_current_time`, `get_weather`, con [Open-Meteo](https://open-meteo.com)).
+
+Por seguridad, cada movimiento se detiene solo tras unos segundos si no llega otro comando, y al salir de la pantalla el robot siempre se detiene. Seguir y recorrer distancias necesitan permiso de cámara y un dispositivo compatible con ARKit; el tiempo necesita permiso de ubicación. Se necesita conexión a internet.
+
 ### Pantalla de proyectos
 
 La pantalla de proyectos muestra tus proyectos de OpenBot Playground si has iniciado sesión con tu cuenta de Google. Puedes ejecutarlos para controlar tu OpenBot o escanear sus códigos QR con el icono del escáner arriba a la derecha. Si no has iniciado sesión, la pantalla muestra un botón para iniciar sesión con Google, pero aun así puedes escanear el código QR de tu proyecto. Si aparece `Oops, no project found` después de iniciar sesión, comprueba que la cuenta tiene proyectos guardados en Google Drive.
