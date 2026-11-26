@@ -19,8 +19,6 @@
 	<dict/>
 	<key>CFBundleIcons~ipad</key>
 	<dict/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
@@ -38,7 +36,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.000000000000-00000000000000000000000000000000</string>
+				<string>com.googleusercontent.apps.955078484078-0kh6cdcgf6o5a3nf8rrcbeo5h4b2ov0o</string>
 			</array>
 		</dict>
 	</array>
@@ -49,8 +47,6 @@
 			<string>ExtendedGamepad</string>
 		</dict>
 	</array>
-	<key>GCSupportsControllerUserInteraction</key>
-	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>http</string>
