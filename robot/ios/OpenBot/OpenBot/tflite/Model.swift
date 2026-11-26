@@ -17,6 +17,10 @@ struct ModelItem: Codable {
     var path: String;
     var inputSize: String;
 
+    enum CodingKeys: String, CodingKey {
+        case id, `class`, type, name, pathType, path, inputSize
+    }
+
     /// Write the characteristics of a given model as a JSON file
     ///
     /// - Parameters: a list of model items
@@ -61,6 +65,61 @@ struct ModelItem: Codable {
         return ""
     }
 
+}
+
+/// Decoding that checks every entry of the shared config.json.
+/// Kept in an extension so the memberwise initializer stays available.
+extension ModelItem {
+
+    private static let pathTypes: Set<String> = ["URL", "ASSET", "FILE"]
+
+    /// Decodes one entry, maps names from older iOS builds, and rejects entries the apps can't use.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let rawClass = try container.decode(String.self, forKey: .class)
+        let rawType = try container.decode(String.self, forKey: .type)
+        guard let classType = CLASS(configValue: rawClass), let type = TYPE(configValue: rawType) else {
+            throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown class \(rawClass) or type \(rawType)")
+        }
+        let pathType = try container.decode(String.self, forKey: .pathType)
+        guard ModelItem.pathTypes.contains(pathType) else {
+            throw DecodingError.dataCorruptedError(forKey: .pathType, in: container, debugDescription: "Unknown pathType \(pathType)")
+        }
+        let name = try container.decode(String.self, forKey: .name)
+        guard !name.isEmpty else {
+            throw DecodingError.dataCorruptedError(forKey: .name, in: container, debugDescription: "Empty model name")
+        }
+        let inputSize = try container.decode(String.self, forKey: .inputSize)
+        self.init(id: try container.decode(Int.self, forKey: .id),
+                  class: classType.rawValue,
+                  type: type.rawValue,
+                  name: name,
+                  pathType: pathType,
+                  path: try container.decodeIfPresent(String.self, forKey: .path) ?? "",
+                  inputSize: inputSize)
+    }
+
+    /// Decodes a model list and skips bad entries instead of failing the whole list.
+    static func decodeList(from data: Data) -> [ModelItem] {
+        guard let entries = try? JSONDecoder().decode([LossyModelItem].self, from: data) else {
+            print("config.json is not a readable model list")
+            return []
+        }
+        let items = entries.compactMap { $0.item }
+        if items.count < entries.count {
+            print("Skipped \(entries.count - items.count) invalid model entries in config.json")
+        }
+        return items
+    }
+
+    /// Wraps one entry so a bad entry decodes as nil.
+    private struct LossyModelItem: Decodable {
+        let item: ModelItem?
+
+        init(from decoder: Decoder) throws {
+            item = try? ModelItem(from: decoder)
+        }
+    }
 }
 
 /// The Model class encapsulates the main properties of a neural network in the context of an OpenBot application.
@@ -178,8 +237,8 @@ extension Model {
         for item in list {
             let model: Model = Model(
                     id: item.id,
-                    classType: CLASS(rawValue: item.class) ?? CLASS.AUTOPILOT_F,
-                    type: TYPE(rawValue: item.type) ?? TYPE.AUTOPILOT,
+                    classType: CLASS(configValue: item.class) ?? CLASS.AUTOPILOT_F,
+                    type: TYPE(configValue: item.type) ?? TYPE.AUTOPILOT,
                     name: item.name,
                     pathType: PATH_TYPE(rawValue: item.pathType) ?? PATH_TYPE.ASSET,
                     path: item.path,
@@ -196,8 +255,8 @@ extension Model {
     static func fromModelItem(item: ModelItem) -> Model {
         let model: Model = Model(
                 id: item.id,
-                classType: CLASS(rawValue: item.class) ?? CLASS.AUTOPILOT_F,
-                type: TYPE(rawValue: item.type) ?? TYPE.AUTOPILOT,
+                classType: CLASS(configValue: item.class) ?? CLASS.AUTOPILOT_F,
+                type: TYPE(configValue: item.type) ?? TYPE.AUTOPILOT,
                 name: item.name,
                 pathType: PATH_TYPE(rawValue: item.pathType) ?? PATH_TYPE.ASSET,
                 path: item.path,

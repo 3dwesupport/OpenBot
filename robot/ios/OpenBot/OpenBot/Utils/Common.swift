@@ -34,9 +34,7 @@ class Common {
         if let url = Bundle.main.url(forResource: "config", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
-                let decoder = JSONDecoder()
-                let jsonData = try decoder.decode([ModelItem].self, from: data)
-                return jsonData;
+                return ModelItem.decodeList(from: data)
             } catch {
                 print("error:\(error)")
             }
@@ -59,13 +57,15 @@ class Common {
         }
         do {
             let data = try Data.init(contentsOf: URL(string: "file://" + filePath)!)
-            let decoder = JSONDecoder()
-            let jsonData = try decoder.decode([ModelItem].self, from: data)
-            return jsonData
+            let items = ModelItem.decodeList(from: data)
+            if !items.isEmpty {
+                return items
+            }
         } catch let error as NSError {
             print("An error took place: \(error)")
         }
-        return []
+        // Never leave the app without models: fall back to the bundled list.
+        return loadAllModelItemsFromBundle()
     }
 
     /// Load the modelItems of a specific mode.
@@ -73,6 +73,7 @@ class Common {
     /// - Parameters: mode (e.g. "AUTOPILOT" or "DETECTOR")
     /// - Returns: array of all models of that type which are downloaded
     static func loadSelectedModels(mode: String) -> [String] {
+        let mode = TYPE(configValue: mode)?.rawValue ?? mode
         var selectedModels: [String] = []
         let allModels = loadAllModelItems()
         for model in allModels {
@@ -141,6 +142,7 @@ class Common {
     /// - Parameters: mode (e.g. "AUTOPILOT" or "DETECTOR")
     /// - Returns: List the names of all the models of a given mode
     static func returnAllModelItemsName(mode: String) -> [String] {
+        let mode = TYPE(configValue: mode)?.rawValue ?? mode
         var selectedModels: [String] = []
         let allModels = loadAllModelItems()
         for model in allModels {

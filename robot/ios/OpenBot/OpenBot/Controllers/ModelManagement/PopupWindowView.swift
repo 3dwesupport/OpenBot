@@ -180,7 +180,7 @@ class popupWindowView: UIView {
         classDropdown.backgroundColor = Colors.freeRoamButtonsColor
         classDropdown.textColor = Colors.border ?? .black
         classDropdown.anchorView = classDropdownView;
-        classDropdown.dataSource = ["AUTOPILOT_F", "MOBILENETV1_1_0_Q", "MOBILENETV3_S_Q", "YOLOV4", "NAVIGATION"]
+        classDropdown.dataSource = Constants.classes
         let ddView = UIView();
         addSubview(ddView);
         ddView.translatesAutoresizingMaskIntoConstraints = false;

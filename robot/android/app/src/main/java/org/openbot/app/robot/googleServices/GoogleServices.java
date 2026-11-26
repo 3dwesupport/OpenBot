@@ -3,6 +3,7 @@ package org.openbot.app.robot.googleServices;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.widget.ImageView;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -480,6 +482,17 @@ public class GoogleServices extends Fragment {
     return null;
   }
 
+  /** Parses the Drive model list; unreadable or invalid entries are dropped. */
+  private static List<Model> parseModelList(Gson gson, String json) {
+    try {
+      return FileUtils.removeInvalidModels(
+          gson.fromJson(json, new TypeToken<List<Model>>() {}.getType()));
+    } catch (JsonParseException e) {
+      Log.w(TAG, "Drive config.json is unreadable, keeping the local list", e);
+      return new ArrayList<>();
+    }
+  }
+
   /**
    * Creates and uploads a JSON file containing a list of models to Google Drive.
    *
@@ -489,7 +502,10 @@ public class GoogleServices extends Fragment {
     // Get the Drive service instance and convert the modelList to JSON string using Gson.
     Drive getDriveService = getDriveService();
     Gson gson = new GsonBuilder().create();
-    String modelListContent = gson.toJson(modelList);
+    // Only valid entries are shared, so a bad model can't break the iOS app.
+    List<Model> validModels = FileUtils.removeInvalidModels(modelList);
+    if (validModels.isEmpty()) return;
+    String modelListContent = gson.toJson(validModels);
 
     // Start a new thread to perform the Drive API operations.
     new Thread(
@@ -698,9 +714,9 @@ public class GoogleServices extends Fragment {
                             .executeMediaAndDownloadTo(outputStream);
                         updatedModelList = outputStream.toString();
 
-                        List<Model> modelList =
-                            gson.fromJson(
-                                updatedModelList, new TypeToken<List<Model>>() {}.getType());
+                        List<Model> modelList = parseModelList(gson, updatedModelList);
+                        // Keep the local list when the Drive copy has no usable model.
+                        if (modelList.isEmpty()) break;
 
                         for (int i = 0; i < modelList.size(); i++) {
                           if (modelList.get(i).pathType == Model.PATH_TYPE.FILE

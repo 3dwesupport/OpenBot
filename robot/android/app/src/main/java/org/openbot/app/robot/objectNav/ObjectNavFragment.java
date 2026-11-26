@@ -159,7 +159,7 @@ public class ObjectNavFragment extends CameraFragment {
     binding.mirrorControl.setOnClickListener(v -> mirrorControl());
 
     List<String> models =
-        getModelNames(f -> f.type.equals(Model.TYPE.DETECTOR) && f.pathType != Model.PATH_TYPE.URL);
+        getModelNames(f -> Model.TYPE.DETECTOR.equals(f.type) && f.pathType != Model.PATH_TYPE.URL);
     initModelSpinner(binding.modelSpinner, models, preferencesManager.getObjectNavModel());
 
     setAnalyserResolution(Enums.Preview.HD.getValue());

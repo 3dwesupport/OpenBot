@@ -310,21 +310,21 @@ public class ModelManagementFragment extends Fragment
     if (filter.equals(Model.TYPE.CMDNAV.toString()) || filter.equals(ALL)) {
       modelInfoList.addAll(
           masterList.stream()
-              .filter(f -> f.type.equals(Model.TYPE.CMDNAV))
+              .filter(f -> Model.TYPE.CMDNAV.equals(f.type))
               .collect(Collectors.toList()));
     }
 
     if (filter.equals(Model.TYPE.GOALNAV.toString()) || filter.equals(ALL)) {
       modelInfoList.addAll(
           masterList.stream()
-              .filter(f -> f.type.equals(Model.TYPE.GOALNAV))
+              .filter(f -> Model.TYPE.GOALNAV.equals(f.type))
               .collect(Collectors.toList()));
     }
 
     if (filter.equals(Model.TYPE.DETECTOR.toString()) || filter.equals(ALL)) {
       modelInfoList.addAll(
           masterList.stream()
-              .filter(f -> f.type.equals(Model.TYPE.DETECTOR))
+              .filter(f -> Model.TYPE.DETECTOR.equals(f.type))
               .collect(Collectors.toList()));
     }
 

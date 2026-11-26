@@ -535,24 +535,30 @@ class Authentication {
                         print(error);
                     }
                     if let data = data {
+                        defer {
+                            NotificationCenter.default.post(name: .autoSynced, object: nil);
+                        }
                         guard let documentDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
                             // Failed to get the document directory URL
+                            return
+                        }
+                        // Keep the local list if the Drive copy has no usable model.
+                        let items = ModelItem.decodeList(from: data)
+                        guard !items.isEmpty else {
+                            print("Drive config.json has no valid models, keeping the local list")
                             return
                         }
 
                         let fileURL = documentDirectoryURL.appendingPathComponent("config.json")
 
                         do {
-                            try data.write(to: fileURL)
+                            // Save only the valid entries, with names both apps read.
+                            try JSONEncoder().encode(items).write(to: fileURL)
                             print("File saved at path: \(fileURL.path)")
 
                         } catch {
                             // Error occurred while saving the file
                             print("Error saving file: \(error.localizedDescription)")
-                        }
-
-                        defer {
-                            NotificationCenter.default.post(name: .autoSynced, object: nil);
                         }
                     }
                 }

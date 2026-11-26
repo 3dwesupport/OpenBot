@@ -103,7 +103,7 @@ public class AutopilotFragment extends CameraFragment {
       binding.usbToggle.setVisibility(View.GONE);
     }
     List<String> models =
-        getModelNames(f -> f.type.equals(Model.TYPE.CMDNAV) && f.pathType != Model.PATH_TYPE.URL);
+        getModelNames(f -> Model.TYPE.CMDNAV.equals(f.type) && f.pathType != Model.PATH_TYPE.URL);
     initModelSpinner(binding.modelSpinner, models, preferencesManager.getAutopilotModel());
     initServerSpinner(binding.serverSpinner);
     setAnalyserResolution(Enums.Preview.HD.getValue());

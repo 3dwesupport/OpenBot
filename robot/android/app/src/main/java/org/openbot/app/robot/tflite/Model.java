@@ -23,8 +23,13 @@ public class Model {
     this.inputSize = inputSize;
   }
 
+  // Alternate names accept the values older iOS builds saved to the shared config.json.
   public enum CLASS {
+    @SerializedName(value = "AUTOPILOT", alternate = {"AUTOPILOT_F"})
     AUTOPILOT,
+    @SerializedName(
+        value = "MOBILENET",
+        alternate = {"MOBILENETV1_1_0_Q", "MOBILENETV3_S_Q"})
     MOBILENET,
     EFFICIENTDET,
     YOLOV4,
@@ -33,8 +38,10 @@ public class Model {
   }
 
   public enum TYPE {
+    @SerializedName(value = "CMDNAV", alternate = {"AUTOPILOT"})
     CMDNAV,
     DETECTOR,
+    @SerializedName(value = "GOALNAV", alternate = {"NAVIGATION"})
     GOALNAV,
   }
 
@@ -61,6 +68,17 @@ public class Model {
 
   public Size getInputSize() {
     return Size.parseSize(inputSize);
+  }
+
+  /** True when every field both apps need is present and has a known value. */
+  public boolean isValid() {
+    return id != null
+        && name != null
+        && !name.isEmpty()
+        && classType != null
+        && type != null
+        && pathType != null
+        && inputSize != null;
   }
 
   public TYPE getType() {

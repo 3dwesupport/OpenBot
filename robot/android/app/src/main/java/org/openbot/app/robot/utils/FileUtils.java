@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.openbot.app.robot.googleServices.GoogleServices;
@@ -26,6 +28,8 @@ import org.openbot.app.robot.projects.GoogleSignInCallback;
 import org.openbot.app.robot.tflite.Model;
 
 public class FileUtils {
+
+  private static final String TAG = "FileUtils";
 
   public static void copyFile(InputStream inputFile, String name, String outputPath) {
 
@@ -80,17 +84,20 @@ public class FileUtils {
     boolean fileExists = checkFileExistence(activity, configFile);
     System.out.println("fileExist::::" + fileExists);
     if (fileExists) {
-      try {
-        jsonElement =
-            gson.fromJson(
-                    new FileReader(activity.getFilesDir() + File.separator + configFile),
-                    JsonElement.class)
-                .getAsJsonArray();
-        return gson.fromJson(jsonElement, listType);
-
+      try (FileReader reader =
+          new FileReader(activity.getFilesDir() + File.separator + configFile)) {
+        JsonElement saved = gson.fromJson(reader, JsonElement.class);
+        if (saved != null && saved.isJsonArray()) {
+          List<Model> models = removeInvalidModels(gson.fromJson(saved, listType));
+          // An unreadable saved list falls back to the bundled one below.
+          if (!models.isEmpty()) return models;
+        }
+        Log.w(TAG, "Saved config.json has no valid models, restoring the bundled list");
       } catch (FileNotFoundException e) {
         e.printStackTrace();
         return null;
+      } catch (IOException | JsonParseException e) {
+        Log.w(TAG, "Saved config.json is unreadable, restoring the bundled list", e);
       }
     }
     try {
@@ -106,7 +113,18 @@ public class FileUtils {
       ex.printStackTrace();
       return null;
     }
-    return gson.fromJson(jsonElement, listType);
+    return removeInvalidModels(gson.fromJson(jsonElement, listType));
+  }
+
+  /** Drops entries with missing or unknown fields, so no screen gets a null type or class. */
+  public static List<Model> removeInvalidModels(List<Model> models) {
+    List<Model> valid = new ArrayList<>();
+    if (models == null) return valid;
+    for (Model model : models) {
+      if (model != null && model.isValid()) valid.add(model);
+      else Log.w(TAG, "Skipping invalid model entry: " + (model != null ? model.name : null));
+    }
+    return valid;
   }
 
   public static boolean updateModelConfig(
@@ -132,7 +150,7 @@ public class FileUtils {
     try {
       Gson gson = new GsonBuilder().setPrettyPrinting().create();
       Writer writer = new FileWriter(activity.getFilesDir() + File.separator + configFile);
-      gson.toJson(modelList, writer);
+      gson.toJson(removeInvalidModels(modelList), writer);
       writer.flush();
       writer.close();
       return true;

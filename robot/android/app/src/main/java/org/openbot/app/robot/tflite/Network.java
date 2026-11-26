@@ -93,6 +93,8 @@ public abstract class Network {
 
     if (model.pathType == Model.PATH_TYPE.FILE) {
       File modelFile = new File(model.path);
+      // Models synced from iOS keep the download URL as path; use the local file with that name.
+      if (!modelFile.isFile()) modelFile = new File(activity.getFilesDir(), model.name);
       tflite = new Interpreter(modelFile, tfliteOptions);
     } else if (model.pathType == Model.PATH_TYPE.ASSET) {
       MappedByteBuffer tfliteModel = loadModelFile(activity, model);

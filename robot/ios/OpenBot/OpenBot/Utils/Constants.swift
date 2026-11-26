@@ -100,10 +100,11 @@ struct Constants {
         ]
     }
     static let frameColors: [UIColor] = [UIColor.red, UIColor.orange, UIColor.blue, UIColor.green, UIColor.brown]
-    static let autopilotMode = "AUTOPILOT"
-    static let objectTrackingMode = "DETECTOR"
-    static let types: [String] = ["AUTOPILOT", "DETECTOR", "NAVIGATION"]
-    static let classes: [String] = ["AUTOPILOT_F", "MOBILENET", "YOLOV4", "YOLOV5", "EFFICIENTDET", "NAVIGATION"]
+    static let autopilotMode = TYPE.AUTOPILOT.rawValue
+    static let objectTrackingMode = TYPE.DETECTOR.rawValue
+    // Same names as Android, so the shared config.json works on both apps.
+    static let types: [String] = [TYPE.AUTOPILOT.rawValue, TYPE.DETECTOR.rawValue, TYPE.NAVIGATION.rawValue]
+    static let classes: [String] = [CLASS.AUTOPILOT_F.rawValue, CLASS.MOBILENET.rawValue, CLASS.EFFICIENTDET.rawValue, CLASS.YOLOV4.rawValue, CLASS.YOLOV5.rawValue, CLASS.NAVIGATION.rawValue]
     static let devices: [String] = ["CPU", "XNNPACK"]
 
 }
@@ -149,21 +150,41 @@ enum RuntimeDevice: String {
          XNNPACK = "XNNPACK"
 }
 
-/// The different types of neural networks available on the robot
+/// The different types of neural networks available on the robot.
+/// Raw values match Android and the shared config.json.
 enum CLASS: String {
-    case AUTOPILOT_F = "AUTOPILOT_F",
+    case AUTOPILOT_F = "AUTOPILOT",
          MOBILENET = "MOBILENET",
          YOLOV4 = "YOLOV4",
          YOLOV5 = "YOLOV5",
          EFFICIENTDET = "EFFICIENTDET",
          NAVIGATION = "NAVIGATION"
+
+    /// Reads a config value, including names saved by older iOS builds.
+    init?(configValue: String) {
+        switch configValue {
+        case "AUTOPILOT_F": self = .AUTOPILOT_F
+        case "MOBILENETV1_1_0_Q", "MOBILENETV3_S_Q": self = .MOBILENET
+        default: self.init(rawValue: configValue)
+        }
+    }
 }
 
-/// The different classes of neural networks available on the robot
+/// The different classes of neural networks available on the robot.
+/// Raw values match Android and the shared config.json.
 enum TYPE: String {
-    case AUTOPILOT = "AUTOPILOT",
+    case AUTOPILOT = "CMDNAV",
          DETECTOR = "DETECTOR",
-         NAVIGATION = "NAVIGATION"
+         NAVIGATION = "GOALNAV"
+
+    /// Reads a config value, including names saved by older iOS builds.
+    init?(configValue: String) {
+        switch configValue {
+        case "AUTOPILOT": self = .AUTOPILOT
+        case "NAVIGATION": self = .NAVIGATION
+        default: self.init(rawValue: configValue)
+        }
+    }
 }
 
 /// Names of the sensor log files

@@ -60,6 +60,7 @@ public abstract class Detector extends Network {
    */
   public static Detector create(Activity activity, Model model, Device device, int numThreads)
       throws IOException {
+    if (model.classType == null) return null;
     switch (model.classType) {
       case MOBILENET:
       case EFFICIENTDET:
