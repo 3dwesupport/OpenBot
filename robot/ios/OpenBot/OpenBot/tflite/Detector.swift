@@ -5,6 +5,11 @@
 import Foundation
 import UIKit
 
+/// Thrown when the model file doesn't have the outputs of its selected class.
+enum DetectorError: Error {
+    case modelDoesNotMatchClass
+}
+
 /// Wrapper for frozen detection models trained using the Tensorflow Object Detection API:
 /// github.com/tensorflow/models/tree/master/research/object_detection
 class Detector: Network {
@@ -137,7 +142,7 @@ class Detector: Network {
             $0.capitalized == "person".capitalized
         };
         selectedMultipleClass = ["person"]
-        parseTFlite();
+        try parseTFlite();
     }
 
     /// Reads label list from Assets.
@@ -343,7 +348,7 @@ class Detector: Network {
     }
 
     /// Get specs from tflite file.
-    func parseTFlite() {
+    func parseTFlite() throws {
     }
 
     /// Get the recognitions.

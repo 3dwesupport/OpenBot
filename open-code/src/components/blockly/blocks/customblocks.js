@@ -747,7 +747,7 @@ Blockly.Blocks["navigateForwardAndLeft"] = {
                 {
                     "type": "field_dropdown",
                     "name": "navigation_models",
-                    "options": filterModels(["NAVIGATION"], "GOALNAV") ?? [
+                    "options": filterModels(["NAVIGATION", "GOALNAV"], "GOALNAV") ?? [
                         [
                             "PilotNet-Goal",
                             "PilotNet-Goal"

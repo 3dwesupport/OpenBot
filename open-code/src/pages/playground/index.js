@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import BlocklyComponent from "../../components/blockly";
 import {Toolbox} from "../../components/blockly/toolbox/Toolbox";
 import {BottomBar} from "../../components/bottomBar/bottomBar";
 import {Header} from "../../components/navBar/header";
+import {setConfigData} from "../../services/workspace";
 
 /**
  * Playground Screen :: Displays the Playground screen which contains a Blockly workspace.
@@ -10,6 +11,11 @@ import {Header} from "../../components/navBar/header";
  * @constructor
  */
 function Playground() {
+    // Read the latest model list, so new blocks offer the models downloaded on the phones.
+    useEffect(() => {
+        setConfigData();
+    }, []);
+
     return (
         <div>
             <Header/>

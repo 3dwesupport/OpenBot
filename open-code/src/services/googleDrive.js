@@ -139,7 +139,7 @@ export async function checkFileExistsInFolder(folderId, fileName, fileType) {
     } else if (fileType === Constants.json) {
         fileNameWithExtension += `.${Constants.json}`;
     }
-    const response = await fetch(`${Constants.baseUrl}/files?q=name='${encodeURIComponent(fileNameWithExtension)}'+and+'${encodeURIComponent(folderId)}'+in+parents+and+trashed=false&access_token=${accessToken}`);
+    const response = await fetch(`${Constants.baseUrl}/files?q=name='${encodeURIComponent(fileNameWithExtension)}'+and+'${encodeURIComponent(folderId)}'+in+parents+and+trashed=false&orderBy=${encodeURIComponent("modifiedTime desc")}&access_token=${accessToken}`);
     const result = await response.json();
     if (result && result.files.length > 0) {
         return {exists: true, fileId: result.files[0].id};
@@ -190,10 +190,41 @@ export async function getFolderId() {
     // Authenticate the user and obtain an access token for the Google Drive API
     const accessToken = getAccessToken();
 
-    // Step 1: Get the ID of the folder with the specified name
-    const searchResponse = await fetch(`${Constants.baseUrl}/files?q=name='${encodeURIComponent(Constants.FolderName)}'+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false&access_token=${accessToken}`);
+    // Step 1: Get the ID of the oldest folder with that name, so every app uses the same one
+    const searchResponse = await fetch(`${Constants.baseUrl}/files?q=name='${encodeURIComponent(Constants.FolderName)}'+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false&orderBy=createdTime&access_token=${accessToken}`);
     const searchResult = await searchResponse.json();
     return searchResult?.files[0]?.id || null;
+}
+
+
+/**
+ * get the newest config.json content from the Playground folder
+ * @returns {Promise<string|null>} file content, or null when there is none
+ */
+export async function getConfigFileContent() {
+    const accessToken = getAccessToken();
+    const folderId = await getFolderId();
+    if (!folderId) {
+        return null;
+    }
+    const query = encodeURIComponent(`name='config.json' and '${folderId}' in parents and trashed=false`);
+    const response = await fetch(`${Constants.baseUrl}/files?q=${query}&orderBy=${encodeURIComponent("modifiedTime desc")}&pageSize=1&fields=files(id)&access_token=${accessToken}`);
+    if (!response.ok) {
+        throw new Error("Unable to search config.json on Drive");
+    }
+    const result = await response.json();
+    const fileId = result?.files?.[0]?.id;
+    if (!fileId) {
+        return null;
+    }
+    const fileResponse = await fetch(`${Constants.baseUrl}/files/${fileId}?alt=media`, {
+        headers: {Authorization: `Bearer ${accessToken}`},
+    });
+    const content = fileResponse.ok ? await fileResponse.text() : null;
+    if (!content || !Array.isArray(JSON.parse(content))) {
+        throw new Error("Unable to read config.json from Drive");
+    }
+    return content;
 }
 
 

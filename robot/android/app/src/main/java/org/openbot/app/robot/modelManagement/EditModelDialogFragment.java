@@ -7,32 +7,37 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.openbot.app.robot.R;
 import org.openbot.app.robot.databinding.DialogEditModelBinding;
-import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.main.OnItemClickListener;
 import org.openbot.app.robot.tflite.Model;
+import org.openbot.app.robot.tflite.ModelFileCheck;
 import org.openbot.app.robot.utils.FileUtils;
 
 public class EditModelDialogFragment extends DialogFragment {
 
   private DialogEditModelBinding binding;
   private final Model model;
-  private List<Model> masterList;
-  public GoogleServices googleServices;
+  private final ModelFileCheck.Settings settings;
   private final OnItemClickListener<Model> itemClickListener;
 
-  public EditModelDialogFragment(Model model, OnItemClickListener<Model> itemClickListener) {
+  /**
+   * @param settings What the model file can run as. Type and input size are locked to it and only
+   *     its classes are offered. Null when the file isn't available, then only the name can change.
+   */
+  public EditModelDialogFragment(
+      Model model,
+      @Nullable ModelFileCheck.Settings settings,
+      OnItemClickListener<Model> itemClickListener) {
     this.model = model;
+    this.settings = settings;
     this.itemClickListener = itemClickListener;
   }
 
@@ -58,44 +63,29 @@ public class EditModelDialogFragment extends DialogFragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    List<String> modelTypes =
-        Arrays.stream(Model.TYPE.values()).map(Enum::toString).collect(Collectors.toList());
-    ArrayAdapter<String> modelAdapter =
+    Model.TYPE type = settings != null ? settings.type : model.type;
+    List<Model.CLASS> classes =
+        settings != null ? settings.classes : Collections.singletonList(model.classType);
+    int width = settings != null ? settings.width : model.getInputSize().getWidth();
+    int height = settings != null ? settings.height : model.getInputSize().getHeight();
+
+    binding.typeSpinner.setAdapter(
         new ArrayAdapter<>(
-            requireContext(), android.R.layout.simple_dropdown_item_1line, modelTypes);
-    binding.typeSpinner.setAdapter(modelAdapter);
-    binding.typeSpinner.setSelection(model.type.ordinal());
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            Collections.singletonList(type.toString())));
+    List<String> classNames = new ArrayList<>();
+    for (Model.CLASS modelClass : classes) classNames.add(modelClass.toString());
+    binding.classSpinner.setAdapter(
+        new ArrayAdapter<>(
+            requireContext(), android.R.layout.simple_dropdown_item_1line, classNames));
+    binding.classSpinner.setSelection(Math.max(0, classes.indexOf(model.classType)));
 
-    List<String> classes = new ArrayList<>();
-    ArrayAdapter<String> classAdapter =
-        new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, classes);
-    binding.classSpinner.setAdapter(classAdapter);
-
-    binding.typeSpinner.setOnItemSelectedListener(
-        new AdapterView.OnItemSelectedListener() {
-          @Override
-          public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            String selected = parent.getItemAtPosition(position).toString();
-            classAdapter.clear();
-            classAdapter.addAll(
-                Arrays.stream(Model.CLASS.values())
-                    .map(Enum::toString)
-                    .filter(
-                        f ->
-                            selected.equals(Model.TYPE.CMDNAV.name())
-                                == f.equals(Model.CLASS.AUTOPILOT.toString()))
-                    .filter(
-                        f ->
-                            selected.equals(Model.TYPE.GOALNAV.name())
-                                == f.equals(Model.CLASS.NAVIGATION.toString()))
-                    .collect(Collectors.toList()));
-            classAdapter.notifyDataSetChanged();
-            binding.classSpinner.setSelection(classAdapter.getPosition(model.classType.toString()));
-          }
-
-          @Override
-          public void onNothingSelected(AdapterView<?> parent) {}
-        });
+    // The model file decides the type and input size, so only the name and a fitting class change.
+    binding.typeSpinner.setEnabled(false);
+    binding.classSpinner.setEnabled(classNames.size() > 1);
+    binding.inputWidth.setEnabled(false);
+    binding.inputHeight.setEnabled(false);
 
     binding.edit.setOnClickListener(
         v -> {
@@ -105,24 +95,17 @@ public class EditModelDialogFragment extends DialogFragment {
           imm.showSoftInput(binding.name, InputMethodManager.SHOW_IMPLICIT);
         });
     binding.name.setText(FileUtils.nameWithoutExtension(model.getName()));
-    binding.inputWidth.setText(String.valueOf(model.getInputSize().getWidth()));
-    binding.inputHeight.setText(String.valueOf(model.getInputSize().getHeight()));
+    binding.inputWidth.setText(String.valueOf(width));
+    binding.inputHeight.setText(String.valueOf(height));
 
     binding.btnSubmit.setOnClickListener(
         v -> {
-          System.out.println("btnClick");
           model.setName(binding.name.getText().toString() + ".tflite");
-          model.setType(Model.TYPE.valueOf(binding.typeSpinner.getSelectedItem().toString()));
-          model.setClassType(
-              Model.CLASS.valueOf(binding.classSpinner.getSelectedItem().toString()));
-          model.setInputSize(
-              binding.inputWidth.getText().toString()
-                  + "x"
-                  + binding.inputHeight.getText().toString());
+          model.setType(type);
+          model.setClassType(classes.get(binding.classSpinner.getSelectedItemPosition()));
+          model.setInputSize(width + "x" + height);
           itemClickListener.onItemClick(model);
           dismiss();
-          //                    googleServices.createAndUploadJsonFile();
-          System.out.println("After dismiss ");
         });
     binding.dismiss.setOnClickListener(v -> dismiss());
   }

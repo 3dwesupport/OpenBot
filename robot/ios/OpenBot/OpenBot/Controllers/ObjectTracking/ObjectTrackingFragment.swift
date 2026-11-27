@@ -27,6 +27,7 @@ class ObjectTrackingFragment: CameraController {
     private var frames: [UIView] = []
     private var bufferHeight = 0
     private var bufferWidth = 0
+    private var hasModelError = false
     private let edgeOffset: CGFloat = 2.0
     private var useDynamicSpeed: Bool = false
     let webSocketMsgHandler = WebSocketMessageHandler();
@@ -38,7 +39,7 @@ class ObjectTrackingFragment: CameraController {
         if (modelItems.count > 0) {
             let model = modelItems.first(where: { $0.type == TYPE.DETECTOR.rawValue })
             currentModel = model
-            detector = try! Detector.create(model: Model.fromModelItem(item: model ?? modelItems[0]), device: RuntimeDevice.CPU, numThreads: numberOfThreads) as? Detector
+            detector = createDetector(model: model ?? modelItems[0], device: RuntimeDevice.CPU)
         }
         if let threads = preferencesManager.getThreads(){
             numberOfThreads = Int(threads) ?? 4
@@ -49,13 +50,13 @@ class ObjectTrackingFragment: CameraController {
         }
         if let device = preferencesManager.getDevice(){
             currentDevice = RuntimeDevice(rawValue: device) ?? RuntimeDevice.CPU
-            detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: currentDevice, numThreads: numberOfThreads) as? Detector
+            detector = createDetector(model: currentModel, device: currentDevice)
             detector?.tfliteOptions.threadCount = numberOfThreads
         }
         if let lastModel = preferencesManager.getObjectTrackModel(){
             if Common.isModelItemAvailableInDocument(modelName: lastModel) == true {
                 currentModel = Common.returnModelItem(modelName: lastModel)
-                detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: currentDevice, numThreads: numberOfThreads) as? Detector
+                detector = createDetector(model: currentModel, device: currentDevice)
             }
         }
         if let object = preferencesManager.getObjectTrackingObject(){
@@ -101,6 +102,7 @@ class ObjectTrackingFragment: CameraController {
     /// Initialization routine
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        showModelErrorIfVisible()
         switch objectTrackingSettings?.autoModeButton.isOn {
         case false:
             autoMode = false
@@ -114,6 +116,27 @@ class ObjectTrackingFragment: CameraController {
         }
     }
 
+    /// Creates the detector; a model that doesn't match its class shows a message instead of crashing.
+    func createDetector(model: ModelItem, device: RuntimeDevice) -> Detector? {
+        do {
+            return try Detector.create(model: Model.fromModelItem(item: model), device: device, numThreads: numberOfThreads) as? Detector
+        } catch {
+            print("Unable to load the model:", error)
+            hasModelError = error is DetectorError
+            showModelErrorIfVisible()
+            return nil
+        }
+    }
+
+    /// Shows the model error once the screen is visible.
+    private func showModelErrorIfVisible() {
+        guard hasModelError, view.window != nil else {
+            return
+        }
+        hasModelError = false
+        showMessage(Strings.modelClassMismatch)
+    }
+
     @objc func switchCamera() {
         switchCameraView()
     }
@@ -121,7 +144,7 @@ class ObjectTrackingFragment: CameraController {
     /// function to update the detector model when change in device[CPU, GPU, NNAPI] is triggered.
     @objc func updateDevice(_ notification: Notification) throws {
         currentDevice = RuntimeDevice(rawValue: notification.object as! String) ?? RuntimeDevice.CPU
-        detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: currentDevice, numThreads: numberOfThreads) as? Detector
+        detector = createDetector(model: currentModel, device: currentDevice)
         currentDevice.rawValue == RuntimeDevice.GPU.rawValue ? NotificationCenter.default.post(name: .updateThreadLabel, object: "N/A") : NotificationCenter.default.post(name: .updateThreadLabel, object: String(numberOfThreads))
         detector?.tfliteOptions.threadCount = numberOfThreads
         preferencesManager.setDevice(value: notification.object as! String);
@@ -162,7 +185,7 @@ class ObjectTrackingFragment: CameraController {
     @objc func updateModel(_ notification: Notification) throws {
         let selectedModelName = notification.object as! String
         currentModel = Common.returnModelItem(modelName: selectedModelName)
-        detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: currentDevice, numThreads: numberOfThreads) as? Detector
+        detector = createDetector(model: currentModel, device: currentDevice)
         NotificationCenter.default.post(name: .updateObjectList, object: detector?.getLabels())
         NotificationCenter.default.post(name: .updateObject, object: currentObject)
     }

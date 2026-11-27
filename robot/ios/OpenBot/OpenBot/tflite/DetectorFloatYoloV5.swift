@@ -53,7 +53,7 @@ class DetectorFloatYoloV5: Detector {
     ///
     /// - Returns: The number of bytes used to store a single color channel value.
     override func getNumBytesPerChannel() -> Int {
-        parseTFlite();
+        try? parseTFlite();
         return isModelQuantized ? 1 : 4;
     }
 
@@ -78,21 +78,28 @@ class DetectorFloatYoloV5: Detector {
         IMAGE_STD;
     }
 
-    override func parseTFlite() {
-        inputScale = try! tflite?.input(at: 0).quantizationParameters?.scale ?? 0
-        inputZeroPoint = try! tflite?.input(at: 0).quantizationParameters?.zeroPoint ?? 0
-        outputScale = try! tflite?.output(at: 0).quantizationParameters?.scale ?? 0
-        outputZeroPoint = try! tflite?.output(at: 0).quantizationParameters?.zeroPoint ?? 0
+    override func parseTFlite() throws {
+        // YOLOv5 models have 1 output whose last size is 5 + number of classes.
+        guard let tflite = tflite, tflite.outputTensorCount == 1 else {
+            throw DetectorError.modelDoesNotMatchClass
+        }
+        let shape = try tflite.output(at: 0).shape.dimensions
+        guard let lastSize = shape.last, lastSize > 5 else {
+            throw DetectorError.modelDoesNotMatchClass
+        }
+        inputScale = try tflite.input(at: 0).quantizationParameters?.scale ?? 0
+        inputZeroPoint = try tflite.input(at: 0).quantizationParameters?.zeroPoint ?? 0
+        outputScale = try tflite.output(at: 0).quantizationParameters?.scale ?? 0
+        outputZeroPoint = try tflite.output(at: 0).quantizationParameters?.zeroPoint ?? 0
         isModelQuantized = (Int(outputScale) + outputZeroPoint) != 0
-        let shape = try! tflite?.output(at: 0).shape.dimensions
-        numClass = shape![shape!.count - 1] - 5
-        let outputSize = try! tflite?.output(at: 0).data.count ?? 0
+        numClass = lastSize - 5
+        let outputSize = try tflite.output(at: 0).data.count
         outData = UnsafeMutableBufferPointer<UInt8>.allocate(capacity: outputSize)
     }
 
     /// Copy data to the input of the neural network
     override func feedData() throws {
-        _ = try! tflite?.output(at: 0).data.copyBytes(to: outData!);
+        _ = try tflite?.output(at: 0).data.copyBytes(to: outData!);
     }
 
     /// Query the output of the neural network and perform post-processing actions

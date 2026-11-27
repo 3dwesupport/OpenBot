@@ -175,33 +175,14 @@ class BottomSheet: UIViewController, UITableViewDataSource, UITableViewDelegate,
         defer {
             url.stopAccessingSecurityScopedResource()
         }
-        var newURL = FileManager.getDocumentsDirectory()
-        newURL.appendPathComponent(url.lastPathComponent)
-        do {
-            if FileManager.default.fileExists(atPath: newURL.path) {
-                try FileManager.default.removeItem(atPath: newURL.path)
-            }
-            try FileManager.default.copyItem(atPath: url.path, toPath: newURL.path)
-            print("The new URL: \(newURL)")
-        } catch {
-            print(error.localizedDescription)
-        }
-
-        var error: NSError? = nil
-        NSFileCoordinator().coordinate(readingItemAt: url, error: &error) { (url) in
-
-            let keys: [URLResourceKey] = [.nameKey, .isDirectoryKey]
-            guard let fileList = FileManager.default.enumerator(at: url, includingPropertiesForKeys: keys)
-            else {
-                Swift.debugPrint("*** Unable to access the contents of \(url.path) ***\n")
-                return
-            }
-            for case _ as URL in fileList {
-                guard url.startAccessingSecurityScopedResource() else {
-                    continue
-                }
-                url.stopAccessingSecurityScopedResource()
-            }
+        // Check a temporary copy; the model is added to the app only on Done.
+        let checkURL = FileManager.default.temporaryDirectory.appendingPathComponent("model_check.tflite")
+        try? FileManager.default.removeItem(at: checkURL)
+        let fileCheck = (try? FileManager.default.copyItem(at: url, to: checkURL)) != nil ? ModelFileCheck.check(fileAt: checkURL.path) : nil
+        guard let fileCheck = fileCheck else {
+            try? FileManager.default.removeItem(at: checkURL)
+            showMessage(Strings.modelNotSupported)
+            return
         }
         let vc = self
         if let sheet = vc.sheetPresentationController {
@@ -212,8 +193,7 @@ class BottomSheet: UIViewController, UITableViewDataSource, UITableViewDelegate,
         if index != nil {
             modelName = String(url.lastPathComponent.prefix(upTo: index!))
         }
-        let popWindowView = popupWindowView(frame: CGRect(x: 10, y: 0, width: width - 20, height: 400), modelName, "", "ASSET")
-        print("hello ", url.lastPathComponent)
+        let popWindowView = popupWindowView(frame: CGRect(x: 10, y: 0, width: width - 20, height: 400), modelName, "", "ASSET", fileCheck: fileCheck, pickedFileURL: checkURL)
         view.addSubview(popWindowView);
         popWindowView.backgroundColor = Colors.freeRoamButtonsColor
     }

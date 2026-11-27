@@ -4,6 +4,7 @@ import {
     deleteFileFromGoogleDrive,
     fileRename,
     getAllFilesFromGoogleDrive,
+    getConfigFileContent,
     getFolderId,
     uploadToGoogleDrive,
 } from "./googleDrive";
@@ -310,22 +311,25 @@ async function renameProject(projectName, oldName, screen) {
 
 /**
  * function to set updated config.json data
- * @returns {Promise<void>}
+ * @returns {Promise<boolean|null>} true if read from Drive, false if Drive has none, null if Drive can't be read
  */
 async function setConfigData() {
     if (localStorage.getItem("isSigIn") === "true") {
-        let projects = []
-        await getDriveProjects(projects).then(() => {
-            let configFile = projects.filter((res) => res.projectType === "application/json")
-            if (configFile?.length > 0) {
-                localStorage.setItem(localStorageKeys.configData, configFile[0].projectData)
-            } else {
-                localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
-            }
-        })
-    } else {
-        localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
+        let driveConfig;
+        try {
+            driveConfig = await getConfigFileContent();
+        } catch (error) {
+            // Keep the current list when Drive can't be read.
+            console.error(error);
+            return null;
+        }
+        if (driveConfig) {
+            localStorage.setItem(localStorageKeys.configData, driveConfig)
+            return true;
+        }
     }
+    localStorage.setItem(localStorageKeys.configData, JSON.stringify(configData));
+    return false;
 }
 
 /**
@@ -384,13 +388,11 @@ function filterLabels() {
  * @returns {Promise<void>}
  */
 async function autoSync() {
-    await setConfigData().then(async () => {
-            let data = JSON.stringify(configData);
-            if (data === localStorage.getItem(localStorageKeys.configData)) {
-                await uploadToGoogleDrive(localStorage.getItem(localStorageKeys.configData), Constants.json)
-            }
-        }
-    )
+    const foundOnDrive = await setConfigData();
+    // Only create the shared list when Drive has none, never overwrite it with defaults.
+    if (foundOnDrive === false && localStorage.getItem("isSigIn") === "true") {
+        await uploadToGoogleDrive(localStorage.getItem(localStorageKeys.configData), Constants.json)
+    }
 }
 
 /**

@@ -61,6 +61,7 @@
     <string name="preview_resolution">Résolution de l\'aperçu</string>
     <string name="save_option">Options d\'enregistrement</string>
     <string name="file_available_body">Un modèle portant le même nom existe déjà. Voulez-vous le remplacer ?</string>
+    <string name="model_not_supported">Ce modèle ne peut pas fonctionner dans OpenBot. Utilisez un modèle de pilote automatique, de navigation, MobileNet, EfficientDet, YOLOv4 ou YOLOv5.</string>
     <string name="file_available_title">Fichier trouvé</string>
     <string name="model_delete_body">Voulez-vous vraiment supprimer ce modèle ?</string>
     <string name="model_delete_title">Confirmer</string>

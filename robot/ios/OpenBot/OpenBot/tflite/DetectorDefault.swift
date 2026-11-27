@@ -65,17 +65,18 @@ class DetectorDefault: Detector {
         NUM_DETECTIONS;
     }
 
-    override func parseTFlite() {
-        let index0 = try! tflite?.output(at: 0);
-        let index1 = try! tflite?.output(at: 1);
-        let index2 = try! tflite?.output(at: 2);
-        let index3 = try! tflite?.output(at: 3);
-
-        assignIndex(tensor: index0, index: 0);
-        assignIndex(tensor: index1, index: 1);
-        assignIndex(tensor: index2, index: 2);
-        assignIndex(tensor: index3, index: 3);
-        NUM_DETECTIONS = try! tflite?.output(at: outputLocationsIdx).shape.dimensions[1] ?? 0;
+    override func parseTFlite() throws {
+        // MobileNet and EfficientDet models have 4 outputs, other models fail here.
+        guard let tflite = tflite, tflite.outputTensorCount == 4 else {
+            throw DetectorError.modelDoesNotMatchClass
+        }
+        for index in 0..<4 {
+            try assignIndex(tensor: tflite.output(at: index), index: index);
+        }
+        guard [outputLocationsIdx, outputClassesIdx, outputScoresIdx, numDetectionsIdx].allSatisfy({ $0 >= 0 }) else {
+            throw DetectorError.modelDoesNotMatchClass
+        }
+        NUM_DETECTIONS = try tflite.output(at: outputLocationsIdx).shape.dimensions[1];
     }
 
     /// Index  allocation to browse the tflite object

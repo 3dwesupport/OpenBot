@@ -22,6 +22,8 @@ async def register(app: web.Application):
 
 
 async def run_test(zc):
+    # Shared with do_close, which unregisters the service on shutdown.
+    global info
     desc = {}
     local_ip = ip4_address()
     name = (

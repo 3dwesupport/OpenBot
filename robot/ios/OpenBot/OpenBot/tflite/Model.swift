@@ -4,6 +4,7 @@
 
 import Foundation
 import UIKit
+import TensorFlowLite
 
 /// The ModelItem structure is a data container for the characteristics of a neural network. It serves as an inerface between the Model class and
 /// a JSON parameter file describing the main characteristics of a network.
@@ -262,5 +263,80 @@ extension Model {
                 path: item.path,
                 inputSize: item.inputSize);
         return model;
+    }
+}
+
+/// What the app can run a .tflite model file as. Keep these rules the same as
+/// open-code/src/utils/tfliteModel.js and Android's ModelFileCheck.
+struct ModelFileCheck {
+    let type: String
+    let classes: [String]
+    let width: Int
+    let height: Int
+
+    var inputSize: String {
+        "\(width)x\(height)"
+    }
+
+    // Output names the detectors look up.
+    private static let ssdOutputs = [
+        ["TFLite_Detection_PostProcess", "TFLite_Detection_PostProcess:1", "TFLite_Detection_PostProcess:2", "TFLite_Detection_PostProcess:3"],
+        ["StatefulPartitionedCall:0", "StatefulPartitionedCall:1", "StatefulPartitionedCall:2", "StatefulPartitionedCall:3"],
+    ]
+    private static let yoloV4Outputs = [
+        ["Identity", "Identity_1"],
+        ["StatefulPartitionedCall:0", "StatefulPartitionedCall:1"],
+    ]
+
+    /// Reads a model file; returns nil when it is not a model the app can run.
+    static func check(fileAt path: String) -> ModelFileCheck? {
+        do {
+            let interpreter = try Interpreter(modelPath: path)
+            try interpreter.allocateTensors()
+            let inputs = try (0..<interpreter.inputTensorCount).map { try interpreter.input(at: $0) }
+            let outputs = try (0..<interpreter.outputTensorCount).map { try interpreter.output(at: $0) }
+            return check(inputs: inputs.map { ($0.name, $0.shape.dimensions) },
+                    outputs: outputs.map { ($0.name, $0.shape.dimensions) })
+        } catch {
+            return nil
+        }
+    }
+
+    /// Applies the rules to the model inputs and outputs; returns nil when unsupported.
+    static func check(inputs: [(name: String, shape: [Int])], outputs: [(name: String, shape: [Int])]) -> ModelFileCheck? {
+        guard let image = inputs.first(where: { $0.shape.count == 4 }) else {
+            return nil
+        }
+        func settings(_ type: TYPE, _ classes: [CLASS]) -> ModelFileCheck {
+            ModelFileCheck(type: type.rawValue, classes: classes.map { $0.rawValue }, width: image.shape[2], height: image.shape[1])
+        }
+        func hasOutputs(_ names: [String]) -> Bool {
+            names.allSatisfy { name in outputs.contains { $0.name == name } }
+        }
+
+        // Driving models take the camera image plus a command (1 value) or a goal (3 values).
+        if inputs.count == 2 && outputs.count == 1 {
+            let extraInput = inputs[0].shape.count == 4 ? inputs[1] : inputs[0]
+            switch extraInput.shape.last {
+            case 1: return settings(.AUTOPILOT, [.AUTOPILOT_F])
+            case 3: return settings(.NAVIGATION, [.NAVIGATION])
+            default: return nil
+            }
+        }
+        guard inputs.count == 1 else {
+            return nil
+        }
+        if outputs.count == 4 && ssdOutputs.contains(where: hasOutputs) {
+            // Both classes use the same detector, so both work.
+            return hasOutputs(ssdOutputs[1]) ? settings(.DETECTOR, [.EFFICIENTDET, .MOBILENET]) : settings(.DETECTOR, [.MOBILENET, .EFFICIENTDET])
+        }
+        if outputs.count == 2 && yoloV4Outputs.contains(where: hasOutputs) {
+            return settings(.DETECTOR, [.YOLOV4])
+        }
+        // YOLOv5 has one output of shape [1, boxes, 5 + number of classes].
+        if outputs.count == 1 && outputs[0].shape.count == 3 && outputs[0].shape[2] > 5 {
+            return settings(.DETECTOR, [.YOLOV5])
+        }
+        return nil
     }
 }

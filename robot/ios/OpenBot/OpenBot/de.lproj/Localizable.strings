@@ -212,3 +212,9 @@
 
 /* Sign-in without the project's Firebase configuration */
 "firebaseNotConfigured" = "Die Google-Anmeldung ist in diesem Build nicht eingerichtet. Dafür wird die Firebase-Konfiguration des Projekts benötigt (GoogleService-Info.plist).";
+
+/* Object detection when the model file does not match its selected class */
+"modelClassMismatch" = "Dieses Modell passt nicht zu seiner Klasse. Wähle in der Modellverwaltung die richtige Klasse.";
+
+/* Model Management when a picked or downloaded file is not a model the app can run */
+"modelNotSupported" = "Dieses Modell kann in OpenBot nicht ausgeführt werden. Verwende ein Autopilot-, Navigations-, MobileNet-, EfficientDet-, YOLOv4- oder YOLOv5-Modell.";

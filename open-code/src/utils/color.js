@@ -1,6 +1,6 @@
 /**
  * openBot playground colors
- * @type {{whiteFont: string, openBotBlue: string, blackBackground: string, blackPopupBackground: string, blocklyBackground: string, blackFont: string, whiteBackground: string}}
+ * @type {{whiteFont: string, openBotBlue: string, blackBackground: string, blackPopupBackground: string, blocklyBackground: string, blackFont: string, whiteBackground: string, errorRed: string}}
  */
 export const colors = {
     openBotBlue: "#0071C5",
@@ -10,6 +10,7 @@ export const colors = {
     whiteBackground: '#FFFFFF',
     blackPopupBackground: "#303030",
     blocklyBackground: "#202020",
+    errorRed: "#E53935",
 }
 
 export const buttonColor = {

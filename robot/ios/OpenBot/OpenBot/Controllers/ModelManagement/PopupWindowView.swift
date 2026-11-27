@@ -5,7 +5,6 @@
 import Foundation
 import UIKit
 import DropDown
-import GoogleSignIn
 
 
 class popupWindowView: UIView {
@@ -24,14 +23,23 @@ class popupWindowView: UIView {
     var widthOfModel: String!
     var heightOfModel: String!
     var modelAddress: String = ""
+    // What the model file can run as; type and input size are locked to it.
+    var fileCheck: ModelFileCheck?
+    // A picked file waiting to be added on Done.
+    var pickedFileURL: URL?
+    // Type, class and size are fixed, except for a model added from a URL whose file isn't here yet.
+    var isLocked = false
+    var originalName = ""
 
 
     /// Initializing function
-    init(frame: CGRect, _ modelName: String, _ modelAddress: String, _ pathType: String) {
+    init(frame: CGRect, _ modelName: String, _ modelAddress: String, _ pathType: String, fileCheck: ModelFileCheck? = nil, pickedFileURL: URL? = nil) {
         super.init(frame: frame)
         self.modelName = modelName
         self.modelAddress = modelAddress
         self.pathType = pathType
+        self.fileCheck = fileCheck
+        self.pickedFileURL = pickedFileURL
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard(_:)))
         setupModelItem();
         addGestureRecognizer(tap)
@@ -64,13 +72,24 @@ class popupWindowView: UIView {
     /// function to setup models list.
     func setupModelItem() {
         model = Common.returnModelItem(modelName: modelName)
+        originalName = model.name
+        // Adding sets the path type, editing keeps it.
+        if !pathType.isEmpty {
+            model.pathType = pathType
+        }
+        if pickedFileURL != nil && !model.name.hasSuffix(Strings.tflite) {
+            model.name.append(Strings.tflite)
+        }
+        if let fileCheck = fileCheck {
+            model.type = fileCheck.type
+            if !fileCheck.classes.contains(model.class) {
+                model.class = fileCheck.classes[0]
+            }
+            model.inputSize = fileCheck.inputSize
+        }
+        isLocked = fileCheck != nil || modelAddress.isEmpty
         widthOfModel = ModelItem.getWidthOfInput(model.inputSize);
         heightOfModel = ModelItem.getHeightOfInput(model.inputSize);
-        if pathType == "ASSET" {
-            model.pathType = "ASSET"
-        } else {
-            model.pathType = "URL"
-        }
     }
 
     /// function to create headings
@@ -141,7 +160,7 @@ class popupWindowView: UIView {
         typeDropdown.backgroundColor = Colors.freeRoamButtonsColor
         typeDropdown.textColor = Colors.border ?? .black
         typeDropdown.anchorView = typeDropdownView;
-        typeDropdown.dataSource = Constants.types;
+        typeDropdown.dataSource = isLocked ? [model.type] : Constants.types;
         let ddView = UIView();
         addSubview(ddView);
         ddView.translatesAutoresizingMaskIntoConstraints = false;
@@ -150,10 +169,11 @@ class popupWindowView: UIView {
         typeDropdownLeadingAnchor = ddView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -width / 2 - 50)
         typeDropdownLeadingAnchor.isActive = true
         ddView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 130).isActive = true;
-        let tap = UITapGestureRecognizer(target: self, action: #selector(showTypeDropdown(_:)))
-        ddView.addGestureRecognizer(tap)
+        if !isLocked {
+            ddView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showTypeDropdown(_:))))
+        }
         let modelTypeLabel = UILabel();
-        modelTypeLabel.text = Common.returnModelItem(modelName: modelName).type
+        modelTypeLabel.text = model.type
         ddView.addSubview(modelTypeLabel)
         modelTypeLabel.translatesAutoresizingMaskIntoConstraints = false;
         modelTypeLabel.widthAnchor.constraint(equalToConstant: 100).isActive = true;
@@ -180,7 +200,7 @@ class popupWindowView: UIView {
         classDropdown.backgroundColor = Colors.freeRoamButtonsColor
         classDropdown.textColor = Colors.border ?? .black
         classDropdown.anchorView = classDropdownView;
-        classDropdown.dataSource = Constants.classes
+        classDropdown.dataSource = fileCheck?.classes ?? (isLocked ? [model.class] : Constants.classes)
         let ddView = UIView();
         addSubview(ddView);
         ddView.translatesAutoresizingMaskIntoConstraints = false;
@@ -189,10 +209,11 @@ class popupWindowView: UIView {
         classDropdownLeadingAnchor = ddView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -width / 2 - 50)
         classDropdownLeadingAnchor.isActive = true;
         ddView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200).isActive = true;
-        let tap = UITapGestureRecognizer(target: self, action: #selector(showClassDropdown(_:)))
-        ddView.addGestureRecognizer(tap)
+        if classDropdown.dataSource.count > 1 {
+            ddView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showClassDropdown(_:))))
+        }
         let classLabel = UILabel();
-        classLabel.text = Common.returnModelItem(modelName: modelName).class
+        classLabel.text = model.class
         ddView.addSubview(classLabel)
         classLabel.translatesAutoresizingMaskIntoConstraints = false;
         classLabel.widthAnchor.constraint(equalToConstant: 150).isActive = true;
@@ -227,9 +248,8 @@ class popupWindowView: UIView {
     func createFirstInputTextField() {
         let input = UITextField();
         input.keyboardType = .numberPad;
-        let modelInputSize = Common.returnModelItem(modelName: modelName).inputSize
-        let index = modelInputSize.index(modelInputSize.startIndex, offsetBy: 3)
-        input.text = String(modelInputSize[..<index])
+        input.text = widthOfModel
+        input.isEnabled = !isLocked
         input.addTarget(self, action: #selector(wDidChange(_:)), for: .editingChanged);
         firstBox.addSubview(input);
         input.translatesAutoresizingMaskIntoConstraints = false;
@@ -243,10 +263,8 @@ class popupWindowView: UIView {
     func createSecondInputField() {
         let input = UITextField();
         input.keyboardType = .numberPad;
-        let modelInputSize = Common.returnModelItem(modelName: modelName).inputSize
-        let index = modelInputSize.firstIndex(of: "x");
-        let nextIndex = modelInputSize.index(after: index!)
-        input.text = String(modelInputSize.suffix(from: nextIndex))
+        input.text = heightOfModel
+        input.isEnabled = !isLocked
         input.addTarget(self, action: #selector(hDidChange(_:)), for: .editingChanged);
         secondBox.addSubview(input);
         input.translatesAutoresizingMaskIntoConstraints = false;
@@ -304,27 +322,31 @@ class popupWindowView: UIView {
 
     /// handler when tapped on the cancel button, removed the popup from the window.
     @objc func onCancelBtnTap(_ sender: UIButton) {
+        if let pickedFileURL = pickedFileURL {
+            try? FileManager.default.removeItem(at: pickedFileURL)
+        }
         NotificationCenter.default.post(name: .removeBlankScreen, object: nil);
         removeFromSuperview();
     }
 
     /// handler when tapped on the save/done button.
     @objc func onDoneBtnTap(_ sender: UIButton) throws {
-        try Common.saveConfigFileToDocument(modelItems: Common.modifyModels(modelAddress: modelAddress, model: model, widthOfModel: widthOfModel, heightOfModel: heightOfModel));
+        let documentsURL = FileManager.getDocumentsDirectory()
+        if let pickedFileURL = pickedFileURL {
+            // The checked file is added to the app only now.
+            let modelURL = documentsURL.appendingPathComponent(model.name)
+            try? FileManager.default.removeItem(at: modelURL)
+            try FileManager.default.moveItem(at: pickedFileURL, to: modelURL)
+        }
+        // A renamed model keeps its file and leaves its old name in the shared list.
+        let isRenamed = pathType.isEmpty && model.name != originalName
+        if isRenamed {
+            try? FileManager.default.moveItem(at: documentsURL.appendingPathComponent(originalName), to: documentsURL.appendingPathComponent(model.name))
+        }
+        let allModels = Common.modifyModels(modelAddress: modelAddress, model: model, widthOfModel: widthOfModel, heightOfModel: heightOfModel)
+        try Common.saveConfigFileToDocument(modelItems: allModels);
         if let index = model.name.firstIndex(of: ".") {
-            if GIDSignIn.sharedInstance.currentUser != nil {
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = [.withoutEscapingSlashes]
-                do {
-                    let jsonData = try encoder.encode(Common.modifyModels(modelAddress: modelAddress, model: model, widthOfModel: widthOfModel, heightOfModel: heightOfModel));
-                    if let jsonString = String(data: jsonData, encoding: .utf8) {
-                        if let data = jsonString.data(using: .utf8) {
-                            Authentication().updateModelListFile(fileData: data);
-                        }
-                    }
-                }
-            } else {
-            }
+            Authentication.googleAuthentication.updateModelListFile(models: allModels.filter { $0.name == model.name }, removedNames: isRenamed ? [originalName] : [])
             NotificationCenter.default.post(name: .removeBlankScreen, object: model.name.prefix(upTo: index));
         }
         removeFromSuperview();

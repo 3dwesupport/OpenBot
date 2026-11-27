@@ -61,6 +61,7 @@
     <string name="preview_resolution">Resolución de vista previa</string>
     <string name="save_option">Opciones de guardado</string>
     <string name="file_available_body">Ya existe un modelo con el mismo nombre. ¿Desea reemplazarlo?</string>
+    <string name="model_not_supported">Este modelo no se puede ejecutar en OpenBot. Usa un modelo de piloto automático, navegación, MobileNet, EfficientDet, YOLOv4 o YOLOv5.</string>
     <string name="file_available_title">Archivo encontrado</string>
     <string name="model_delete_body">¿Está seguro de que desea eliminar este modelo?</string>
     <string name="model_delete_title">Confirmar</string>

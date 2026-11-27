@@ -83,7 +83,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
         let modelItems = Common.loadAllModelItemsFromBundle()
         if (modelItems.count > 0) {
             let detectorModel = modelItems.first(where: { $0.type == TYPE.DETECTOR.rawValue })
-            runRobot.detector = try! Detector.create(model: Model.fromModelItem(item: detectorModel ?? modelItems[0]), device: RuntimeDevice.CPU, numThreads: 1) as? Detector
+            runRobot.detector = try? Detector.create(model: Model.fromModelItem(item: detectorModel ?? modelItems[0]), device: RuntimeDevice.CPU, numThreads: 1) as? Detector
             let autopilotModel = modelItems.first(where: { $0.type == TYPE.AUTOPILOT.rawValue });
             runRobot.autopilot = Autopilot(model: Model.fromModelItem(item: autopilotModel ?? modelItems[0]), device: RuntimeDevice.CPU, numThreads: 1);
         }
@@ -591,7 +591,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
             runRobot.isObjectTracking = true;
         }
         let currentModel = Common.returnModelItem(modelName: model)
-        detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: .CPU, numThreads: 1) as? Detector
+        detector = try? Detector.create(model: Model.fromModelItem(item: currentModel), device: .CPU, numThreads: 1) as? Detector
     }
 
     /**
@@ -618,7 +618,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
             runRobot.isMultipleObjectTracking = true;
         }
         let currentModel = Common.returnModelItem(modelName: model)
-        detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: .CPU, numThreads: 1) as? Detector
+        detector = try? Detector.create(model: Model.fromModelItem(item: currentModel), device: .CPU, numThreads: 1) as? Detector
     }
 
     /**
@@ -644,7 +644,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
      */
     static func onDetection(object: String, model: String, task: String) {
         let currentModel = Common.returnModelItem(modelName: model)
-        detector = try! Detector.create(model: Model.fromModelItem(item: currentModel), device: .CPU, numThreads: 1) as? Detector
+        detector = try? Detector.create(model: Model.fromModelItem(item: currentModel), device: .CPU, numThreads: 1) as? Detector
         DispatchQueue.main.async {
             runRobot.isDetection = true;
         }
@@ -972,7 +972,7 @@ class runRobot: CameraController, ARSCNViewDelegate, UITextFieldDelegate {
         }
         let objectTrackingModel = Common.returnModelItem(modelName: detectorModel);
         let auto = Common.returnModelItem(modelName: autoPilotModel);
-        detector = try! Detector.create(model: Model.fromModelItem(item: objectTrackingModel), device: .CPU, numThreads: 1) as? Detector
+        detector = try? Detector.create(model: Model.fromModelItem(item: objectTrackingModel), device: .CPU, numThreads: 1) as? Detector
         autopilot = Autopilot(model: Model.fromModelItem(item: auto), device: RuntimeDevice.CPU, numThreads: 1);
     }
 

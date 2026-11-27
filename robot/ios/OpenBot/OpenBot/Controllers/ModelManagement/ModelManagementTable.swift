@@ -327,7 +327,10 @@ class ModelManagementTable: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        popupWindow = popupWindowView(frame: .zero, models[indexPath.row], "", "")
+        // A model file on this phone decides the type, classes and size the popup offers.
+        let modelURL = FileManager.getDocumentsDirectory().appendingPathComponent(Common.returnModelItem(modelName: models[indexPath.row]).name)
+        let fileCheck = FileManager.default.fileExists(atPath: modelURL.path) ? ModelFileCheck.check(fileAt: modelURL.path) : nil
+        popupWindow = popupWindowView(frame: .zero, models[indexPath.row], "", "", fileCheck: fileCheck)
         selectedIndex = indexPath
         createBlankScreen()
         createPopupWindow()
@@ -340,9 +343,29 @@ class ModelManagementTable: UITableViewController {
             let url = URL.init(string: model.path)!
             FileDownloader.loadFileAsync(url: url, completion: { s, error in
                 print("File downloaded to : \(s!)")
+                // Only a file the app can run is kept; its type, class and size come from the file.
+                guard let path = s, let fileCheck = ModelFileCheck.check(fileAt: path) else {
+                    if let path = s {
+                        try? FileManager.default.removeItem(atPath: path)
+                    }
+                    DispatchQueue.main.async {
+                        self.alert.dismiss(animated: true) {
+                            self.showMessage(Strings.modelNotSupported)
+                        }
+                        self.tableView.reloadRows(at: [self.selectedIndex], with: .bottom)
+                    }
+                    return
+                }
+                var checkedModel = model
+                checkedModel.type = fileCheck.type
+                checkedModel.inputSize = fileCheck.inputSize
+                if !fileCheck.classes.contains(model.class) {
+                    checkedModel.class = fileCheck.classes[0]
+                }
                 do {
-                    try Common.saveConfigFileToDocument(modelItems: Common.modifyModel(model: model, isDelete: false))
-                    try Authentication.googleAuthentication.saveConfigJsonToDrive();
+                    let allModels = Common.modifyModel(model: checkedModel, isDelete: false)
+                    try Common.saveConfigFileToDocument(modelItems: allModels)
+                    Authentication.googleAuthentication.updateModelListFile(models: allModels.filter { $0.id == model.id })
                 } catch {
                     print("unable to save config file to document");
                 }
@@ -381,21 +404,28 @@ class ModelManagementTable: UITableViewController {
         let filesPath = DataLogger.shared.getDocumentDirectoryInformation()
         for url in filesPath {
             if Common.returnModelItem(modelName: modelName).name == url.lastPathComponent {
-                let item = Common.returnModelItem(modelName: modelName)
-                if (item.path == "" && item.pathType == "FILE") {
-                    print(Common.modifyModel(model: item, isDelete: true))
-                }
                 DataLogger.shared.deleteFiles(fileNameToDelete: url.lastPathComponent);
             }
         }
         let model = Common.returnModelItem(modelName: modelName);
+        // Own models have no download link, so they leave the list.
+        let isOwnModel = model.path == ""
         do {
-            try Common.saveConfigFileToDocument(modelItems: Common.modifyModel(model: model, isDelete: true))
-            try Authentication.googleAuthentication.saveConfigJsonToDrive();
+            let allModels = isOwnModel ? Common.loadAllModelItems().filter { $0.id != model.id } : Common.modifyModel(model: model, isDelete: true)
+            try Common.saveConfigFileToDocument(modelItems: allModels)
+            if isOwnModel {
+                Authentication.googleAuthentication.updateModelListFile(models: [], removedNames: [model.name])
+            } else {
+                Authentication.googleAuthentication.updateModelListFile(models: allModels.filter { $0.id == model.id })
+            }
         } catch {
             print("unable to save config file to document");
         }
-        tableView.reloadRows(at: [selectedIndex], with: .bottom);
+        if isOwnModel {
+            updateModelItemList(type: "All")
+        } else {
+            tableView.reloadRows(at: [selectedIndex], with: .bottom);
+        }
     }
 
     @objc func updateConnect(_ notification: Notification) {

@@ -39,6 +39,13 @@ extension UIViewController {
     static let DELAY_SHORT = 1.5
     static let DELAY_LONG = 3.0
 
+    /// Shows a message with an OK button.
+    func showMessage(_ text: String) {
+        let alert = UIAlertController(title: nil, message: text, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.okAction, style: .default))
+        present(alert, animated: true)
+    }
+
     /**
      Function to set the delay and origin of toast message
      - Parameters:

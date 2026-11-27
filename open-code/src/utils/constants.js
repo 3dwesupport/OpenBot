@@ -191,19 +191,6 @@ export const PlaygroundConstants = {
     labels2: "labels2"
 }
 /**
- * AI models
- * @type {{type: string[]}}
- */
-export const Models = {
-    type: [
-        'AUTOPILOT',
-        'DETECTOR',
-        'NAVIGATION',
-        'CMDNAV',
-    ],
-}
-
-/**
  * Application paths
  * @type {{playGround: string, home: string}}
  */

@@ -212,6 +212,8 @@ struct Strings {
     static var genericErrorMessage: String { L10n.string("genericErrorMessage") }
     static var okAction: String { L10n.string("okAction") }
     static var firebaseNotConfigured: String { L10n.string("firebaseNotConfigured") }
+    static var modelClassMismatch: String { L10n.string("modelClassMismatch") }
+    static var modelNotSupported: String { L10n.string("modelNotSupported") }
 
     // Profile screen
     static var myProfileHeading: String { L10n.string("myProfileHeading") }

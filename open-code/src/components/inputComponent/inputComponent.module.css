@@ -14,6 +14,10 @@
     outline: none;
 }
 
+.inputSection:disabled {
+    cursor: not-allowed;
+}
+
 .inputBorder {
     margin-top: 10px;
     display: flex;

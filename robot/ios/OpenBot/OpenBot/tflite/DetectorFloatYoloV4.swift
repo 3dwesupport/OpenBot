@@ -75,15 +75,20 @@ class DetectorFloatYoloV4: Detector {
     }
 
     /// This function will parse a .tflite neural model and
-    override func parseTFlite() {
-        let index0 = try! tflite?.output(at: 0);
-        let index1 = try! tflite?.output(at: 1);
-        assignIndex(tensor: index0, index: 0);
-        assignIndex(tensor: index1, index: 1);
-        NUM_DETECTIONS = try! tflite?.output(at: outputLocationsIdx).shape.dimensions[1] ?? 0;
-        let outputSize = try! tflite?.output(at: outputLocationsIdx).data.count ?? 0
+    override func parseTFlite() throws {
+        // YOLOv4 models have 2 outputs, locations and scores.
+        guard let tflite = tflite, tflite.outputTensorCount == 2 else {
+            throw DetectorError.modelDoesNotMatchClass
+        }
+        try assignIndex(tensor: tflite.output(at: 0), index: 0);
+        try assignIndex(tensor: tflite.output(at: 1), index: 1);
+        guard outputLocationsIdx >= 0, outputScoresIdx >= 0 else {
+            throw DetectorError.modelDoesNotMatchClass
+        }
+        NUM_DETECTIONS = try tflite.output(at: outputLocationsIdx).shape.dimensions[1];
+        let outputSize = try tflite.output(at: outputLocationsIdx).data.count
         outputLocations = UnsafeMutableBufferPointer<Float32>.allocate(capacity: outputSize)
-        let outputScoresTensorSize = try! tflite?.output(at: outputScoresIdx).data.count ?? 0
+        let outputScoresTensorSize = try tflite.output(at: outputScoresIdx).data.count
         outputScores = UnsafeMutableBufferPointer<Float32>.allocate(capacity: outputScoresTensorSize)
     }
 
@@ -107,8 +112,8 @@ class DetectorFloatYoloV4: Detector {
 
     /// Copy data to the input of the neural network
     override func feedData() throws {
-        _ = try! tflite?.output(at: outputLocationsIdx).data.copyBytes(to: outputLocations!);
-        _ = try! tflite?.output(at: outputScoresIdx).data.copyBytes(to: outputScores!);
+        _ = try tflite?.output(at: outputLocationsIdx).data.copyBytes(to: outputLocations!);
+        _ = try tflite?.output(at: outputScoresIdx).data.copyBytes(to: outputScores!);
     }
 
     /// Query the output of the neural network and perform post-processing actions

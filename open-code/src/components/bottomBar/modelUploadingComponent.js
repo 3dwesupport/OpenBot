@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {Backdrop, Box, CircularProgress, Modal} from "@mui/material";
 import styles from "../navBar/navbar.module.css";
-import {Constants, errorToast, localStorageKeys, Models, Themes} from "../../utils/constants";
+import {Constants, errorToast, localStorageKeys, Themes} from "../../utils/constants";
 import {Images} from "../../utils/images";
 import SimpleInputComponent from "../inputComponent/simpleInputComponent";
 import BlueButton from "../buttonComponent/blueButtonComponent";
@@ -11,6 +11,9 @@ import {StoreContext} from "../../context/context";
 import {getConfigData, setConfigData} from "../../services/workspace";
 import {uploadToGoogleDrive} from "../../services/googleDrive";
 import {uploadModelDetails} from "../../apis/models";
+import {getModelSettings, readTfliteModel} from "../../utils/tfliteModel";
+
+const UNSUPPORTED_MODEL_MESSAGE = "This model can't run in the OpenBot app. Use an autopilot, navigation, MobileNet, EfficientDet, YOLOv4 or YOLOv5 model.";
 
 /**
  * function to upload new model (.tflite)
@@ -26,15 +29,13 @@ export function ModelUploadingComponent(params) {
     const [fileName, setFileName] = useState(localFileName ?? "");
     const [isDesktopLargerScreen, setIsDesktopLargerScreen] = useState(window.matchMedia("(min-height: 900px)").matches);
     const [fileUploadLoader, setFileUploadLoader] = useState(false);
-    const [modelClassDropdown, setModelClassDropdown] = useState("AUTOPILOT");
+    const [modelClassDropdown, setModelClassDropdown] = useState("");
     const [modelDetails, setModelDetails] = useState({
-        displayName: localFileName,
-        type: "AUTOPILOT",
-        class: "AUTOPILOT",
-        width: 256,
-        height: 96
+        displayName: localFileName
     })
-    const [handleTypeDependency, setHandleTypeDependency] = useState(["AUTOPILOT"]);
+    // Type, classes and size read from the model file; null until read or when unsupported.
+    const [modelSettings, setModelSettings] = useState(null);
+    const [isUnsupportedModel, setIsUnsupportedModel] = useState(false);
 
     //function to close the model
     const handleClose = () => {
@@ -68,51 +69,6 @@ export function ModelUploadingComponent(params) {
         }
     }
 
-    //function to handle model type and class dependency on type
-    const handleTypeMap = {
-        AUTOPILOT: {handleTypeDependency: ['AUTOPILOT'], modelClass: 'AUTOPILOT'},
-        DETECTOR: {handleTypeDependency: ['MOBILENET', 'EFFICIENTDET', 'YOLOV4', 'YOLOV5'], modelClass: 'MOBILENET'},
-        NAVIGATION: {handleTypeDependency: ['NAVIGATION'], modelClass: 'NAVIGATION'},
-        CMDNAV: {handleTypeDependency: ['AUTOPILOT'], modelClass: 'AUTOPILOT'},
-    };
-
-    function handleTypeChange(e) {
-        const handleTypeData = handleTypeMap[e] || {};
-
-        setHandleTypeDependency(handleTypeData.handleTypeDependency || []);
-        setModelClassDropdown(handleTypeData.modelClass || '');
-
-        setModelDetails({
-            ...modelDetails,
-            type: e,
-            class: modelClassDropdown,
-        });
-    }
-
-    //function to handle model class
-    function handleClassChange(e) {
-        setModelDetails({
-            ...modelDetails,
-            class: e
-        })
-    }
-
-    //function to handle model width
-    function handleWidthChange(e) {
-        setModelDetails({
-            ...modelDetails,
-            width: parseInt(e)
-        })
-    }
-
-    //function to handle model height
-    function handleHeightChange(e) {
-        setModelDetails({
-            ...modelDetails,
-            height: parseInt(e)
-        })
-    }
-
     useEffect(() => {
         const handleOrientationChange = () => {
             setIsDesktopLargerScreen(
@@ -122,18 +78,36 @@ export function ModelUploadingComponent(params) {
         window.addEventListener("resize", handleOrientationChange);
     }, []);
 
+    // Read the model file, so only the type, class and size the apps can run are offered.
     useEffect(() => {
-        setModelDetails({
-            ...modelDetails,
-            class: modelClassDropdown
-        })
-    }, [handleTypeDependency])
+        if (!file) {
+            return;
+        }
+        setModelSettings(null);
+        setIsUnsupportedModel(false);
+        file.arrayBuffer()
+            .then((buffer) => {
+                const settings = getModelSettings(readTfliteModel(buffer));
+                if (!settings) {
+                    setIsUnsupportedModel(true);
+                    return;
+                }
+                setModelSettings(settings);
+                setModelClassDropdown(settings.classes[0]);
+            })
+            .catch(() => setIsUnsupportedModel(true));
+    }, [file])
 
     /**
      * function to save and add new model
      * @returns {Promise<void>}
      */
     async function handleSubmit() {
+        // Only models the apps can run are saved.
+        if (!modelSettings) {
+            errorToast(isUnsupportedModel ? UNSUPPORTED_MODEL_MESSAGE : "Reading the model, please try again.")
+            return;
+        }
         if (isOnline) {
             if (localStorage.getItem("isSigIn") === "true") {
                 setFileUploadLoader(true);
@@ -141,17 +115,23 @@ export function ModelUploadingComponent(params) {
                     fileData: file,
                     name: modelDetails.displayName
                 }
-                await setConfigData().then(async () => {
+                await setConfigData().then(async (foundOnDrive) => {
+                    // Don't save an old list over Drive when it can't be read.
+                    if (foundOnDrive === null) {
+                        setFileUploadLoader(false);
+                        errorToast("Something went wrong!")
+                        return;
+                    }
                     let configData = getConfigData()
                     await uploadToGoogleDrive(data, Constants.tflite).then(async (res) => {
                         let newModelData = {
-                            id: configData.length + 1,
+                            id: Math.max(0, ...configData.map((model) => model.id)) + 1,
                             name: modelDetails.displayName + `.${Constants.tflite}`,
                             pathType: "URL",
                             path: res,
-                            type: `${modelDetails.type}`,
-                            class: `${modelDetails.class}`,
-                            inputSize: `${modelDetails.width}x${modelDetails.height}`
+                            type: modelSettings.type,
+                            class: modelClassDropdown,
+                            inputSize: `${modelSettings.width}x${modelSettings.height}`
                         }
                         configData.push(newModelData)
                         await uploadToGoogleDrive(JSON.stringify(configData), Constants.json).then(async () => {
@@ -210,28 +190,31 @@ export function ModelUploadingComponent(params) {
                                           modelExtension={true}
                                           inputTitle={"Model Name"} extraInputStyle={styles.extraInputStyle}
                     />
-                    <SimpleInputComponent inputType={"dropdown"} inputTitle={"Type"}
-                                          onDataChange={handleTypeChange} modelData={Models.type}
+                    <SimpleInputComponent inputType={"email"} inputTitle={"Type"}
+                                          value={modelSettings?.type ?? ""}
+                                          inlineStyle={{height: "50%"}}
                                           extraStyle={styles.inputExtraStyle} extraInputStyle={styles.extraInputStyle}/>
                 </div>
                 <div style={{display: "flex"}}>
                     <SimpleInputComponent inputType={"dropdown"} inputTitle={"Class"}
                                           modelClassDropdown={modelClassDropdown}
                                           setModelClassDropdown={setModelClassDropdown}
-                                          modelData={handleTypeDependency}
+                                          modelData={modelSettings?.classes ?? []}
                                           extraStyle={styles.inputExtraStyle}
-                                          onDataChange={handleClassChange}
                                           extraInputStyle={styles.extraInputStyle}
                     />
                     <SimpleInputComponent inputType={"dimensions"} inputTitle={"Input(w × h)"}
-                                          onWidthDataChange={handleWidthChange}
-                                          onHeightDataChange={handleHeightChange}
+                                          widthValue={modelSettings?.width}
+                                          heightValue={modelSettings?.height}
                                           extraInputStyle={styles.extraInputStyle}
                                           extraStyle={styles.inputExtraStyle} extraMargin={styles.dropdownMargin}/>
 
                 </div>
+                {isUnsupportedModel &&
+                    <div style={{color: colors.errorRed, padding: "0 5%"}}>{UNSUPPORTED_MODEL_MESSAGE}</div>}
                 <div className={styles.buttonSection}>
                     <BlueButton buttonType={"contained"} buttonName={"Save"} onClick={handleSubmit}
+                                inlineStyle={modelSettings ? undefined : {opacity: 0.5}}
                                 buttonStyle={styles.buttonText}/>
                     <BlueButton onClick={handleClose} buttonName={"Cancel"} buttonStyle={styles.buttonText}/>
                 </div>

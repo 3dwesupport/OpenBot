@@ -29,9 +29,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.gson.Gson;
 import com.nononsenseapps.filepicker.Utils;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -44,6 +44,7 @@ import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.main.OnItemClickListener;
 import org.openbot.app.robot.projects.GoogleSignInCallback;
 import org.openbot.app.robot.tflite.Model;
+import org.openbot.app.robot.tflite.ModelFileCheck;
 import org.openbot.app.robot.utils.Constants;
 import org.openbot.app.robot.utils.FileUtils;
 import org.openbot.app.robot.utils.PermissionUtils;
@@ -169,36 +170,67 @@ public class ModelManagementFragment extends Fragment
     return fileName;
   }
 
+  /** Copies the picked file to a temporary file and adds it only if the app can run it. */
   private void processModelFromStorage(List<Uri> files, String fileName) {
+    File checkFile = new File(requireActivity().getCacheDir(), "model_check.tflite");
+    new Thread(
+            () -> {
+              ModelFileCheck.Settings settings = copyAndCheck(files.get(0), checkFile);
+              if (!isAdded()) return;
+              requireActivity()
+                  .runOnUiThread(
+                      () -> {
+                        if (settings == null) {
+                          checkFile.delete();
+                          Toast.makeText(
+                                  requireContext(), R.string.model_not_supported, Toast.LENGTH_LONG)
+                              .show();
+                        } else {
+                          showAddModelDialog(checkFile, fileName, settings);
+                        }
+                      });
+            })
+        .start();
+  }
+
+  private ModelFileCheck.Settings copyAndCheck(Uri uri, File checkFile) {
+    try (InputStream inputStream = requireActivity().getContentResolver().openInputStream(uri)) {
+      FileUtils.copyFile(inputStream, checkFile.getName(), checkFile.getParent());
+      return ModelFileCheck.check(checkFile);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  private void showAddModelDialog(
+      File checkFile, String fileName, ModelFileCheck.Settings settings) {
     Model item =
         new Model(
             masterList.size() + 1,
-            Model.CLASS.AUTOPILOT,
-            Model.TYPE.CMDNAV,
+            settings.classes.get(0),
+            settings.type,
             fileName,
             Model.PATH_TYPE.FILE,
             requireActivity().getFilesDir() + File.separator + fileName,
-            "256x96");
+            settings.getInputSize());
 
     EditModelDialogFragment edMbS =
         new EditModelDialogFragment(
             item,
+            settings,
             item1 -> {
-              try {
-                InputStream inputStream =
-                    requireActivity().getContentResolver().openInputStream(files.get(0));
+              try (InputStream inputStream = new FileInputStream(checkFile)) {
                 FileUtils.copyFile(
                     inputStream, fileName, requireActivity().getFilesDir().getAbsolutePath());
               } catch (IOException e) {
                 e.printStackTrace();
               }
+              checkFile.delete();
               masterList.add(item1);
               showModels(loadModelList(binding.modelSpinner.getSelectedItem().toString()));
               FileUtils.updateModelConfig(requireActivity(), requireContext(), masterList, false);
-              googleServices.createAndUploadJsonFile(masterList);
-              Gson gson = new Gson();
-              String json = gson.toJson(masterList);
-              System.out.println("filenameId:::" + masterList.indexOf(item1));
+              googleServices.uploadModelChange(item1, false);
               Toast.makeText(
                       requireContext().getApplicationContext(),
                       "Model added: " + fileName,
@@ -213,7 +245,6 @@ public class ModelManagementFragment extends Fragment
     intent.setType("application/octet-stream"); // Specify the MIME type for TFLite files
     intent.addCategory(Intent.CATEGORY_OPENABLE);
     mStartForResult.launch(intent);
-    googleServices.createAndUploadJsonFile(masterList);
   }
 
   @Nullable
@@ -334,10 +365,19 @@ public class ModelManagementFragment extends Fragment
   @Override
   public void onItemClick(Model item) {
 
+    // Only a model file on this phone can be read, other models keep their type and size.
+    File modelFile = new File(item.path);
+    if (!modelFile.isFile()) modelFile = new File(requireActivity().getFilesDir(), item.name);
+    ModelFileCheck.Settings settings =
+        item.pathType == Model.PATH_TYPE.FILE && modelFile.isFile()
+            ? ModelFileCheck.check(modelFile)
+            : null;
+
     @SuppressLint("NotifyDataSetChanged")
     EditModelDialogFragment edMbS =
         new EditModelDialogFragment(
             item,
+            settings,
             item1 -> {
               adapter.notifyDataSetChanged();
               FileUtils.updateModelConfig(requireActivity(), requireContext(), masterList, false);
@@ -368,11 +408,25 @@ public class ModelManagementFragment extends Fragment
       isDownloading = false;
       for (Model model : masterList) {
         if (model.id.equals(mItem.id)) {
-          model.setPath(requireActivity().getFilesDir() + File.separator + model.name);
+          // Only a file the app can run is kept; its type, class and size come from the file.
+          File modelFile = new File(requireActivity().getFilesDir(), model.name);
+          ModelFileCheck.Settings settings = ModelFileCheck.check(modelFile);
+          if (settings == null) {
+            modelFile.delete();
+            Toast.makeText(requireContext(), R.string.model_not_supported, Toast.LENGTH_LONG)
+                .show();
+            showModels(loadModelList(binding.modelSpinner.getSelectedItem().toString()));
+            break;
+          }
+          model.setType(settings.type);
+          if (!settings.classes.contains(model.classType))
+            model.setClassType(settings.classes.get(0));
+          model.setInputSize(settings.getInputSize());
+          model.setPath(modelFile.getPath());
           model.setPathType(Model.PATH_TYPE.FILE);
           FileUtils.updateModelConfig(requireActivity(), requireContext(), masterList, false);
           // adapter.notifyDataSetChanged();
-          googleServices.createAndUploadJsonFile(masterList);
+          googleServices.uploadModelChange(model, false);
           break;
         }
       }
@@ -392,10 +446,12 @@ public class ModelManagementFragment extends Fragment
 
           Model originalModelConfig =
               FileUtils.getOriginalModelFromConfig(requireActivity(), mItem);
+          boolean removed = false;
           if (originalModelConfig == null) {
             if (mItem.pathType == Model.PATH_TYPE.FILE) {
               masterList.remove(mItem);
               adapter.notifyItemRemoved(index);
+              removed = true;
             }
           } else {
             mItem.setPath(originalModelConfig.path);
@@ -408,7 +464,7 @@ public class ModelManagementFragment extends Fragment
                   () ->
                       adapter.setItems(
                           loadModelList(binding.modelSpinner.getSelectedItem().toString())));
-          googleServices.createAndUploadJsonFile(masterList);
+          googleServices.uploadModelChange(mItem, removed);
         });
     builder.setNegativeButton("Cancel", (dialog, id) -> {});
     AlertDialog dialog = builder.create();

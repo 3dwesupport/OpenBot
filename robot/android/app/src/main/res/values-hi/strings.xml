@@ -61,6 +61,7 @@
     <string name="preview_resolution">प्रीव्यू रिज़ॉल्यूशन</string>
     <string name="save_option">सेव विकल्प</string>
     <string name="file_available_body">इसी नाम का एक मॉडल पहले से मौजूद है। क्या आप इसे बदलना चाहते हैं?</string>
+    <string name="model_not_supported">यह मॉडल OpenBot में नहीं चल सकता। ऑटोपायलट, नेविगेशन, MobileNet, EfficientDet, YOLOv4 या YOLOv5 मॉडल का उपयोग करें।</string>
     <string name="file_available_title">फ़ाइल मिली</string>
     <string name="model_delete_body">क्या आप वाकई इस मॉडल को हटाना चाहते हैं?</string>
     <string name="model_delete_title">पुष्टि करें</string>

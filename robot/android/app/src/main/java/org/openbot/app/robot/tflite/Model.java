@@ -25,7 +25,9 @@ public class Model {
 
   // Alternate names accept the values older iOS builds saved to the shared config.json.
   public enum CLASS {
-    @SerializedName(value = "AUTOPILOT", alternate = {"AUTOPILOT_F"})
+    @SerializedName(
+        value = "AUTOPILOT",
+        alternate = {"AUTOPILOT_F"})
     AUTOPILOT,
     @SerializedName(
         value = "MOBILENET",
@@ -38,10 +40,14 @@ public class Model {
   }
 
   public enum TYPE {
-    @SerializedName(value = "CMDNAV", alternate = {"AUTOPILOT"})
+    @SerializedName(
+        value = "CMDNAV",
+        alternate = {"AUTOPILOT"})
     CMDNAV,
     DETECTOR,
-    @SerializedName(value = "GOALNAV", alternate = {"NAVIGATION"})
+    @SerializedName(
+        value = "GOALNAV",
+        alternate = {"NAVIGATION"})
     GOALNAV,
   }
 

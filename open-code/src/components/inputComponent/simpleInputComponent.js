@@ -24,11 +24,11 @@ export default function SimpleInputComponent(props) {
         value,
         extraInputStyle,
         inlineStyle,
-        onWidthDataChange,
-        onHeightDataChange,
         modelExtension,
         modelData,
         modelClassDropdown, setModelClassDropdown,
+        // Model input size is read from the model file and only shown here.
+        widthValue, heightValue,
         OpenNewProjectHandle = () => {
         }
     } = props
@@ -37,9 +37,6 @@ export default function SimpleInputComponent(props) {
     const date = new Date()
     let currentDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
     const [inputDOBValue, setInputDOBValue] = useState(value ? value : currentDate);
-    const [modelTypeDropdown, setModelTypeDropdown] = useState("AUTOPILOT");
-    const [modelWidth, setModelWidth] = useState(256);
-    const [modelHeight, setModelHeight] = useState(96);
 
     //name change event handling
     function handleChange(e) {
@@ -53,27 +50,8 @@ export default function SimpleInputComponent(props) {
         onDataChange(e.target.value);
     }
 
-    //model type change event handling
-    function onModelTypeChange(e) {
-        setModelTypeDropdown(e.target.value);
-        onDataChange(e.target.value);
-    }
-
     function onModelClassChange(e) {
         setModelClassDropdown(e.target.value);
-        onDataChange(e.target.value);
-    }
-
-    //model width change event handling
-    function onModelWidthChange(e) {
-        setModelWidth(e.target.value);
-        onWidthDataChange(e.target.value);
-    }
-
-    //model height change event handling
-    function onModelHeightChange(e) {
-        setModelHeight(e.target.value);
-        onHeightDataChange(e.target.value);
     }
 
     return (
@@ -113,7 +91,7 @@ export default function SimpleInputComponent(props) {
                     </div>
                     :
                     inputType === "email" ?
-                        <div className={styles.inputBorder}>
+                        <div className={styles.inputBorder} style={inlineStyle}>
                             <input disabled={true} className={styles.inputSection + " " + extraInputStyle}
                                    value={props.value}/>
                         </div>
@@ -124,8 +102,8 @@ export default function SimpleInputComponent(props) {
                                     labelId="model-type"
                                     id="model-type"
                                     className={extraInputStyle}
-                                    value={inputTitle === "Type" ? modelTypeDropdown : modelClassDropdown}
-                                    onChange={inputTitle === "Type" ? onModelTypeChange : onModelClassChange}
+                                    value={modelClassDropdown}
+                                    onChange={onModelClassChange}
                                     sx={{
                                         backgroundColor: theme.theme === "dark" ? "#414141" : colors.whiteBackground,
                                         fontFamily: "Gilroy-Regular, sans-serif",
@@ -166,13 +144,8 @@ export default function SimpleInputComponent(props) {
                                                name={"inputBox"}
                                                placeholder={placeHolder}
                                                className={styles.inputSection + " " + extraInputStyle}
-                                               value={modelWidth} onChange={onModelWidthChange}
-                                               style={{
-                                                   color: theme.theme === "dark" ? colors.whiteFont : colors.blackFont,
-                                                   backgroundColor: theme.theme === "dark" ? "#414141" : colors.whiteBackground,
-                                                   height: "100%",
-                                                   paddingLeft: "20%"
-                                               }}
+                                               value={widthValue ?? ""} disabled
+                                               style={{height: "100%", paddingLeft: "20%"}}
                                         />
                                     </div>
                                     <div style={{
@@ -185,13 +158,8 @@ export default function SimpleInputComponent(props) {
                                                name={"inputBox"}
                                                placeholder={placeHolder}
                                                className={styles.inputSection + " " + extraInputStyle}
-                                               value={modelHeight} onChange={onModelHeightChange}
-                                               style={{
-                                                   color: theme.theme === "dark" ? colors.whiteFont : colors.blackFont,
-                                                   backgroundColor: theme.theme === "dark" ? "#414141" : colors.whiteBackground,
-                                                   height: "100%",
-                                                   paddingLeft: "20%"
-                                               }}
+                                               value={heightValue ?? ""} disabled
+                                               style={{height: "100%", paddingLeft: "20%"}}
                                         />
                                     </div>
                                 </div>

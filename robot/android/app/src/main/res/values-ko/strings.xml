@@ -61,6 +61,7 @@
     <string name="preview_resolution">미리보기 해상도</string>
     <string name="save_option">저장 옵션</string>
     <string name="file_available_body">동일한 이름의 모델이 이미 있습니다. 교체하시겠습니까?</string>
+    <string name="model_not_supported">이 모델은 OpenBot에서 실행할 수 없습니다. 자율 주행, 내비게이션, MobileNet, EfficientDet, YOLOv4 또는 YOLOv5 모델을 사용하세요.</string>
     <string name="file_available_title">파일을 찾았습니다</string>
     <string name="model_delete_body">이 모델을 삭제하시겠습니까?</string>
     <string name="model_delete_title">확인</string>

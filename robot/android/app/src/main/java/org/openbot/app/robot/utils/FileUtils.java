@@ -90,7 +90,10 @@ public class FileUtils {
         if (saved != null && saved.isJsonArray()) {
           List<Model> models = removeInvalidModels(gson.fromJson(saved, listType));
           // An unreadable saved list falls back to the bundled one below.
-          if (!models.isEmpty()) return models;
+          if (!models.isEmpty()) {
+            restoreDownloadLinks(activity, models, true);
+            return models;
+          }
         }
         Log.w(TAG, "Saved config.json has no valid models, restoring the bundled list");
       } catch (FileNotFoundException e) {
@@ -114,6 +117,38 @@ public class FileUtils {
       return null;
     }
     return removeInvalidModels(gson.fromJson(jsonElement, listType));
+  }
+
+  /**
+   * Puts back the bundled download link for models that only have a local file path.
+   *
+   * @param keepDownloaded Keeps the local path of downloaded models, which this device still needs.
+   */
+  public static void restoreDownloadLinks(
+      Activity activity, List<Model> modelList, boolean keepDownloaded) {
+    List<Model> bundledModels;
+    try (InputStreamReader reader =
+        new InputStreamReader(activity.getAssets().open("config.json"))) {
+      bundledModels = new Gson().fromJson(reader, new TypeToken<List<Model>>() {}.getType());
+    } catch (IOException | JsonParseException e) {
+      Log.w(TAG, "Bundled config.json is unreadable", e);
+      return;
+    }
+    if (bundledModels == null) return;
+    for (Model model : modelList) {
+      if (isWebLink(model.path) || model.pathType == Model.PATH_TYPE.ASSET) continue;
+      if (keepDownloaded && model.pathType == Model.PATH_TYPE.FILE) continue;
+      for (Model bundledModel : bundledModels) {
+        if (model.name.equals(bundledModel.name) && isWebLink(bundledModel.path)) {
+          model.setPath(bundledModel.path);
+          break;
+        }
+      }
+    }
+  }
+
+  public static boolean isWebLink(String path) {
+    return path != null && path.startsWith("http");
   }
 
   /** Drops entries with missing or unknown fields, so no screen gets a null type or class. */

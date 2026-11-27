@@ -67,11 +67,8 @@ class Authentication {
             Auth.auth().signIn(with: credential) { result, error in
             }
             NotificationCenter.default.post(name: .googleSignIn, object: nil)
-            do {
-                try self.saveConfigJsonToDrive()
-            } catch {
-                print("Error in saving file to drive");
-            }
+            // Add this phone's downloaded models without replacing the others.
+            self.updateModelListFile(models: Common.loadAllModelItems().filter { $0.pathType == "FILE" })
             let userIdToken = user?.accessToken
             self.userToken = userIdToken?.tokenString ?? ""
             let userFirstName = user?.profile?.givenName ?? ""
@@ -403,27 +400,58 @@ class Authentication {
      - Parameter completion:
      */
     func checkFolderExistsInDrive(completion: @escaping (String) -> Void) {
-        let signIn = googleSignIn.currentUser
-        var folderID = ""
-        getAllFoldersInDrive(accessToken: signIn?.idToken?.tokenString ?? "") { files, error in
-            if let files = files {
-                folderID = self.getOPenBotFolderId(files: files);
-                if (folderID == "") {
-                    self.createOpenBotFolder { identifier in
-                        if (identifier == "") {
-                            completion("")
-                        } else {
-                            completion(identifier)
-                        }
-                    }
-                } else {
-                    completion(folderID)
-                }
-            }
+        findPlaygroundFolderId { folderId, error in
             if let error = error {
                 completion("")
                 print(error);
+            } else if let folderId = folderId {
+                completion(folderId)
+            } else {
+                self.createOpenBotFolder { identifier in
+                    completion(identifier)
+                }
             }
+        }
+    }
+
+    /**
+     Function to find the oldest openBot folder, so all apps use the same one
+     - Parameter completion:
+     */
+    func findPlaygroundFolderId(completion: @escaping (String?, Error?) -> Void) {
+        findFirstFileId(query: "name = 'openBot-Playground' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+                orderBy: "createdTime", completion: completion)
+    }
+
+    /**
+     Function to find the newest config.json in the openBot folder
+     - Parameter completion:
+     */
+    func findConfigFileId(completion: @escaping (String?, Error?) -> Void) {
+        findPlaygroundFolderId { folderId, error in
+            guard let folderId = folderId else {
+                completion(nil, error)
+                return
+            }
+            self.findFirstFileId(query: "name = 'config.json' and '\(folderId)' in parents and trashed = false",
+                    orderBy: "modifiedTime desc", completion: completion)
+        }
+    }
+
+    private func findFirstFileId(query q: String, orderBy: String, completion: @escaping (String?, Error?) -> Void) {
+        let query = GTLRDriveQuery_FilesList.query()
+        query.q = q
+        query.orderBy = orderBy
+        query.pageSize = 1
+        query.spaces = "drive"
+        query.fields = "files(id)"
+        service.authorizer = googleSignIn.currentUser?.fetcherAuthorizer
+        service.executeQuery(query) { _, result, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            completion((result as? GTLRDrive_FileList)?.files?.first?.identifier, nil)
         }
     }
 
@@ -471,28 +499,58 @@ class Authentication {
     }
 
     /**
-     Function to update or create JSON file
-     - Parameter fileData:
+     Function to update the JSON file in drive
+     - Parameters:
+       - fileData:
+       - fileId:
      */
-    func updateModelListFile(fileData: Data) {
-        let service: GTLRDriveService = GTLRDriveService()
-        let signIn = googleSignIn.currentUser
-        service.authorizer = signIn?.fetcherAuthorizer
+    func updateFileInDrive(fileData: Data, fileId: String) {
+        let uploadParameters = GTLRUploadParameters(data: fileData, mimeType: "application/json")
+        let query = GTLRDriveQuery_FilesUpdate.query(withObject: GTLRDrive_File(), fileId: fileId, uploadParameters: uploadParameters)
+        service.executeQuery(query) { _, _, error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+    }
+
+    /**
+     Function to add, replace or remove models in the drive config file, other models are kept
+     - Parameters:
+       - models: models to add or replace
+       - removedNames: names of the models to remove
+     */
+    func updateModelListFile(models: [ModelItem], removedNames: [String] = []) {
+        guard googleSignIn.currentUser != nil, !(models.isEmpty && removedNames.isEmpty) else {
+            return
+        }
         checkFolderExistsInDrive { folderID in
             if folderID != "" {
-                self.getIdOfDriveFile(name: "config", fileType: "JSON") { fileId, error in
-                    if let fileId = fileId {
-                        self.deleteFile(fileId: fileId) { error in
-                            if let error = error {
-                                print(error)
-                            }
-                            self.uploadFileToDrive(fileData: fileData, folderId: folderID)
+                self.findConfigFileId { fileId, error in
+                    if let error = error {
+                        print("error while getting json file::", error)
+                        return
+                    }
+                    guard let fileId = fileId else {
+                        // Drive has no list yet, so start from the local one.
+                        let allModels = Authentication.applyModelChanges(to: Common.loadAllModelItems(), models: models, removedNames: removedNames)
+                        if let data = Authentication.encodeModels(allModels) {
+                            self.uploadFileToDrive(fileData: data, folderId: folderID)
                         }
-                    } else {
+                        return
+                    }
+                    self.downloadFile(withId: fileId, accessToken: self.googleSignIn.currentUser?.accessToken.tokenString ?? "") { data, error in
                         if let error = error {
-                            print("error while getting json file::", error)
-                        } else {
-                            self.uploadFileToDrive(fileData: fileData, folderId: folderID)
+                            print(error)
+                            return
+                        }
+                        var driveModels = data.map { ModelItem.decodeList(from: $0) } ?? []
+                        if driveModels.isEmpty {
+                            driveModels = Common.loadAllModelItems()
+                        }
+                        let allModels = Authentication.applyModelChanges(to: driveModels, models: models, removedNames: removedNames)
+                        if let data = Authentication.encodeModels(allModels) {
+                            self.updateFileInDrive(fileData: data, fileId: fileId)
                         }
                     }
                 }
@@ -501,31 +559,55 @@ class Authentication {
     }
 
     /**
-     function to save config file to the drive
-     - Throws:
+     Function to replace or add models by name and remove the given names
+     - Returns: the updated list
      */
-     func saveConfigJsonToDrive() throws {
-        var allModels: [ModelItem] = Common.loadAllModelItems()
-        if GIDSignIn.sharedInstance.currentUser != nil {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.withoutEscapingSlashes]
-            do {
-                let jsonData = try encoder.encode(allModels)
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    print(jsonString)
-                    if let data = jsonString.data(using: .utf8) {
-                        Authentication().updateModelListFile(fileData: data);
-                    }
+    static func applyModelChanges(to allModels: [ModelItem], models: [ModelItem], removedNames: [String]) -> [ModelItem] {
+        var result = restoreDownloadLinks(allModels).filter { !removedNames.contains($0.name) }
+        for var model in models {
+            if let index = result.firstIndex(where: { $0.name == model.name }) {
+                model.id = result[index].id
+                // Keep the download link, a local path is no use on other devices.
+                if !model.path.hasPrefix("http") && result[index].path.hasPrefix("http") {
+                    model.path = result[index].path
                 }
+                result[index] = model
+            } else {
+                model.id = (result.map { $0.id }.max() ?? 0) + 1
+                result.append(model)
             }
-        } else {
+        }
+        return result
+    }
+
+    /**
+     Function to put back the bundled download link for models that only have a local file path
+     - Returns: the repaired list
+     */
+    static func restoreDownloadLinks(_ models: [ModelItem]) -> [ModelItem] {
+        let bundledModels = Common.loadAllModelItemsFromBundle()
+        return models.map { model in
+            guard model.pathType != "ASSET", !model.path.hasPrefix("http"),
+                  let bundledModel = bundledModels.first(where: { $0.name == model.name && $0.path.hasPrefix("http") }) else {
+                return model
+            }
+            var repairedModel = model
+            repairedModel.path = bundledModel.path
+            return repairedModel
         }
     }
+
+    static func encodeModels(_ models: [ModelItem]) -> Data? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.withoutEscapingSlashes]
+        return try? encoder.encode(models)
+    }
+
     /**
      function to download the config.json from the drive
      */
     func downloadConfigFile() {
-        let configFileId = getIdOfDriveFile(name: "config", fileType: "JSON") { id, error in
+        findConfigFileId { id, error in
             if let error = error {
                 print(error.localizedDescription);
             }
@@ -543,7 +625,7 @@ class Authentication {
                             return
                         }
                         // Keep the local list if the Drive copy has no usable model.
-                        let items = ModelItem.decodeList(from: data)
+                        let items = Authentication.restoreDownloadLinks(ModelItem.decodeList(from: data))
                         guard !items.isEmpty else {
                             print("Drive config.json has no valid models, keeping the local list")
                             return

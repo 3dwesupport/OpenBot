@@ -454,32 +454,52 @@ public class GoogleServices extends Fragment {
 
   private String checkPlaygroundFolder() {
     Drive getDriveService = getDriveService();
-    String pageToken = null;
-    do {
-      try {
-        if (getDriveService != null) {
-          FileList result =
-              getDriveService
-                  .files()
-                  .list()
-                  .setSpaces("drive")
-                  .setPageToken(pageToken)
-                  .setQ("trashed = false")
-                  .execute();
-          List<File> driveProjectFiles = result.getFiles();
-          for (File driveProjectFile : driveProjectFiles) {
-            if (driveProjectFile.getName().equals("openBot-Playground")) {
-              return driveProjectFile.getId();
-            }
-          }
-          pageToken = result.getNextPageToken();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-        pageToken = null;
-      }
-    } while (pageToken != null);
-    return null;
+    if (getDriveService == null) return null;
+    try {
+      return findPlaygroundFolderId(getDriveService);
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  /** Returns the oldest Playground folder, so all apps use the same one. */
+  private static String findPlaygroundFolderId(Drive driveService) throws IOException {
+    return findFirstFileId(
+        driveService,
+        "name = 'openBot-Playground' and mimeType = 'application/vnd.google-apps.folder'"
+            + " and trashed = false",
+        "createdTime");
+  }
+
+  /** Returns the newest config.json inside the Playground folder. */
+  private static String findConfigFileId(Drive driveService, String folderId) throws IOException {
+    return findFirstFileId(
+        driveService,
+        "name = 'config.json' and '" + folderId + "' in parents and trashed = false",
+        "modifiedTime desc");
+  }
+
+  private static String findFirstFileId(Drive driveService, String query, String orderBy)
+      throws IOException {
+    List<File> files =
+        driveService
+            .files()
+            .list()
+            .setSpaces("drive")
+            .setQ(query)
+            .setOrderBy(orderBy)
+            .setPageSize(1)
+            .setFields("files(id)")
+            .execute()
+            .getFiles();
+    return files == null || files.isEmpty() ? null : files.get(0).getId();
+  }
+
+  private static String readFile(Drive driveService, String fileId) throws IOException {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+    return outputStream.toString();
   }
 
   /** Parses the Drive model list; unreadable or invalid entries are dropped. */
@@ -494,69 +514,73 @@ public class GoogleServices extends Fragment {
   }
 
   /**
-   * Creates and uploads a JSON file containing a list of models to Google Drive.
+   * Updates one model in the shared config.json on Google Drive and keeps all other models.
    *
-   * @param modelList List of Model objects to be included in the JSON file.
+   * @param model The model that was downloaded, added or deleted.
+   * @param removed True if the model was removed from the list.
    */
-  public void createAndUploadJsonFile(List<Model> modelList) {
-    // Get the Drive service instance and convert the modelList to JSON string using Gson.
+  public void uploadModelChange(Model model, boolean removed) {
     Drive getDriveService = getDriveService();
+    if (getDriveService == null || model == null) return;
     Gson gson = new GsonBuilder().create();
-    // Only valid entries are shared, so a bad model can't break the iOS app.
-    List<Model> validModels = FileUtils.removeInvalidModels(modelList);
-    if (validModels.isEmpty()) return;
-    String modelListContent = gson.toJson(validModels);
 
     // Start a new thread to perform the Drive API operations.
     new Thread(
             () -> {
-              String pageToken = null;
-              do {
-                try {
-                  if (getDriveService != null) {
-                    FileList result =
-                        getDriveService
-                            .files()
-                            .list()
-                            .setSpaces("drive")
-                            .setPageToken(pageToken)
-                            .setQ("trashed = false")
-                            .execute();
-                    List<File> driveProjectFiles = result.getFiles();
-                    boolean getOpenBotPlayGroundFile = false;
-                    boolean getConfigFIle = false;
-                    String configFileId = null;
-                    String openBotPlayGroundFileId = null;
-                    for (File driveProjectFile : driveProjectFiles) {
-                      if (driveProjectFile.getName().equals("openBot-Playground")) {
-                        getOpenBotPlayGroundFile = true;
-                        openBotPlayGroundFileId = driveProjectFile.getId();
-                      }
-                      if (driveProjectFile.getName().equals("config.json")) {
-                        getConfigFIle = true;
-                        configFileId = driveProjectFile.getId();
-                      }
-                    }
-
-                    // Perform necessary actions based on file existence.
-                    if (getOpenBotPlayGroundFile && getConfigFIle)
-                      // Update existing config.json with model list.
-                      updateModelListFile(modelListContent, configFileId);
-                    if (getOpenBotPlayGroundFile && !getConfigFIle)
-                      // Create config.json and add model list.
-                      createModelListFile(modelListContent, openBotPlayGroundFileId);
-                    if (!getOpenBotPlayGroundFile && !getConfigFIle)
-                      // Create 'openBot' folder and add config.json with model list.
-                      createOpenBotFolder(modelListContent, null);
-                    pageToken = result.getNextPageToken();
-                  }
-                } catch (IOException e) {
-                  e.printStackTrace();
-                  pageToken = null;
+              try {
+                String folderId = findPlaygroundFolderId(getDriveService);
+                String configFileId =
+                    folderId != null ? findConfigFileId(getDriveService, folderId) : null;
+                List<Model> modelList =
+                    configFileId != null
+                        ? parseModelList(gson, readFile(getDriveService, configFileId))
+                        : new ArrayList<>();
+                // Drive has no list yet, so start from the local one.
+                if (modelList.isEmpty()) {
+                  List<Model> localModels = FileUtils.loadConfigJSONFromAsset(mActivity);
+                  if (localModels != null) modelList.addAll(localModels);
                 }
-              } while (pageToken != null);
+                FileUtils.restoreDownloadLinks(mActivity, modelList, false);
+                applyModelChange(gson, modelList, model, removed);
+                String modelListContent = gson.toJson(FileUtils.removeInvalidModels(modelList));
+
+                if (configFileId != null) updateModelListFile(modelListContent, configFileId);
+                else if (folderId != null) createModelListFile(modelListContent, folderId);
+                else createOpenBotFolder(modelListContent, null);
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
             })
         .start();
+  }
+
+  /** Replaces, adds or removes the model with the same name in the list. */
+  private static void applyModelChange(
+      Gson gson, List<Model> modelList, Model model, boolean removed) {
+    Model newModel = gson.fromJson(gson.toJson(model), Model.class);
+    int maxId = 0;
+    for (int i = 0; i < modelList.size(); i++) {
+      Model oldModel = modelList.get(i);
+      if (!oldModel.name.equals(newModel.name)) {
+        maxId = Math.max(maxId, oldModel.id);
+        continue;
+      }
+      if (removed) {
+        // A model with a download link stays in the list, so other devices can still get it.
+        if (FileUtils.isWebLink(oldModel.path)) oldModel.setPathType(Model.PATH_TYPE.URL);
+        else modelList.remove(i);
+        return;
+      }
+      newModel.id = oldModel.id;
+      // Keep the download link, a local file path is no use on other devices.
+      if (!FileUtils.isWebLink(newModel.path) && FileUtils.isWebLink(oldModel.path))
+        newModel.setPath(oldModel.path);
+      modelList.set(i, newModel);
+      return;
+    }
+    if (removed) return;
+    newModel.id = maxId + 1;
+    modelList.add(newModel);
   }
 
   /**
@@ -690,62 +714,37 @@ public class GoogleServices extends Fragment {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     new Thread(
             () -> {
-              String pageToken = null;
-              do {
-                try {
-                  if (driveService != null) {
-                    FileList result =
-                        driveService
-                            .files()
-                            .list()
-                            .setSpaces("drive")
-                            .setPageToken(pageToken)
-                            .setQ("trashed = false")
-                            .execute();
-                    List<File> driveProjectFiles = result.getFiles();
-                    String updatedModelList;
-                    for (File driveProjectFile : driveProjectFiles) {
-                      if (driveProjectFile.getName().equals("config.json")) {
-                        // Read the content of the file
-                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                        driveService
-                            .files()
-                            .get(driveProjectFile.getId())
-                            .executeMediaAndDownloadTo(outputStream);
-                        updatedModelList = outputStream.toString();
-
-                        List<Model> modelList = parseModelList(gson, updatedModelList);
-                        // Keep the local list when the Drive copy has no usable model.
-                        if (modelList.isEmpty()) break;
-
-                        for (int i = 0; i < modelList.size(); i++) {
-                          if (modelList.get(i).pathType == Model.PATH_TYPE.FILE
-                              && !FileUtils.checkFileExistence(mActivity, modelList.get(i).name)) {
-                            modelList.get(i).setPathType(Model.PATH_TYPE.URL);
-                          }
-                        }
-                        FileUtils.updateModelConfig(mActivity, mContext, modelList, false);
-                        mActivity.runOnUiThread(
-                            () -> {
-                              updateModelListAdapter.setItems(modelList);
-                              updateModelListAdapter.notifyDataSetChanged();
-                            });
-                        break;
+              try {
+                String folderId =
+                    driveService != null ? findPlaygroundFolderId(driveService) : null;
+                String configFileId =
+                    folderId != null ? findConfigFileId(driveService, folderId) : null;
+                if (configFileId != null) {
+                  List<Model> modelList =
+                      parseModelList(gson, readFile(driveService, configFileId));
+                  // Keep the local list when the Drive copy has no usable model.
+                  if (!modelList.isEmpty()) {
+                    for (int i = 0; i < modelList.size(); i++) {
+                      if (modelList.get(i).pathType == Model.PATH_TYPE.FILE
+                          && !FileUtils.checkFileExistence(mActivity, modelList.get(i).name)) {
+                        modelList.get(i).setPathType(Model.PATH_TYPE.URL);
                       }
                     }
-                    // Pause rotation animation and reset icon.
-                    rotation.pause();
-                    icon.setRotation(0f);
-
-                  } else {
-                    rotation.pause();
-                    icon.setRotation(0f);
+                    FileUtils.restoreDownloadLinks(mActivity, modelList, true);
+                    FileUtils.updateModelConfig(mActivity, mContext, modelList, false);
+                    mActivity.runOnUiThread(
+                        () -> {
+                          updateModelListAdapter.setItems(modelList);
+                          updateModelListAdapter.notifyDataSetChanged();
+                        });
                   }
-                } catch (IOException e) {
-                  e.printStackTrace();
-                  pageToken = null;
                 }
-              } while (pageToken != null);
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+              // Pause rotation animation and reset icon.
+              rotation.pause();
+              icon.setRotation(0f);
             })
         .start();
   }

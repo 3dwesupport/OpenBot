@@ -212,3 +212,9 @@
 
 /* Sign-in without the project's Firebase configuration */
 "firebaseNotConfigured" = "此版本未设置 Google 登录。需要项目自己的 Firebase 配置（GoogleService-Info.plist）。";
+
+/* Object detection when the model file does not match its selected class */
+"modelClassMismatch" = "此模型与其类别不匹配。请在模型管理中为它选择正确的类别。";
+
+/* Model Management when a picked or downloaded file is not a model the app can run */
+"modelNotSupported" = "此模型无法在 OpenBot 中运行。请使用自动驾驶、导航、MobileNet、EfficientDet、YOLOv4 或 YOLOv5 模型。";
