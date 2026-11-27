@@ -83,11 +83,16 @@ export function ModelUploadingComponent(params) {
         if (!file) {
             return;
         }
+        // A file picked later must not be replaced by the result of an earlier one.
+        let isCurrentFile = true;
         setModelSettings(null);
         setIsUnsupportedModel(false);
         file.arrayBuffer()
             .then((buffer) => {
                 const settings = getModelSettings(readTfliteModel(buffer));
+                if (!isCurrentFile) {
+                    return;
+                }
                 if (!settings) {
                     setIsUnsupportedModel(true);
                     return;
@@ -95,7 +100,10 @@ export function ModelUploadingComponent(params) {
                 setModelSettings(settings);
                 setModelClassDropdown(settings.classes[0]);
             })
-            .catch(() => setIsUnsupportedModel(true));
+            .catch(() => isCurrentFile && setIsUnsupportedModel(true));
+        return () => {
+            isCurrentFile = false;
+        };
     }, [file])
 
     /**
@@ -123,6 +131,12 @@ export function ModelUploadingComponent(params) {
                         return;
                     }
                     let configData = getConfigData()
+                    // Two models with one name would replace each other on the phones.
+                    if (configData.some((model) => model.name.toLowerCase() === `${modelDetails.displayName}.${Constants.tflite}`.toLowerCase())) {
+                        setFileUploadLoader(false);
+                        errorToast("A model with this name already exists. Please use another name.")
+                        return;
+                    }
                     await uploadToGoogleDrive(data, Constants.tflite).then(async (res) => {
                         let newModelData = {
                             id: Math.max(0, ...configData.map((model) => model.id)) + 1,

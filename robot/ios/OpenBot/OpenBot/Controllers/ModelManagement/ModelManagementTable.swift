@@ -43,6 +43,7 @@ class ModelManagementTable: UITableViewController {
         setupHeader()
         setupNavigationBarItem()
         createAddModelButton()
+        tableView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(modelLongPressed(_:))))
         NotificationCenter.default.addObserver(self, selector: #selector(fileDownloaded), name: .fileDownloaded, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(removeBlankScreen), name: .removeBlankScreen, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(stopRotatingImageView), name: .autoSynced, object: nil);
@@ -327,13 +328,20 @@ class ModelManagementTable: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // A model file on this phone decides the type, classes and size the popup offers.
-        let modelURL = FileManager.getDocumentsDirectory().appendingPathComponent(Common.returnModelItem(modelName: models[indexPath.row]).name)
-        let fileCheck = FileManager.default.fileExists(atPath: modelURL.path) ? ModelFileCheck.check(fileAt: modelURL.path) : nil
-        popupWindow = popupWindowView(frame: .zero, models[indexPath.row], "", "", fileCheck: fileCheck)
+        let displayName = models[indexPath.row]
         selectedIndex = indexPath
-        createBlankScreen()
-        createPopupWindow()
+        let showPopup = { (fileCheck: ModelFileCheck?) in
+            self.popupWindow = popupWindowView(frame: .zero, displayName, "", "", fileCheck: fileCheck)
+            self.createBlankScreen()
+            self.createPopupWindow()
+        }
+        // A model file on this phone decides the type, classes and size the popup offers.
+        guard let model = Common.modelItem(displayName: displayName),
+              FileManager.default.fileExists(atPath: FileManager.getDocumentsDirectory().appendingPathComponent(model.name).path) else {
+            showPopup(nil)
+            return
+        }
+        ModelFileCheck.check(fileAt: FileManager.getDocumentsDirectory().appendingPathComponent(model.name).path, completion: showPopup)
     }
 
     /// function to download the model from internet and save it in local storage.
@@ -426,6 +434,52 @@ class ModelManagementTable: UITableViewController {
         } else {
             tableView.reloadRows(at: [selectedIndex], with: .bottom);
         }
+    }
+
+    /// Long press on a model the user added asks to delete it for good.
+    @objc func modelLongPressed(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began,
+              let indexPath = tableView.indexPathForRow(at: gesture.location(in: tableView)),
+              indexPath.row < models.count else {
+            return
+        }
+        // Deleting is for good, so only an exact, single match is used and a shared name is never guessed.
+        let matches = Common.loadAllModelItems().filter { Common.displayName(of: $0) == models[indexPath.row] }
+        guard matches.count == 1, let model = matches.first, Common.isUserModel(name: model.name) else {
+            return
+        }
+        let alert = UIAlertController(title: Strings.deleteModelPermanentTitle,
+                message: String(format: Strings.deleteModelPermanentMessageFormat, models[indexPath.row]), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.cancel, style: .cancel))
+        alert.addAction(UIAlertAction(title: Strings.okAction, style: .destructive) { _ in
+            self.deleteModelEverywhere(model)
+        })
+        present(alert, animated: true)
+    }
+
+    /// Deletes a model the user added from Google Drive and the shared list, then from this phone.
+    func deleteModelEverywhere(_ model: ModelItem) {
+        guard Authentication.googleAuthentication.googleSignIn.currentUser != nil else {
+            deleteModelFromPhone(model)
+            return
+        }
+        // This phone keeps the model until Drive is done, otherwise the next sync would bring it back.
+        Authentication.googleAuthentication.deleteModelEverywhere(model) { isDone in
+            DispatchQueue.main.async {
+                if isDone {
+                    self.deleteModelFromPhone(model)
+                } else {
+                    self.showMessage(Strings.deleteModelFailed)
+                }
+            }
+        }
+    }
+
+    /// Deletes the model file and its entry on this phone.
+    func deleteModelFromPhone(_ model: ModelItem) {
+        try? FileManager.default.removeItem(at: FileManager.getDocumentsDirectory().appendingPathComponent(model.name))
+        try? Common.saveConfigFileToDocument(modelItems: Common.loadAllModelItems().filter { $0.name != model.name })
+        updateModelItemList(type: "All")
     }
 
     @objc func updateConnect(_ notification: Notification) {

@@ -178,24 +178,24 @@ class BottomSheet: UIViewController, UITableViewDataSource, UITableViewDelegate,
         // Check a temporary copy; the model is added to the app only on Done.
         let checkURL = FileManager.default.temporaryDirectory.appendingPathComponent("model_check.tflite")
         try? FileManager.default.removeItem(at: checkURL)
-        let fileCheck = (try? FileManager.default.copyItem(at: url, to: checkURL)) != nil ? ModelFileCheck.check(fileAt: checkURL.path) : nil
-        guard let fileCheck = fileCheck else {
-            try? FileManager.default.removeItem(at: checkURL)
+        let modelName = url.lastPathComponent.firstIndex(of: ".").map { String(url.lastPathComponent.prefix(upTo: $0)) } ?? url.lastPathComponent
+        guard (try? FileManager.default.copyItem(at: url, to: checkURL)) != nil else {
             showMessage(Strings.modelNotSupported)
             return
         }
-        let vc = self
-        if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.large()]
+        ModelFileCheck.check(fileAt: checkURL.path) { fileCheck in
+            guard let fileCheck = fileCheck else {
+                try? FileManager.default.removeItem(at: checkURL)
+                self.showMessage(Strings.modelNotSupported)
+                return
+            }
+            if let sheet = self.sheetPresentationController {
+                sheet.detents = [.large()]
+            }
+            let popWindowView = popupWindowView(frame: CGRect(x: 10, y: 0, width: width - 20, height: 400), modelName, "", "ASSET", fileCheck: fileCheck, pickedFileURL: checkURL)
+            self.view.addSubview(popWindowView);
+            popWindowView.backgroundColor = Colors.freeRoamButtonsColor
         }
-        let index = url.lastPathComponent.firstIndex(of: ".");
-        var modelName: String = ""
-        if index != nil {
-            modelName = String(url.lastPathComponent.prefix(upTo: index!))
-        }
-        let popWindowView = popupWindowView(frame: CGRect(x: 10, y: 0, width: width - 20, height: 400), modelName, "", "ASSET", fileCheck: fileCheck, pickedFileURL: checkURL)
-        view.addSubview(popWindowView);
-        popWindowView.backgroundColor = Colors.freeRoamButtonsColor
     }
 
     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {

@@ -218,3 +218,8 @@
 
 /* Model Management when a picked or downloaded file is not a model the app can run */
 "modelNotSupported" = "此模型无法在 OpenBot 中运行。请使用自动驾驶、导航、MobileNet、EfficientDet、YOLOv4 或 YOLOv5 模型。";
+
+/* Model Management: long press on a model the user added */
+"deleteModelPermanentTitle" = "永久删除？";
+"deleteModelPermanentMessageFormat" = "%@ 将被永久删除。";
+"deleteModelFailed" = "无法删除模型。请检查网络连接后重试。";

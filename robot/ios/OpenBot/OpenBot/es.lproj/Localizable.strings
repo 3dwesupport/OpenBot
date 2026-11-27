@@ -218,3 +218,8 @@
 
 /* Model Management when a picked or downloaded file is not a model the app can run */
 "modelNotSupported" = "Este modelo no se puede ejecutar en OpenBot. Usa un modelo de piloto automático, navegación, MobileNet, EfficientDet, YOLOv4 o YOLOv5.";
+
+/* Model Management: long press on a model the user added */
+"deleteModelPermanentTitle" = "¿Eliminar de forma permanente?";
+"deleteModelPermanentMessageFormat" = "%@ se eliminará de forma permanente.";
+"deleteModelFailed" = "No se pudo eliminar el modelo. Comprueba tu conexión a internet e inténtalo de nuevo.";

@@ -28,7 +28,12 @@ export function readTfliteModel(buffer) {
             return {start: 0, length: 0};
         }
         const start = follow(position);
-        return {start: start + 4, length: view.getUint32(start, true)};
+        const length = view.getUint32(start, true);
+        // A corrupt file can claim a huge vector; every item here takes 4 bytes.
+        if (start + 4 + length * 4 > bytes.length) {
+            throw new Error("Invalid TensorFlow Lite model");
+        }
+        return {start: start + 4, length};
     };
     const readString = (table, index) => {
         const position = field(table, index);

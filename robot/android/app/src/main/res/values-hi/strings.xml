@@ -62,6 +62,9 @@
     <string name="save_option">सेव विकल्प</string>
     <string name="file_available_body">इसी नाम का एक मॉडल पहले से मौजूद है। क्या आप इसे बदलना चाहते हैं?</string>
     <string name="model_not_supported">यह मॉडल OpenBot में नहीं चल सकता। ऑटोपायलट, नेविगेशन, MobileNet, EfficientDet, YOLOv4 या YOLOv5 मॉडल का उपयोग करें।</string>
+    <string name="model_delete_permanent_title">हमेशा के लिए हटाएं?</string>
+    <string name="model_delete_permanent_body">%1$s हमेशा के लिए हटा दिया जाएगा।</string>
+    <string name="model_delete_failed">मॉडल हटाया नहीं जा सका। अपना इंटरनेट कनेक्शन जांचें और फिर से कोशिश करें।</string>
     <string name="file_available_title">फ़ाइल मिली</string>
     <string name="model_delete_body">क्या आप वाकई इस मॉडल को हटाना चाहते हैं?</string>
     <string name="model_delete_title">पुष्टि करें</string>

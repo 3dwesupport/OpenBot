@@ -504,13 +504,14 @@ class Authentication {
        - fileData:
        - fileId:
      */
-    func updateFileInDrive(fileData: Data, fileId: String) {
+    func updateFileInDrive(fileData: Data, fileId: String, completion: ((Error?) -> Void)? = nil) {
         let uploadParameters = GTLRUploadParameters(data: fileData, mimeType: "application/json")
         let query = GTLRDriveQuery_FilesUpdate.query(withObject: GTLRDrive_File(), fileId: fileId, uploadParameters: uploadParameters)
         service.executeQuery(query) { _, _, error in
             if let error = error {
                 print(error.localizedDescription)
             }
+            completion?(error)
         }
     }
 
@@ -556,6 +557,72 @@ class Authentication {
                 }
             }
         }
+    }
+
+    /**
+     Function to delete a model for good: its entry in the shared config file, then its file in Drive
+     - Parameters:
+       - model: the model to delete
+       - completion: called with true when Drive is done, false when it couldn't be changed
+     */
+    func deleteModelEverywhere(_ model: ModelItem, completion: @escaping (Bool) -> Void) {
+        findConfigFileId { fileId, error in
+            if error != nil {
+                completion(false)
+                return
+            }
+            // There is no shared list yet, so there is nothing to delete in Drive.
+            guard let fileId = fileId else {
+                completion(true)
+                return
+            }
+            self.downloadFile(withId: fileId, accessToken: self.googleSignIn.currentUser?.accessToken.tokenString ?? "") { data, error in
+                var driveModels = data.map { ModelItem.decodeList(from: $0) } ?? []
+                // Never write a list that couldn't be read.
+                guard error == nil, !driveModels.isEmpty else {
+                    completion(false)
+                    return
+                }
+                let entryPath = driveModels.first { $0.name == model.name }?.path ?? ""
+                let driveFileId = Authentication.driveFileId(from: entryPath) ?? Authentication.driveFileId(from: model.path)
+                driveModels.removeAll { $0.name == model.name }
+                guard let updatedList = Authentication.encodeModels(driveModels) else {
+                    completion(false)
+                    return
+                }
+                self.updateFileInDrive(fileData: updatedList, fileId: fileId) { error in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    // The list is saved, so the model file can go to the Drive trash.
+                    if let driveFileId = driveFileId {
+                        self.trashFile(fileId: driveFileId)
+                    }
+                    completion(true)
+                }
+            }
+        }
+    }
+
+    /// Moves a Drive file to the trash.
+    func trashFile(fileId: String) {
+        let file = GTLRDrive_File()
+        file.trashed = NSNumber(value: true)
+        let query = GTLRDriveQuery_FilesUpdate.query(withObject: file, fileId: fileId, uploadParameters: nil)
+        service.executeQuery(query) { _, _, error in
+            if let error = error {
+                print("Couldn't move the model file to the Drive trash:", error)
+            }
+        }
+    }
+
+    /// Returns the Drive file id of a link like https://drive.google.com/uc?id=ID&export=download
+    static func driveFileId(from link: String) -> String? {
+        guard link.hasPrefix("https://drive.google.com") else {
+            return nil
+        }
+        return URLComponents(string: link)?.queryItems?.first { $0.name == "id" }?.value
     }
 
     /**

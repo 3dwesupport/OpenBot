@@ -71,14 +71,19 @@ class popupWindowView: UIView {
 
     /// function to setup models list.
     func setupModelItem() {
-        model = Common.returnModelItem(modelName: modelName)
+        if let fileCheck = fileCheck, pickedFileURL != nil {
+            // A picked file is a new model, and one with the same name replaces it.
+            let fileName = modelName + Strings.tflite
+            let allModels = Common.loadAllModelItems()
+            let id = allModels.first { $0.name == fileName }?.id ?? (allModels.map { $0.id }.max() ?? 0) + 1
+            model = ModelItem(id: id, class: fileCheck.classes[0], type: fileCheck.type, name: fileName, pathType: pathType, path: "", inputSize: fileCheck.inputSize)
+        } else {
+            model = Common.modelItem(displayName: modelName) ?? Common.returnModelItem(modelName: modelName)
+        }
         originalName = model.name
         // Adding sets the path type, editing keeps it.
         if !pathType.isEmpty {
             model.pathType = pathType
-        }
-        if pickedFileURL != nil && !model.name.hasSuffix(Strings.tflite) {
-            model.name.append(Strings.tflite)
         }
         if let fileCheck = fileCheck {
             model.type = fileCheck.type
@@ -338,8 +343,13 @@ class popupWindowView: UIView {
             try? FileManager.default.removeItem(at: modelURL)
             try FileManager.default.moveItem(at: pickedFileURL, to: modelURL)
         }
-        // A renamed model keeps its file and leaves its old name in the shared list.
-        let isRenamed = pathType.isEmpty && model.name != originalName
+        // Models that ship with the app keep their name; a renamed model of the user keeps its file
+        // and leaves its old name in the shared list.
+        let isEditing = pathType.isEmpty
+        if isEditing && !Common.isUserModel(name: originalName) {
+            model.name = originalName
+        }
+        let isRenamed = isEditing && model.name != originalName
         if isRenamed {
             try? FileManager.default.moveItem(at: documentsURL.appendingPathComponent(originalName), to: documentsURL.appendingPathComponent(model.name))
         }

@@ -302,6 +302,16 @@ struct ModelFileCheck {
         }
     }
 
+    /// Reads a model file off the main thread, then calls back on the main thread.
+    static func check(fileAt path: String, completion: @escaping (ModelFileCheck?) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = check(fileAt: path)
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+    }
+
     /// Applies the rules to the model inputs and outputs; returns nil when unsupported.
     static func check(inputs: [(name: String, shape: [Int])], outputs: [(name: String, shape: [Int])]) -> ModelFileCheck? {
         guard let image = inputs.first(where: { $0.shape.count == 4 }) else {

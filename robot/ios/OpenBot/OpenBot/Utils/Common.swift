@@ -107,19 +107,7 @@ class Common {
     ///
     /// - Returns: list of names of the loaded models
     static func loadAllModelsName() -> [String] {
-        var models: [String] = []
-        let allModels = loadAllModelItems()
-        for model in allModels {
-            if model.name != "" {
-                let index = model.name.firstIndex(of: ".")
-                if index == nil {
-                    models.append(model.name);
-                } else {
-                    models.append(String(model.name.prefix(upTo: index!)))
-                }
-            }
-        }
-        return models
+        loadAllModelItems().filter { $0.name != "" }.map { displayName(of: $0) }
     }
 
     /// Get a modelItem from its name
@@ -172,6 +160,23 @@ class Common {
             }
         }
         return false
+    }
+
+    /// True for a model the user added, false for one that ships with the app.
+    static func isUserModel(name: String) -> Bool {
+        let bundledModels = loadAllModelItemsFromBundle()
+        // An unreadable bundled list must never make a built-in model deletable.
+        return !bundledModels.isEmpty && !bundledModels.contains { $0.name == name }
+    }
+
+    /// The name shown in the model list: the file name up to the first ".".
+    static func displayName(of model: ModelItem) -> String {
+        model.name.firstIndex(of: ".").map { String(model.name.prefix(upTo: $0)) } ?? model.name
+    }
+
+    /// The model shown in the list under this exact name, nil when there is none.
+    static func modelItem(displayName: String) -> ModelItem? {
+        loadAllModelItems().first { self.displayName(of: $0) == displayName }
     }
 
     /// Informs whether the desired modelItem associated to a given document

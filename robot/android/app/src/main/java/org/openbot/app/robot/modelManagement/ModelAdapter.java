@@ -37,6 +37,8 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ViewHolder> 
     void onModelDownloaded(boolean status, Model mItem);
 
     void onModelDelete(Model mItem);
+
+    void onModelLongClick(Model mItem);
   }
 
   public ModelAdapter(
@@ -58,6 +60,13 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ViewHolder> 
     holder.mItem = mValues.get(position);
     holder.title.setText(FileUtils.nameWithoutExtension(mValues.get(position).getName()));
     holder.title.setOnClickListener(v -> itemClickListener.onItemClick(holder.mItem));
+    View.OnLongClickListener longClickListener =
+        v -> {
+          itemClickListener.onModelLongClick(holder.mItem);
+          return true;
+        };
+    holder.title.setOnLongClickListener(longClickListener);
+    holder.itemView.setOnLongClickListener(longClickListener);
     holder.imgDownload.setOnClickListener(
         v -> {
           if (itemClickListener.onModelDownloadClicked()) {

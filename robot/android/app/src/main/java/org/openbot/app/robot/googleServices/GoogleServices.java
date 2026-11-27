@@ -43,6 +43,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import org.openbot.app.robot.databinding.FragmentProjectsBinding;
 import org.openbot.app.robot.env.SharedPreferencesManager;
 import org.openbot.app.robot.modelManagement.ModelAdapter;
@@ -552,6 +553,73 @@ public class GoogleServices extends Fragment {
               }
             })
         .start();
+  }
+
+  /** True when a Google account is signed in, so Drive can be used. */
+  public boolean isSignedIn() {
+    return getDriveService() != null;
+  }
+
+  /**
+   * Deletes a model for good from Drive: its entry in the shared config.json, then its file, which
+   * goes to the Drive trash.
+   *
+   * @param callback Called on the main thread with true when Drive is done, false when it couldn't
+   *     be changed.
+   */
+  public void deleteModelEverywhere(Model model, Consumer<Boolean> callback) {
+    Drive driveService = getDriveService();
+    if (driveService == null || model == null) {
+      callback.accept(false);
+      return;
+    }
+    Gson gson = new GsonBuilder().create();
+    new Thread(
+            () -> {
+              boolean isDone = false;
+              try {
+                String folderId = findPlaygroundFolderId(driveService);
+                String configFileId =
+                    folderId != null ? findConfigFileId(driveService, folderId) : null;
+                // With no shared list yet, there is nothing to delete in Drive.
+                if (configFileId == null) {
+                  isDone = true;
+                } else {
+                  List<Model> modelList =
+                      parseModelList(gson, readFile(driveService, configFileId));
+                  // Never write a list that couldn't be read.
+                  if (modelList.isEmpty()) throw new IOException("Shared model list is empty");
+                  String driveFileId = null;
+                  for (Iterator<Model> iterator = modelList.iterator(); iterator.hasNext(); ) {
+                    Model entry = iterator.next();
+                    if (!entry.name.equals(model.name)) continue;
+                    if (driveFileId == null)
+                      driveFileId = FileUtils.driveFileIdFromLink(entry.path);
+                    iterator.remove();
+                  }
+                  if (driveFileId == null) driveFileId = FileUtils.driveFileIdFromLink(model.path);
+                  ByteArrayContent content =
+                      ByteArrayContent.fromString("application/json", gson.toJson(modelList));
+                  driveService.files().update(configFileId, null, content).execute();
+                  isDone = true;
+                  // The list is saved, so the model file can go to the Drive trash.
+                  if (driveFileId != null) trashFile(driveService, driveFileId);
+                }
+              } catch (IOException e) {
+                Log.w(TAG, "Couldn't delete the model from Drive", e);
+              }
+              boolean result = isDone;
+              mActivity.runOnUiThread(() -> callback.accept(result));
+            })
+        .start();
+  }
+
+  private static void trashFile(Drive driveService, String fileId) {
+    try {
+      driveService.files().update(fileId, new File().setTrashed(true)).execute();
+    } catch (IOException e) {
+      Log.w(TAG, "Couldn't move the model file to the Drive trash", e);
+    }
   }
 
   /** Replaces, adds or removes the model with the same name in the list. */

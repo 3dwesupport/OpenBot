@@ -23,6 +23,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.openbot.app.robot.googleServices.GoogleServices;
 import org.openbot.app.robot.projects.GoogleSignInCallback;
 import org.openbot.app.robot.tflite.Model;
@@ -126,15 +128,7 @@ public class FileUtils {
    */
   public static void restoreDownloadLinks(
       Activity activity, List<Model> modelList, boolean keepDownloaded) {
-    List<Model> bundledModels;
-    try (InputStreamReader reader =
-        new InputStreamReader(activity.getAssets().open("config.json"))) {
-      bundledModels = new Gson().fromJson(reader, new TypeToken<List<Model>>() {}.getType());
-    } catch (IOException | JsonParseException e) {
-      Log.w(TAG, "Bundled config.json is unreadable", e);
-      return;
-    }
-    if (bundledModels == null) return;
+    List<Model> bundledModels = loadBundledModels(activity);
     for (Model model : modelList) {
       if (isWebLink(model.path) || model.pathType == Model.PATH_TYPE.ASSET) continue;
       if (keepDownloaded && model.pathType == Model.PATH_TYPE.FILE) continue;
@@ -145,6 +139,36 @@ public class FileUtils {
         }
       }
     }
+  }
+
+  /** Models that ship with the app. */
+  private static List<Model> loadBundledModels(Activity activity) {
+    try (InputStreamReader reader =
+        new InputStreamReader(activity.getAssets().open("config.json"))) {
+      List<Model> models = new Gson().fromJson(reader, new TypeToken<List<Model>>() {}.getType());
+      return models != null ? models : new ArrayList<>();
+    } catch (IOException | JsonParseException e) {
+      Log.w(TAG, "Bundled config.json is unreadable", e);
+      return new ArrayList<>();
+    }
+  }
+
+  /** True for a model the user added, false for one that ships with the app. */
+  public static boolean isUserModel(Activity activity, Model model) {
+    List<Model> bundledModels = loadBundledModels(activity);
+    // An unreadable bundled list must never make a built-in model deletable.
+    if (bundledModels.isEmpty()) return false;
+    for (Model bundledModel : bundledModels) {
+      if (bundledModel.name.equals(model.name)) return false;
+    }
+    return true;
+  }
+
+  /** Returns the Drive file id of a link like https://drive.google.com/uc?id=ID&export=download. */
+  public static String driveFileIdFromLink(String link) {
+    if (link == null || !link.startsWith("https://drive.google.com")) return null;
+    Matcher matcher = Pattern.compile("[?&]id=([^&]+)").matcher(link);
+    return matcher.find() ? matcher.group(1) : null;
   }
 
   public static boolean isWebLink(String path) {

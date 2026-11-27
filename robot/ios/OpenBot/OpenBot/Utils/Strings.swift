@@ -214,6 +214,9 @@ struct Strings {
     static var firebaseNotConfigured: String { L10n.string("firebaseNotConfigured") }
     static var modelClassMismatch: String { L10n.string("modelClassMismatch") }
     static var modelNotSupported: String { L10n.string("modelNotSupported") }
+    static var deleteModelPermanentTitle: String { L10n.string("deleteModelPermanentTitle") }
+    static var deleteModelPermanentMessageFormat: String { L10n.string("deleteModelPermanentMessageFormat") }
+    static var deleteModelFailed: String { L10n.string("deleteModelFailed") }
 
     // Profile screen
     static var myProfileHeading: String { L10n.string("myProfileHeading") }

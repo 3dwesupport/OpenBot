@@ -172,29 +172,30 @@ public class ModelManagementFragment extends Fragment
 
   /** Copies the picked file to a temporary file and adds it only if the app can run it. */
   private void processModelFromStorage(List<Uri> files, String fileName) {
-    File checkFile = new File(requireActivity().getCacheDir(), "model_check.tflite");
+    // The activity is read now, because the fragment can be gone when the copy ends.
+    Activity activity = requireActivity();
+    File checkFile = new File(activity.getCacheDir(), "model_check.tflite");
     new Thread(
             () -> {
-              ModelFileCheck.Settings settings = copyAndCheck(files.get(0), checkFile);
-              if (!isAdded()) return;
-              requireActivity()
-                  .runOnUiThread(
-                      () -> {
-                        if (settings == null) {
-                          checkFile.delete();
-                          Toast.makeText(
-                                  requireContext(), R.string.model_not_supported, Toast.LENGTH_LONG)
-                              .show();
-                        } else {
-                          showAddModelDialog(checkFile, fileName, settings);
-                        }
-                      });
+              ModelFileCheck.Settings settings = copyAndCheck(activity, files.get(0), checkFile);
+              activity.runOnUiThread(
+                  () -> {
+                    if (!isAdded() || settings == null) {
+                      checkFile.delete();
+                      if (isAdded()) {
+                        Toast.makeText(activity, R.string.model_not_supported, Toast.LENGTH_LONG)
+                            .show();
+                      }
+                    } else {
+                      showAddModelDialog(checkFile, fileName, settings);
+                    }
+                  });
             })
         .start();
   }
 
-  private ModelFileCheck.Settings copyAndCheck(Uri uri, File checkFile) {
-    try (InputStream inputStream = requireActivity().getContentResolver().openInputStream(uri)) {
+  private ModelFileCheck.Settings copyAndCheck(Activity activity, Uri uri, File checkFile) {
+    try (InputStream inputStream = activity.getContentResolver().openInputStream(uri)) {
       FileUtils.copyFile(inputStream, checkFile.getName(), checkFile.getParent());
       return ModelFileCheck.check(checkFile);
     } catch (IOException e) {
@@ -366,7 +367,7 @@ public class ModelManagementFragment extends Fragment
   public void onItemClick(Model item) {
 
     // Only a model file on this phone can be read, other models keep their type and size.
-    File modelFile = new File(item.path);
+    File modelFile = new File(item.path != null ? item.path : "");
     if (!modelFile.isFile()) modelFile = new File(requireActivity().getFilesDir(), item.name);
     ModelFileCheck.Settings settings =
         item.pathType == Model.PATH_TYPE.FILE && modelFile.isFile()
@@ -469,6 +470,51 @@ public class ModelManagementFragment extends Fragment
     builder.setNegativeButton("Cancel", (dialog, id) -> {});
     AlertDialog dialog = builder.create();
     dialog.show();
+  }
+
+  /** Long press on a model the user added asks to delete it for good. */
+  @Override
+  public void onModelLongClick(Model mItem) {
+    if (!FileUtils.isUserModel(requireActivity(), mItem)) return;
+    new AlertDialog.Builder(requireActivity())
+        .setTitle(R.string.model_delete_permanent_title)
+        .setMessage(
+            getString(
+                R.string.model_delete_permanent_body, FileUtils.nameWithoutExtension(mItem.name)))
+        .setPositiveButton(android.R.string.ok, (dialog, id) -> deleteModelEverywhere(mItem))
+        .setNegativeButton(android.R.string.cancel, null)
+        .show();
+  }
+
+  /** Deletes a model the user added from Google Drive and the shared list, then from this phone. */
+  private void deleteModelEverywhere(Model mItem) {
+    if (!googleServices.isSignedIn()) {
+      deleteModelFromPhone(mItem);
+      return;
+    }
+    // This phone keeps the model until Drive is done, otherwise the next sync would bring it back.
+    googleServices.deleteModelEverywhere(
+        mItem,
+        isDone -> {
+          if (!isAdded()) return;
+          if (isDone) deleteModelFromPhone(mItem);
+          else
+            Toast.makeText(requireContext(), R.string.model_delete_failed, Toast.LENGTH_LONG)
+                .show();
+        });
+  }
+
+  /** Deletes the model file and its entry on this phone. */
+  private void deleteModelFromPhone(Model mItem) {
+    File modelFile = new File(mItem.path != null ? mItem.path : "");
+    if (!modelFile.isFile()) modelFile = new File(requireActivity().getFilesDir(), mItem.name);
+    modelFile.delete();
+    // The list is read again, because a sync can have changed it after this screen opened.
+    List<Model> latestList = FileUtils.loadConfigJSONFromAsset(requireActivity());
+    if (latestList != null) masterList = latestList;
+    masterList.removeIf(model -> model.name.equals(mItem.name));
+    FileUtils.updateModelConfig(requireActivity(), requireContext(), masterList, false);
+    showModels(loadModelList(binding.modelSpinner.getSelectedItem().toString()));
   }
 
   private final ActivityResultLauncher<String> requestPermissionLauncher =

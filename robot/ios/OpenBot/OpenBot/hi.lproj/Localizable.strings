@@ -218,3 +218,8 @@
 
 /* Model Management when a picked or downloaded file is not a model the app can run */
 "modelNotSupported" = "यह मॉडल OpenBot में नहीं चल सकता। ऑटोपायलट, नेविगेशन, MobileNet, EfficientDet, YOLOv4 या YOLOv5 मॉडल का उपयोग करें।";
+
+/* Model Management: long press on a model the user added */
+"deleteModelPermanentTitle" = "हमेशा के लिए हटाएं?";
+"deleteModelPermanentMessageFormat" = "%@ हमेशा के लिए हटा दिया जाएगा।";
+"deleteModelFailed" = "मॉडल हटाया नहीं जा सका। अपना इंटरनेट कनेक्शन जांचें और फिर से कोशिश करें।";

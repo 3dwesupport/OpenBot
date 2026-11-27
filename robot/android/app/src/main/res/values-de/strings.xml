@@ -62,6 +62,9 @@
     <string name="save_option">Speicher-&#8203;Optionen</string>
     <string name="file_available_body">Ein Modell mit demselben Namen existiert bereits. Möchten Sie es ersetzen?</string>
     <string name="model_not_supported">Dieses Modell kann in OpenBot nicht ausgeführt werden. Verwende ein Autopilot-, Navigations-, MobileNet-, EfficientDet-, YOLOv4- oder YOLOv5-Modell.</string>
+    <string name="model_delete_permanent_title">Endgültig löschen?</string>
+    <string name="model_delete_permanent_body">%1$s wird endgültig gelöscht.</string>
+    <string name="model_delete_failed">Das Modell konnte nicht gelöscht werden. Prüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="file_available_title">Datei gefunden</string>
     <string name="model_delete_body">Möchten Sie dieses Modell wirklich löschen?</string>
     <string name="model_delete_title">Bestätigen</string>
